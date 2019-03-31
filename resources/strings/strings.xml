@@ -1,0 +1,7 @@
+<strings>
+    <string id="AppName">ReturnToRun</string>
+    <string id="WarmUp">Warm Up</string>
+    <string id="CoolDown">Cool Down</string>
+    <string id="Walk">Walk</string>
+    <string id="Run">Run</string>
+</strings>
