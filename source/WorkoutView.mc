@@ -1,5 +1,5 @@
-using Toybox.WatchUi;
 using Toybox.Timer;
+using Toybox.WatchUi;
 
 class WorkoutView extends WatchUi.View {
 
@@ -8,7 +8,7 @@ class WorkoutView extends WatchUi.View {
 	var currentActivity;
 	
 	var timer;
-	var timeLeft = 60;
+	var timeLeft;
 	var countdownLabel;
 	var activityNameLabel;
 
@@ -56,6 +56,7 @@ class WorkoutView extends WatchUi.View {
     	currentActivity = workout.getActivityAtIndex(currentActivityIndex);
     	if (currentActivity == null) {
     		timer.stop();
+			attentionForWorkoutComplete();
     		return;
     	}
     	
@@ -63,6 +64,8 @@ class WorkoutView extends WatchUi.View {
     	showTimeLeft();
     	
     	showCurrentActivityName();
+    	
+    	attentionForNewActivity(currentActivity.type);
     }
 
 	function showCurrentActivityName() {
