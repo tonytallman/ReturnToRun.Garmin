@@ -6,27 +6,27 @@ class Activity {
 function createWarmUpActivity() {
 	var activity = new Activity();
 	activity.type = WarmUp;
-	activity.seconds = 5;
+	activity.seconds = 300;
 	return activity;
 }
 
 function createCoolDownActivity() {
 	var activity = new Activity();
 	activity.type = CoolDown;
-	activity.seconds = 5;
+	activity.seconds = 300;
 	return activity;
 }
 
 function createWalkActivity(seconds) {
 	var activity = new Activity();
 	activity.type = Walk;
-	activity.seconds = 5;
+	activity.seconds = seconds;
 	return activity;
 }
 
 function createRunActivity(seconds) {
 	var activity = new Activity();
 	activity.type = Run;
-	activity.seconds = 5;
+	activity.seconds = seconds;
 	return activity;
 }
