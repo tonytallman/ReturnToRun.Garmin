@@ -1,0 +1,10 @@
+Start workout
+Open menu
+Workout results
+Save completed workout in fit file
+Recommend workout
+Add icon
+Add launch screen
+Translate
+Add more devices
+Submit to store

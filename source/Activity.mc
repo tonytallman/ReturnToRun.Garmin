@@ -3,17 +3,17 @@ class Activity {
 	var seconds;
 }
 
-function createWarmUpActivity() {
+function createWarmUpActivity(seconds) {
 	var activity = new Activity();
 	activity.type = WarmUp;
-	activity.seconds = 300;
+	activity.seconds = seconds;
 	return activity;
 }
 
-function createCoolDownActivity() {
+function createCoolDownActivity(seconds) {
 	var activity = new Activity();
 	activity.type = CoolDown;
-	activity.seconds = 300;
+	activity.seconds = seconds;
 	return activity;
 }
 

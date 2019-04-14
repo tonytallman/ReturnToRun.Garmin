@@ -1,0 +1,20 @@
+<layout id="WorkoutSelectionView">
+    <label id="WorkoutTitleLabel"
+    	x="center" y="top"
+     	text="Workout #1"
+     	color="Graphics.COLOR_WHITE"
+     	justification="Graphics.TEXT_JUSTIFY_CENTER"
+     	font="Graphics.FONT_SMALL" />
+    <label id="WorkoutDescriptionLabel"
+    	x="center" y="28"
+    	text=""
+    	color="Graphics.COLOR_WHITE"
+    	justification="Graphics.TEXT_JUSTIFY_CENTER"
+    	font="Graphics.FONT_MEDIUM" />
+    <label id="WorkoutInstructionsLabel"
+    	x="center" y="bottom"
+     	text="@Strings.WorkoutSelectionViewInstructions"
+     	color="Graphics.COLOR_WHITE"
+     	justification="Graphics.TEXT_JUSTIFY_CENTER"
+     	font="Graphics.FONT_SMALL" />
+</layout>

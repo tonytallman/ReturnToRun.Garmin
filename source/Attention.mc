@@ -15,11 +15,11 @@ function attentionForNewActivity(activityType) {
 function attentionForRunActivity() {
     if (Attention has :vibrate) {
         var vibrateData = [
-            new Attention.VibeProfile(75, 250),
-            new Attention.VibeProfile( 0, 100),
-            new Attention.VibeProfile(75, 250),
-            new Attention.VibeProfile( 0, 100),
-            new Attention.VibeProfile(75, 250)
+            new Attention.VibeProfile(100, 500),
+            new Attention.VibeProfile( 0, 250),
+            new Attention.VibeProfile(100, 500),
+            new Attention.VibeProfile( 0, 250),
+            new Attention.VibeProfile(100, 500)
         ];
 
         Attention.vibrate(vibrateData);
@@ -29,9 +29,9 @@ function attentionForRunActivity() {
 function attentionForWalkActivity() {
     if (Attention has :vibrate) {
         var vibrateData = [
-            new Attention.VibeProfile(40, 750),
+            new Attention.VibeProfile(75, 750),
             new Attention.VibeProfile( 0, 250),
-            new Attention.VibeProfile(40, 750),
+            new Attention.VibeProfile(75, 750),
             new Attention.VibeProfile( 0, 250)
         ];
 
@@ -42,11 +42,11 @@ function attentionForWalkActivity() {
 function attentionForWorkoutComplete() {
     if (Attention has :vibrate) {
         var vibrateData = [
-            new Attention.VibeProfile(40, 750),
+            new Attention.VibeProfile(75, 750),
             new Attention.VibeProfile( 0, 250),
-            new Attention.VibeProfile(40, 750),
+            new Attention.VibeProfile(75, 750),
             new Attention.VibeProfile( 0, 250),
-            new Attention.VibeProfile(40, 750),
+            new Attention.VibeProfile(75, 750),
             new Attention.VibeProfile( 0, 250)
         ];
 

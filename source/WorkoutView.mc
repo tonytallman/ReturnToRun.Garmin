@@ -22,7 +22,7 @@ class WorkoutView extends WatchUi.View {
 
     // Load your resources here
     function onLayout(dc) {
-        setLayout(Rez.Layouts.Countdown(dc));
+        setLayout(Rez.Layouts.WorkoutView(dc));
         countdownLabel = View.findDrawableById("CountdownLabel");
         activityNameLabel = View.findDrawableById("ActivityNameLabel");
         timer = new Timer.Timer();
@@ -72,16 +72,16 @@ class WorkoutView extends WatchUi.View {
 		var activityName = "";    	
     	switch (currentActivity.type) {
     		case WarmUp:
-    			activityName = "Warm Up";
+    			activityName =  WatchUi.loadResource(Rez.Strings.WarmUp);
     			break;
     		case CoolDown:
-    			activityName = "Cool Down";
+    			activityName =  WatchUi.loadResource(Rez.Strings.CoolDown);
     			break;
     		case Walk:
-    			activityName = "Walk";
+    			activityName =  WatchUi.loadResource(Rez.Strings.Walk);
     			break;
     		case Run:
-    			activityName = "Run";
+    			activityName =  WatchUi.loadResource(Rez.Strings.Run);
     			break;
     	}
     	if (activityNameLabel != null) {
@@ -99,18 +99,12 @@ class WorkoutView extends WatchUi.View {
     }
 
 	function showTimeLeft() {        
-        var minutes = timeLeft / 60;
-        var seconds = timeLeft % 60;
-        var string = zeroPadded(minutes) + ":" + zeroPadded(seconds);
+        var string = getTimeAsString(timeLeft);
         
         if (countdownLabel != null) {
 	        countdownLabel.setText(string);
 	    }
         
         WatchUi.requestUpdate();
-    }
-    
-    function zeroPadded(value) {
-    	return ((value < 10) ? "0" : "") + value;
     }
 }

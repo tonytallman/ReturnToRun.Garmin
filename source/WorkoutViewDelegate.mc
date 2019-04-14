@@ -1,6 +1,6 @@
 using Toybox.WatchUi;
 
-class CountdownViewDelegate extends WatchUi.BehaviorDelegate {
+class WorkoutViewDelegate extends WatchUi.BehaviorDelegate {
 
     function initialize() {
         BehaviorDelegate.initialize();

@@ -1,4 +1,4 @@
-<layout id="Countdown">
+<layout id="WorkoutView">
     <label id="ActivityNameLabel"
     	x="center" y="5"
      	text="Run" 
