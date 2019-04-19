@@ -1,5 +1,6 @@
 Start workout
-Open menu
+Show menu
+Pause and resume
 Workout results
 Save completed workout in fit file
 Recommend workout
