@@ -1,0 +1,10 @@
+<resources>
+	<drawable-list id="Seperator">
+		<shape
+			type="rectangle"
+			x="0" y="20"
+			width="200"
+			height="1"
+			color="Gfx.COLOR_BLUE" />
+	</drawable-list>
+</resources>

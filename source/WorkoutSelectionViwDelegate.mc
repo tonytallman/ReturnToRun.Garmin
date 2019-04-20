@@ -11,7 +11,7 @@ class WorkoutSelectionViewDelegate extends WatchUi.BehaviorDelegate {
     function onKey(evt) {
         if (evt.getKey() == KEY_ENTER) {
             var view = new WorkoutView(workoutSelectionView.workout);
-            var delegate = new WorkoutViewDelegate();
+            var delegate = new WorkoutViewDelegate(view);
             WatchUi.pushView(view, delegate, WatchUi.SLIDE_IMMEDIATE);
         }
     }

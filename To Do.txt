@@ -1,4 +1,3 @@
-Start workout
 Show menu
 Pause and resume
 Workout results
