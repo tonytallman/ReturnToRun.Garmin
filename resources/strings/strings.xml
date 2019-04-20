@@ -7,4 +7,7 @@
     <string id="Run">Run</string>
     <string id="WorkoutSelectionViewTitle">Recommended Workout</string>
     <string id="WorkoutSelectionViewInstructions">Press start to begin or press menu.</string>
+    <string id="ChangeWorkout">Change Workout</string>
+    <string id="Instructions">Instructions</string>
+    <string id="About">About</string>
 </strings>

@@ -15,4 +15,9 @@ class WorkoutSelectionViewDelegate extends WatchUi.BehaviorDelegate {
             WatchUi.pushView(view, delegate, WatchUi.SLIDE_IMMEDIATE);
         }
     }
+
+    function onMenu() {
+        WatchUi.pushView(new Rez.Menus.MainMenu(), new MainMenuDelegate(), WatchUi.SLIDE_UP);
+        return true;
+    }
 }

@@ -1,4 +1,6 @@
-Show menu
+Add change workout screen
+Add instructions screen
+Add about screen
 Pause and resume
 Workout results
 Save completed workout in fit file

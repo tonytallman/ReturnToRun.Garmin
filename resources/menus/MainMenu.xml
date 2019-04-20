@@ -1,0 +1,5 @@
+<menu id="MainMenu" title="@Strings.AppName">
+	<menu-item id="ChangeWorkout">@Strings.ChangeWorkout</menu-item>
+	<menu-item id="Instructions">@Strings.Instructions</menu-item>
+	<menu-item id="About">@Strings.About</menu-item>
+</menu>
