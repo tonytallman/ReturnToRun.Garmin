@@ -17,7 +17,7 @@ class ReturnToRunApp extends Application.AppBase {
 
     // Return the initial view of your application here
     function getInitialView() {
-    	var view = new WorkoutSelectionView(36);
+    	var view = new WorkoutSelectionView(0);
     	var delegate = new WorkoutSelectionViewDelegate(view);
         return [view, delegate];
     }

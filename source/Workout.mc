@@ -37,7 +37,7 @@ class Workout {
 }
 
 function getNumberOfWorkouts() {
-	return 13;
+	return 40;
 }
 
 function getWorkoutAtIndex(index) {

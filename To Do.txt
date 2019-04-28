@@ -1,4 +1,3 @@
-Add change workout screen
 Add instructions screen
 Add about screen
 Pause and resume
@@ -10,3 +9,5 @@ Add launch screen
 Translate
 Add more devices
 Submit to store
+Add detail to workout picker
+Override back button during workout
