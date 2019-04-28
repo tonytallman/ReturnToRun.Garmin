@@ -14,8 +14,7 @@ class WorkoutPickerDelegate extends WatchUi.PickerDelegate {
 	}
 
 	function onAccept(values) {
-		var setWorkoutIndex = workoutIndexChangedObserver.method(:setWorkoutIndex);
-		setWorkoutIndex.invoke(values[0]);
+		workoutIndexChangedObserver.setWorkoutIndex(values[0]);
 		WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
 	}
 }
