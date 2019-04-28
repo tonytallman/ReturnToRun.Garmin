@@ -29,10 +29,7 @@ function attentionForRunActivity() {
 function attentionForWalkActivity() {
     if (Attention has :vibrate) {
         var vibrateData = [
-            new Attention.VibeProfile(75, 750),
-            new Attention.VibeProfile( 0, 250),
-            new Attention.VibeProfile(75, 750),
-            new Attention.VibeProfile( 0, 250)
+            new Attention.VibeProfile(75, 1500)
         ];
 
         Attention.vibrate(vibrateData);
