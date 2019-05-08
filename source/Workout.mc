@@ -12,7 +12,7 @@ class Workout {
 	}
 	
 	function getActivityCount() {
-		return repeatCount * 2 + 2;
+		return repeatCount * 2 + 1;
 	}
 	
 	function getActivityAtIndex(index) {
