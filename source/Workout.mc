@@ -1,33 +1,36 @@
+using Toybox.Application;
+using Toybox.Application.Storage as Storage;
+
 class Workout {
 	var warmUpSeconds = 300;
 	var runSeconds;
 	var walkSeconds;
 	var coolDownSeconds = 300;
 	var repeatCount;
-	
+
 	function initialize(runSeconds, walkSeconds, repeatCount) {
 		self.runSeconds = runSeconds;
 		self.walkSeconds = walkSeconds;
 		self.repeatCount = repeatCount;
 	}
-	
+
 	function getActivityCount() {
 		return repeatCount * 2 + 1;
 	}
-	
+
 	function getActivityAtIndex(index) {
 		if (index >= getActivityCount()) {
 			return null;
 		}
-		
+
 		if (index == 0) {
 			return createWarmUpActivity(warmUpSeconds);
 		}
-		
+
 		if (index == getActivityCount() - 1) {
 			return createCoolDownActivity(coolDownSeconds);
 		}
-		
+
 		if ((index % 2) == 1) {
 			return createRunActivity(runSeconds);
 		} else {
@@ -90,7 +93,45 @@ function getWorkoutAtIndex(index) {
 		case 38: return new Workout(1500, 60, 1);
 
 		case 39: return new Workout(1800, 60, 1);
-		
+
 		default: return null;
 	}
+}
+
+private var workoutIndexKey = "WorkoutIndex";
+
+function saveWorkoutIndex(workoutIndex) {
+	if (workoutIndex < 0) {
+		workoutIndex = 0;
+	}
+	if (workoutIndex >= getNumberOfWorkouts()) {
+		workoutIndex = getNumberOfWorkouts() - 1;
+	}
+
+	if (Toybox.Application has :Storage) {
+		Storage.setValue(workoutIndexKey, workoutIndex);
+	} else {
+		Application.getApp().setProperty(workoutIndexKey, workoutIndex);
+	}
+}
+
+function getSavedWorkoutIndex() {
+	var workoutIndex = null;
+	if (Toybox.Application has :Storage) {
+		workoutIndex = Storage.getValue(workoutIndexKey);
+	} else {
+		workoutIndex = Toybox.Application.getApp().getProperty(workoutIndexKey);
+	}
+
+	if (workoutIndex == null) {
+		workoutIndex = 0;
+	}
+	if (workoutIndex < 0) {
+		workoutIndex = 0;
+	}
+	if (workoutIndex >= getNumberOfWorkouts()) {
+		workoutIndex = getNumberOfWorkouts() - 1;
+	}
+
+	return workoutIndex;
 }
