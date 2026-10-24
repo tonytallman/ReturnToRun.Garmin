@@ -28,9 +28,8 @@ class ReturnToRunApp extends Application.AppBase {
 
 	// Return the initial view of your application here
 	function getInitialView() {
-		var workoutIndex = getServices().recommendedWorkoutIndex();
-		var view = new WorkoutSelectionView(workoutIndex);
-		var delegate = new WorkoutSelectionViewDelegate(view);
+		var view = new MainMenuView();
+		var delegate = new MainMenuDelegate();
 		return [view, delegate];
 	}
 }

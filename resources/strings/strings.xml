@@ -1,14 +1,22 @@
 <strings>
     <string id="AppName">Return to Run</string>
-    <string id="Workout">Workout</string>
-    <string id="WarmUp">Warm Up</string>
-    <string id="CoolDown">Cool Down</string>
+    <string id="WarmUp">Warm up</string>
+    <string id="CoolDown">Cool down</string>
     <string id="Walk">Walk</string>
     <string id="Run">Run</string>
-    <string id="WorkoutSelectionViewTitle">Recommended Workout</string>
-    <string id="WorkoutSelectionViewInstructions">Press start to begin or press menu.</string>
-    <string id="ChangeWorkout">Change Workout</string>
-    <string id="Instructions">Instructions</string>
-    <string id="About">About</string>
-	<string id="SelectWorkout">Select Workout</string>
+    <string id="Paused">Paused</string>
+    <string id="TimeLeftSuffix">left</string>
+    <string id="EndWorkoutConfirm">End workout?</string>
+    <string id="Continue">Continue</string>
+    <string id="Cancel">Cancel</string>
+    <string id="WarningTitle">Before you run</string>
+    <string id="AlreadyRanToday">You already ran today</string>
+    <string id="RestDayRecommended">Rest day recommended</string>
+    <string id="TooFewRecentRuns">Can&apos;t reach 4 runs this week</string>
+    <string id="RunAbbrev">R</string>
+    <string id="WalkAbbrev">W</string>
+    <string id="TimesMark">&#215;</string>
+    <string id="MinuteAbbrev">min</string>
+    <string id="WithWalks">with walks</string>
+    <string id="RecommendedMark">&#9733; </string>
 </strings>

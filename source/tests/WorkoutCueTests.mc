@@ -59,12 +59,13 @@ function testIntervalCount(logger as Test.Logger) as Boolean {
 (:test)
 function testSegmentAlerts(logger as Test.Logger) as Boolean {
 	logger.debug("segment alerts");
-	TestSupport.expectEqual(SegmentAlerts.RUN, SegmentAlerts.forActivityType(Run), "run");
-	TestSupport.expectEqual(SegmentAlerts.WALK, SegmentAlerts.forActivityType(WarmUp), "warm-up uses the walk pattern");
-	TestSupport.expectEqual(SegmentAlerts.WALK, SegmentAlerts.forActivityType(Walk), "walk");
-	TestSupport.expectEqual(SegmentAlerts.WALK, SegmentAlerts.forActivityType(CoolDown), "cool-down uses the walk pattern");
+	TestSupport.expectEqual(SegmentAlerts.SEGMENT, SegmentAlerts.forActivityType(Run), "run");
+	TestSupport.expectEqual(SegmentAlerts.SEGMENT, SegmentAlerts.forActivityType(WarmUp), "warm-up");
+	TestSupport.expectEqual(SegmentAlerts.SEGMENT, SegmentAlerts.forActivityType(Walk), "walk");
+	TestSupport.expectEqual(SegmentAlerts.SEGMENT, SegmentAlerts.forActivityType(CoolDown), "cool-down");
 	TestSupport.expectEqual(SegmentAlerts.WORKOUT_COMPLETE, SegmentAlerts.forWorkoutComplete(), "workout complete");
 	TestSupport.expectTrue(SegmentAlerts.forActivityType(CoolDown) != SegmentAlerts.WORKOUT_COMPLETE, "cool-down is not completion");
+	TestSupport.expectTrue(SegmentAlerts.forActivityType(Run) == SegmentAlerts.forActivityType(Walk), "segments share one pulse");
 
 	var repeatCount = 4;
 	var workout = new Workout(60, 60, repeatCount, 300, 300);
@@ -72,11 +73,7 @@ function testSegmentAlerts(logger as Test.Logger) as Boolean {
 	for (var index = 0; index < count; index++) {
 		var activity = workout.getActivityAtIndex(index) as Activity;
 		var alert = SegmentAlerts.forActivityType(activity.type);
-		if ((index % 2) == 1) {
-			TestSupport.expectEqual(SegmentAlerts.RUN, alert, "odd index is a run");
-		} else {
-			TestSupport.expectEqual(SegmentAlerts.WALK, alert, "warm-up, walk, and cool-down");
-		}
+		TestSupport.expectEqual(SegmentAlerts.SEGMENT, alert, "every segment shares one pulse");
 	}
 	TestSupport.expectNull(workout.getActivityAtIndex(count), "no segment past cool-down");
 	return true;
