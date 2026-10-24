@@ -2,35 +2,27 @@ import Toybox.Graphics;
 import Toybox.Lang;
 import Toybox.WatchUi;
 
-// All pre-run warnings on one round-screen page, with Continue and Cancel.
+// The pre-run warning on one round-screen page, with Continue and Cancel.
 // Positions are fractions of the display so the text stays inside the circle.
 class WarningView extends WatchUi.View {
 	var workoutIndex as Number;
-	var lines as Array<String>;
-	var titleText as String;
+	var message as String;
 	var continueText as String;
 	var cancelText as String;
 	var focusContinue as Boolean;
 	var closed as Boolean;
 	var leaveTimer as LeaveTimer;
 
-	function initialize(workoutIndex as Number, warnings as Array<Number>) {
+	function initialize(workoutIndex as Number, warning as Number) {
 		View.initialize();
 		self.workoutIndex = workoutIndex;
 		focusContinue = true;
 		closed = false;
 		leaveTimer = new LeaveTimer();
-		var alreadyRan = WatchUi.loadResource(Rez.Strings.AlreadyRanToday) as String;
-		var restDay = WatchUi.loadResource(Rez.Strings.RestDayRecommended) as String;
-		var tooFew = WatchUi.loadResource(Rez.Strings.TooFewRecentRuns) as String;
-		lines = [] as Array<String>;
-		for (var index = 0; index < warnings.size(); index++) {
-			var line = WarningMessages.lineFor(warnings[index] as Number, alreadyRan, restDay, tooFew);
-			if (line != null) {
-				lines.add(line as String);
-			}
-		}
-		titleText = WatchUi.loadResource(Rez.Strings.WarningTitle) as String;
+		var oncePerDay = WatchUi.loadResource(Rez.Strings.OncePerDayWarning) as String;
+		var sixPerWeek = WatchUi.loadResource(Rez.Strings.SixPerWeekWarning) as String;
+		var text = WarningMessages.messageFor(warning, oncePerDay, sixPerWeek);
+		message = (text != null) ? text as String : "";
 		continueText = WatchUi.loadResource(Rez.Strings.Continue) as String;
 		cancelText = WatchUi.loadResource(Rez.Strings.Cancel) as String;
 	}
@@ -47,20 +39,15 @@ class WarningView extends WatchUi.View {
 		dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
 		dc.clear();
 
-		// Title, then one warning per line, each centered on its own row.
-		dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT);
-		dc.drawText(centerX, height * 17 / 100, Graphics.FONT_XTINY, titleText, center);
-		var lineHeight = dc.getFontHeight(Graphics.FONT_XTINY);
-		var lineY = (height * 17 / 100) + lineHeight + (lineHeight / 4);
+		// The message alone, wrapped to fit the wide middle of the round face.
+		// There is no title, so a full sentence has room for four lines.
+		var wrapped = Graphics.fitTextToArea(message, Graphics.FONT_XTINY, width * 84 / 100, height * 58 / 100, true);
 		dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
-		for (var index = 0; index < lines.size(); index++) {
-			dc.drawText(centerX, lineY, Graphics.FONT_XTINY, lines[index], center);
-			lineY = lineY + lineHeight;
-		}
+		dc.drawText(centerX, height * 37 / 100, Graphics.FONT_XTINY, wrapped, center);
 
 		// The highlight bar and the focused action share one center line.
-		var continueY = height * 68 / 100;
-		var cancelY = height * 82 / 100;
+		var continueY = height * 70 / 100;
+		var cancelY = height * 84 / 100;
 		var focusY = focusContinue ? continueY : cancelY;
 		var barWidth = width * 58 / 100;
 		var barHeight = dc.getFontHeight(Graphics.FONT_SMALL) + 4;

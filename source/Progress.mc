@@ -14,7 +14,7 @@ class Progress {
 		return Recommender.recommend(history.latest(), today, history.maxWorkoutId());
 	}
 
-	function warnings(today as CalendarDay) as Array<Number> {
+	function warning(today as CalendarDay) as Number? {
 		return PreRunWarnings.evaluate(history, today);
 	}
 

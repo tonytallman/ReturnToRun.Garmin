@@ -9,10 +9,8 @@
     <string id="EndWorkoutConfirm">End workout?</string>
     <string id="Continue">Continue</string>
     <string id="Cancel">Cancel</string>
-    <string id="WarningTitle">Before you run</string>
-    <string id="AlreadyRanToday">Already ran today</string>
-    <string id="RestDayRecommended">Rest day advised</string>
-    <string id="TooFewRecentRuns">Can&apos;t get 4 this week</string>
+    <string id="OncePerDayWarning">It is recommended that you run no more than once per day.</string>
+    <string id="SixPerWeekWarning">It is recommended that you run no more than six times per week.</string>
     <string id="RunAbbrev">R</string>
     <string id="WalkAbbrev">W</string>
     <string id="TimesMark">&#215;</string>

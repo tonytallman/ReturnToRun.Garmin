@@ -47,8 +47,8 @@ class AppServices {
 		trainingProgress.addEntry(today, zeroBasedIndex + 1, Rating.GOOD);
 	}
 
-	function warningsForToday() as Array<Number> {
-		return trainingProgress.warnings(currentDay());
+	function warningForToday() as Number? {
+		return trainingProgress.warning(currentDay());
 	}
 
 	function shouldShowProgramComplete() as Boolean {

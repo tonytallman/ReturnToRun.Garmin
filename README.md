@@ -11,7 +11,7 @@ Workout definitions live in `resources-program/data/program.json` and load throu
 `Progress` is the API the screens call:
 
 - add an entry on any date, change a rating, delete one entry, delete an entry and every entry older than it, or clear every entry
-- `recommend(today)` and `warnings(today)`, both pure functions of history plus the date the caller passes in
+- `recommend(today)` and `warning(today)`, both pure functions of history plus the date the caller passes in
 - `shouldShowProgramComplete(today)` and `markProgramCompleteShown()`
 
 The recommended workout is never stored. It is derived from the newest entry.
@@ -26,13 +26,12 @@ Program completion is that same result before clamping. If it would be 41 or hig
 
 ### Pre-run warnings
 
-`PreRunWarnings.evaluate` returns every warning that applies, in this order:
+`PreRunWarnings.evaluate` returns at most one warning, the first that applies in this priority order, or null:
 
-1. `ALREADY_LOGGED_TODAY` — any entry dated today
-2. `SEVEN_CONSECUTIVE_DAYS` — each of the previous 6 calendar days has at least one entry, so a run today would be the 7th day in a row
-3. `TOO_FEW_RECENT_RUNS` — fewer than 3 entries on the previous 6 days, excluding today. Entries are counted, not distinct days, because more than one log on a day counts. Three entries on one recent day is enough; two is not. A day seven days ago does not count.
+1. `ALREADY_LOGGED_TODAY` — any entry dated today. Message: "It is recommended that you run no more than once per day."
+2. `SEVEN_CONSECUTIVE_DAYS` — each of the previous 6 calendar days has at least one entry, so a run today would be the 7th day in a row. Message: "It is recommended that you run no more than six times per week."
 
-The weekly rule is 4 to 6 runs, at most one a day. Even with today's run, fewer than 3 earlier entries in the window cannot make 4. An empty history therefore returns the frequency warning. All three warnings cannot be true together, because six previous days is already at least three runs.
+There is no check for too few recent runs.
 
 ### Screens
 
@@ -42,11 +41,11 @@ The first screen is a Menu2 titled with the app name. Its only item is Run. Back
 
 Run opens a Menu2 with one item per workout. The label is `#1  R1 W1 ×3`: the id, run, walk, and repeat count. A whole number of minutes is `R1` or `R30`; anything else is `m:ss`, such as `R1:30`. One repeat has no walk interval, because `Workout.getActivityAtIndex` replaces that walk with the cool-down, so workout 40 is `#40  R30`. The subtitle is the total of that activity sequence, rounded to the nearest minute (30 seconds and above rounds up). Workout 1 is `15 min with walks`: 15 minutes, not 16, because the last walk is the cool-down rather than an extra interval on top of it. A workout with no walk interval omits `with walks`. The recommended workout is focused, and its subtitle is prefixed with a star.
 
-Choosing a workout runs `PreRunWarnings`. No warnings starts the workout. Otherwise one screen shows every warning that applies, plus Continue and Cancel. Cancel and Back return to the list. Continue starts the workout anyway. Up and Down move between the two actions. Each warning gets its own short line under the title: "Already ran today", "Rest day advised", and "Can't get 4 this week". The view draws text directly so the blue focus bar is centered on the focused action. The workout list marks the recommended workout with "*", because the fēnix 5X fonts have no ★ glyph.
+Choosing a workout runs `PreRunWarnings`. No warning starts the workout. Otherwise one screen shows that warning, plus Continue and Cancel. Cancel and Back return to the list. Continue starts the workout anyway. Up and Down move between the two actions. The message is wrapped to fit the middle of the round face, with no title. The view draws text directly so the blue focus bar is centered on the focused action. The workout list marks the recommended workout with "*", because the fēnix 5X fonts have no ★ glyph.
 
 The in-progress screen shows the step (Warm up, Run, Walk, or Cool down) above a large centered countdown, the time left in the whole workout, and the repeat such as `1/8`. The step is at `10%`, the countdown is centered, the workout time remaining is at `73%`, and the repeat stays centered at the bottom (`85%`). Start/Stop pauses and resumes. While paused, the countdown turns yellow and a Paused label is shown. The timer and the five-second tones stop while paused. Back while running pauses. Back while paused asks "End workout?". Yes returns to the main menu and does not log. No stays paused. Reaching cool-down still logs the workout as Good for today; ending later, during cool-down, does not remove that entry. When the last segment reaches zero, the app returns to the main menu. Save, discard, and the rating screen are phase 3.
 
-Every segment, including warm-up and cool-down, starts with one vibration: duty cycle 100 for 1000 ms. Connect IQ has no built-in vibration preset, so that single pulse is the segment cue. Workout complete is three 500 ms pulses at the same duty cycle, separated by 250 ms gaps. Each of the last five seconds of a segment (5, 4, 3, 2, 1) plays one short tone when the device has `Attention.playTone` and `System.getDeviceSettings().tonesOn` is true. Those beeps do not vibrate, and they do not play while paused. The next segment's vibration follows the last beep. Which seconds beep, which repeat a segment index is, which alert a segment gets, the list text, the duration totals, the warning lines, and the pause transitions are pure functions (`CountdownTones`, `IntervalCount`, `SegmentAlerts`, `WorkoutListFormat`, `WorkoutDuration`, `WarningMessages`, `WorkoutSession`). They do not import the UI.
+Every segment, including warm-up and cool-down, starts with one vibration: duty cycle 100 for 1000 ms. Connect IQ has no built-in vibration preset, so that single pulse is the segment cue. Workout complete is three 500 ms pulses at the same duty cycle, separated by 250 ms gaps. Each of the last five seconds of a segment (5, 4, 3, 2, 1) plays one short tone when the device has `Attention.playTone` and `System.getDeviceSettings().tonesOn` is true. Those beeps do not vibrate, and they do not play while paused. The next segment's vibration follows the last beep. Which seconds beep, which repeat a segment index is, which alert a segment gets, the list text, the duration totals, the warning message, and the pause transitions are pure functions (`CountdownTones`, `IntervalCount`, `SegmentAlerts`, `WorkoutListFormat`, `WorkoutDuration`, `WarningMessages`, `WorkoutSession`). They do not import the UI.
 
 Day differences use a civil calendar, not 86400-second chunks, so a daylight-saving change does not add or remove a day off.
 

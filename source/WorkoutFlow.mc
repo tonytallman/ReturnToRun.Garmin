@@ -8,9 +8,9 @@ function openWorkoutList() as Void {
 }
 
 function openWorkout(workoutIndex as Number) as Void {
-	var warnings = appServices().warningsForToday();
-	if (warnings.size() > 0) {
-		var view = new WarningView(workoutIndex, warnings);
+	var warning = appServices().warningForToday();
+	if (warning != null) {
+		var view = new WarningView(workoutIndex, warning as Number);
 		var delegate = new WarningViewDelegate(view);
 		WatchUi.pushView(view, delegate, WatchUi.SLIDE_LEFT);
 		return;
