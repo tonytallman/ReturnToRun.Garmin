@@ -10,13 +10,13 @@
     <string id="Continue">Continue</string>
     <string id="Cancel">Cancel</string>
     <string id="WarningTitle">Before you run</string>
-    <string id="AlreadyRanToday">You already ran today</string>
-    <string id="RestDayRecommended">Rest day recommended</string>
-    <string id="TooFewRecentRuns">Can&apos;t reach 4 runs this week</string>
+    <string id="AlreadyRanToday">Already ran today</string>
+    <string id="RestDayRecommended">Rest day advised</string>
+    <string id="TooFewRecentRuns">Can&apos;t get 4 this week</string>
     <string id="RunAbbrev">R</string>
     <string id="WalkAbbrev">W</string>
     <string id="TimesMark">&#215;</string>
     <string id="MinuteAbbrev">min</string>
     <string id="WithWalks">with walks</string>
-    <string id="RecommendedMark">&#9733; </string>
+    <string id="RecommendedMark">* </string>
 </strings>
