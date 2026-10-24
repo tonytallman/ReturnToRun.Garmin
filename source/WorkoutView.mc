@@ -1,3 +1,4 @@
+import Toybox.Lang;
 using Toybox.Timer;
 using Toybox.WatchUi;
 

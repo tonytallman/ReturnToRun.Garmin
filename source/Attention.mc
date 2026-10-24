@@ -1,5 +1,5 @@
+import Toybox.Lang;
 using Toybox.Attention;
-using Toybox.Lang;
 using Toybox.System;
 
 function attentionForNewActivity(activityType) {
