@@ -1,21 +1,27 @@
 import Toybox.Lang;
 import Toybox.WatchUi;
 
-// "End workout?" Yes leaves the session without logging. No stays paused.
-class EndWorkoutDelegate extends WatchUi.ConfirmationDelegate {
+// Passes the end-prompt answer to the workout. Back stays paused.
+class EndWorkoutDelegate extends WatchUi.Menu2InputDelegate {
 	var workoutView as WorkoutView;
 
 	function initialize(workoutView as WorkoutView) {
-		ConfirmationDelegate.initialize();
+		Menu2InputDelegate.initialize();
 		self.workoutView = workoutView;
 	}
 
-	function onResponse(response as WatchUi.Confirm) as Boolean {
-		if (response == WatchUi.CONFIRM_YES) {
-			workoutView.confirmEnd();
-		} else {
-			workoutView.declineEnd();
+	function onSelect(item as WatchUi.MenuItem) as Void {
+		var id = item.getId();
+		if (id == WorkoutSession.RESUME) {
+			workoutView.resumeFromEnd();
+		} else if (id == WorkoutSession.SAVE) {
+			workoutView.saveEarly();
+		} else if (id == WorkoutSession.DISCARD) {
+			workoutView.discard();
 		}
-		return true;
+	}
+
+	function onBack() as Void {
+		workoutView.declineEnd();
 	}
 }

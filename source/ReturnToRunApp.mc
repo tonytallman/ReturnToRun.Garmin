@@ -13,8 +13,12 @@ class ReturnToRunApp extends Application.AppBase {
 	function onStart(state) {
 	}
 
-	// onStop() is called when your application is exiting
+	// onStop() is called when your application is exiting.
+	// A run still in progress is saved rather than lost.
 	function onStop(state) {
+		if (services != null) {
+			(services as AppServices).finishActiveRecording();
+		}
 	}
 
 	function getServices() as AppServices {

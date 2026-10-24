@@ -113,10 +113,10 @@ function testCurrentUiMapping(logger as Test.Logger) as Boolean {
 	TestSupport.expectNull(services.workoutAtIndex(-1), "negative index");
 	TestSupport.expectNull(services.workoutAtIndex(40), "past the last workout");
 
-	services.recordCompletedWorkout(4);
+	TestSupport.expectFalse(services.logWorkout(4, Rating.GOOD), "workout 5 does not complete the program");
 	var logged = services.trainingProgress.latest() as HistoryEntry;
-	TestSupport.expectEqual(5, logged.workoutId, "cool-down logs the 1-based id");
-	TestSupport.expectEqual(Rating.GOOD, logged.rating, "the current ui rates the run Good");
+	TestSupport.expectEqual(5, logged.workoutId, "logs the 1-based id");
+	TestSupport.expectEqual(Rating.GOOD, logged.rating, "logs the chosen rating");
 	TestSupport.expectEqual(0, logged.date.compare(CalendarDay.today()), "logged on the device's today");
 	TestSupport.expectEqual(5, services.recommendedWorkoutIndex(), "Good advances the 0-based index by one");
 	return true;

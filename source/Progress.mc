@@ -29,6 +29,17 @@ class Progress {
 		return true;
 	}
 
+	// Logs a finished run. Returns true when the program-complete screen should
+	// show now: this rating pushed the recommendation past the last workout and
+	// the screen has not been shown for this program. A full history drops its
+	// oldest entry as usual. A rejected entry shows nothing.
+	function logWorkout(date as CalendarDay, workoutId as Number, rating as Number) as Boolean {
+		if (!addEntry(date, workoutId, rating)) {
+			return false;
+		}
+		return shouldShowProgramComplete(date);
+	}
+
 	function setRating(index as Number, rating as Number) as Boolean {
 		return history.setRating(index, rating);
 	}

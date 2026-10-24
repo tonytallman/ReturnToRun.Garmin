@@ -9,6 +9,7 @@ class WorkoutView extends WatchUi.View {
 	var currentActivityIndex as Number;
 	var currentActivity as Activity?;
 	var session as WorkoutSession.Machine;
+	var recorder as WorkoutRecording.Recorder;
 	var leaveTimer as LeaveTimer;
 	var timer as Timer.Timer?;
 	var visible as Boolean;
@@ -25,6 +26,7 @@ class WorkoutView extends WatchUi.View {
 		View.initialize();
 		self.workoutIndex = workoutIndex;
 		session = new WorkoutSession.Machine();
+		recorder = appServices().newRecorder();
 		leaveTimer = new LeaveTimer();
 		pausedText = "";
 		timeLeftSuffix = "";
@@ -39,6 +41,7 @@ class WorkoutView extends WatchUi.View {
 			workout = loaded as Workout;
 		}
 		setCurrentActivity(0);
+		recorder.start();
 	}
 
 	function onLayout(dc as Graphics.Dc) as Void {
@@ -72,23 +75,59 @@ class WorkoutView extends WatchUi.View {
 		stopTicking();
 	}
 
-	// Yes on "End workout?". If this view is already showing, the confirm dialog
-	// closed before the answer was delivered, so pop from here. If the dialog is
-	// still up, onShow pops once the flag is set.
-	function confirmEnd() as Void {
-		if (session.onConfirmEnd() != WorkoutSession.DISCARD) {
+	// Resume on "End workout?".
+	function resumeFromEnd() as Void {
+		if (session.onResumeFromEnd() != WorkoutSession.RESUME) {
 			return;
 		}
-		stopTicking();
-		ScreenStack.requestReturnToMain();
-		if (visible) {
-			leaveTimer.schedule();
-		}
+		recorder.start();
+		WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
 	}
 
+	// Back on "End workout?". The workout stays paused.
 	function declineEnd() as Void {
-		session.onDeclineEnd();
-		showTimeLeft();
+		if (session.onDeclineEnd() != WorkoutSession.KEEP_PAUSED) {
+			return;
+		}
+		WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
+	}
+
+	// Save on "End workout?". The rating replaces the prompt, and this view
+	// leaves after the rating, through the return to the main menu.
+	function saveEarly() as Void {
+		if (session.onSaveEarly() != WorkoutSession.SAVE) {
+			return;
+		}
+		recorder.save();
+		WatchUi.switchToView(new RatingMenu(), new RatingDelegate(self), WatchUi.SLIDE_LEFT);
+	}
+
+	// Discard on "End workout?". Nothing is saved or logged. Closing the prompt
+	// shows this view again, and its onShow pops it.
+	function discard() as Void {
+		if (session.onDiscard() != WorkoutSession.DISCARD) {
+			return;
+		}
+		recorder.discard();
+		ScreenStack.requestReturnToMain();
+		WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
+	}
+
+	// A choice on "How did it go?". Saves the run if the end prompt did not,
+	// logs it, then shows program complete once or returns to the main menu.
+	function rate(rating as Number) as Void {
+		if (session.onRated() != WorkoutSession.LOG) {
+			return;
+		}
+		recorder.save();
+		var services = appServices();
+		if (services.logWorkout(workoutIndex, rating)) {
+			services.markProgramCompleteShown();
+			WatchUi.switchToView(new ProgramCompleteView(), new ProgramCompleteDelegate(), WatchUi.SLIDE_LEFT);
+			return;
+		}
+		ScreenStack.requestReturnToMain();
+		WatchUi.popView(WatchUi.SLIDE_RIGHT);
 	}
 
 	function onSelectPressed() as Void {
@@ -101,11 +140,13 @@ class WorkoutView extends WatchUi.View {
 
 	function apply(action as Number) as Void {
 		if (action == WorkoutSession.PAUSE) {
+			recorder.pause();
 			stopTicking();
 			showTimeLeft();
 			return;
 		}
 		if (action == WorkoutSession.RESUME) {
+			recorder.start();
 			startTicking();
 			showTimeLeft();
 			return;
@@ -113,10 +154,7 @@ class WorkoutView extends WatchUi.View {
 		if (action == WorkoutSession.ASK_TO_END) {
 			stopTicking();
 			showTimeLeft();
-			var message = WatchUi.loadResource(Rez.Strings.EndWorkoutConfirm) as String;
-			var dialog = new WatchUi.Confirmation(message);
-			var dialogDelegate = new EndWorkoutDelegate(self);
-			WatchUi.pushView(dialog, dialogDelegate, WatchUi.SLIDE_IMMEDIATE);
+			WatchUi.pushView(new EndWorkoutMenu(), new EndWorkoutDelegate(self), WatchUi.SLIDE_IMMEDIATE);
 		}
 	}
 
@@ -124,11 +162,7 @@ class WorkoutView extends WatchUi.View {
 		currentActivityIndex = activityIndex;
 		currentActivity = workout.getActivityAtIndex(currentActivityIndex);
 		if (currentActivity == null) {
-			session.onCompleted();
-			stopTicking();
-			attentionForWorkoutComplete();
-			ScreenStack.requestReturnToMain();
-			WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
+			finish();
 			return;
 		}
 
@@ -138,11 +172,22 @@ class WorkoutView extends WatchUi.View {
 		showIntervalCount();
 		showTimeLeft();
 		attentionForNewActivity(activity.type);
-
-		// Reaching cool-down logs the workout as Good. Leaving before that does not.
-		if (activity.type == CoolDown) {
-			appServices().recordCompletedWorkout(workoutIndex);
+		// Each segment after the warm-up starts a new lap in the activity.
+		if (activityIndex > 0) {
+			recorder.lap();
 		}
+	}
+
+	// The last segment finished. The recording stops and waits for the rating,
+	// which replaces this view.
+	function finish() as Void {
+		if (session.onCompleted() != WorkoutSession.COMPLETE) {
+			return;
+		}
+		stopTicking();
+		recorder.pause();
+		attentionForWorkoutComplete();
+		WatchUi.switchToView(new RatingMenu(), new RatingDelegate(self), WatchUi.SLIDE_LEFT);
 	}
 
 	function showCurrentActivityName() as Void {
