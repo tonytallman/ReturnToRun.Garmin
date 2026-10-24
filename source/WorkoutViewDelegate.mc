@@ -1,3 +1,4 @@
+using Toybox.Lang;
 using Toybox.WatchUi;
 
 class WorkoutViewDelegate extends WatchUi.BehaviorDelegate {
@@ -9,7 +10,9 @@ class WorkoutViewDelegate extends WatchUi.BehaviorDelegate {
         self.workoutView = workoutView;
     }
 
-    function onBack() {
+    function onBack() as Lang.Boolean {
         workoutView.dispose();
+        // Let the default back behavior pop the view.
+        return false;
     }
 }

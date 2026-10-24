@@ -2,6 +2,7 @@
     <iq:application entry="ReturnToRunApp" id="d05822f7-a662-4d5f-b6fd-8aa0cb0c404b" launcherIcon="@Drawables.LauncherIcon" name="@Strings.AppName" type="watch-app" version="0.0.1">
         <iq:products>
             <iq:product id="vivoactive"/>
+            <iq:product id="fenix5x"/>
         </iq:products>
         <iq:permissions/>
         <iq:languages/>

@@ -81,7 +81,7 @@ class WorkoutView extends WatchUi.View {
 		}
 	}
 
-	function timerCallback() {
+	function timerCallback() as Void {
 		timeLeft -= 1;
 		if (timeLeft == 0) {
 			setCurrentActivity(currentActivityIndex + 1);

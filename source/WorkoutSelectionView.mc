@@ -35,8 +35,8 @@ class WorkoutSelectionView extends WatchUi.View {
 			return;
 		}
 
-		var workoutTitleLabel = View.findDrawableById("WorkoutTitleLabel");
-		var workoutDescriptionLabel = View.findDrawableById("WorkoutDescriptionLabel");
+		var workoutTitleLabel = View.findDrawableById("WorkoutTitleLabel") as WatchUi.Text?;
+		var workoutDescriptionLabel = View.findDrawableById("WorkoutDescriptionLabel") as WatchUi.Text?;
 
 		if ((workoutTitleLabel == null) || (workoutDescriptionLabel == null)) {
 			return;

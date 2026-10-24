@@ -98,7 +98,7 @@ function getWorkoutAtIndex(index) {
 	}
 }
 
-private var workoutIndexKey = "WorkoutIndex";
+const workoutIndexKey = "WorkoutIndex";
 
 function saveWorkoutIndex(workoutIndex) {
 	if (workoutIndex < 0) {
