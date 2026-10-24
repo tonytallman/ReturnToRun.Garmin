@@ -19,7 +19,7 @@ function testWorkoutDuration(logger as Test.Logger) as Boolean {
 	var continuous = new Workout(1800, 60, 1, 300, 300);
 	TestSupport.expectEqual(2400, WorkoutDuration.totalSeconds(continuous), "warm-up, 30 min run, cool-down");
 	TestSupport.expectEqual(40, WorkoutDuration.roundedMinutes(2400), "40 min");
-	TestSupport.expectEqual(1800, WorkoutDuration.remainingSeconds(continuous, 1, 1800), "the run, then cool-down is still ahead");
+	TestSupport.expectEqual(2100, WorkoutDuration.remainingSeconds(continuous, 1, 1800), "the run, then cool-down is still ahead");
 
 	var two = new Workout(540, 60, 2, 300, 300);
 	TestSupport.expectEqual(1740, WorkoutDuration.totalSeconds(two), "one walk between two runs");
