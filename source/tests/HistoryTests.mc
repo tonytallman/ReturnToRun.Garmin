@@ -125,9 +125,9 @@ function testHistoryPersistence(logger as Test.Logger) as Boolean {
 	var overflow = new MemoryStorageGateway();
 	var stored = [] as Array<Storage.ValueType>;
 	for (var id = 5; id >= 1; id -= 1) {
-		var dateValue as Storage.ValueType = 20261000 + id;
-		var workoutValue as Storage.ValueType = id;
-		var ratingValue as Storage.ValueType = Rating.OK;
+		var dateValue = (20261000 + id) as Storage.ValueType;
+		var workoutValue = (id) as Storage.ValueType;
+		var ratingValue = (Rating.OK) as Storage.ValueType;
 		stored.add(dateValue);
 		stored.add(workoutValue);
 		stored.add(ratingValue);

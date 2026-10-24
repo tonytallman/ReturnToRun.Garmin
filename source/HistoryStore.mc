@@ -60,9 +60,9 @@ class HistoryStore {
 		var flat = [] as Array<Storage.ValueType>;
 		for (var i = 0; i < entries.size(); i++) {
 			var entry = entries[i] as HistoryEntry;
-			var dateValue as Storage.ValueType = entry.date.toNumber();
-			var workoutValue as Storage.ValueType = entry.workoutId;
-			var ratingValue as Storage.ValueType = entry.rating;
+			var dateValue = (entry.date.toNumber()) as Storage.ValueType;
+			var workoutValue = (entry.workoutId) as Storage.ValueType;
+			var ratingValue = (entry.rating) as Storage.ValueType;
 			flat.add(dateValue);
 			flat.add(workoutValue);
 			flat.add(ratingValue);

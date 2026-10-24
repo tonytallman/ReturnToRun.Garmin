@@ -15,7 +15,7 @@ function testCalendarDay(logger as Test.Logger) as Boolean {
 
 	var leap = new CalendarDay(2024, 2, 28).plusDays(1);
 	TestSupport.expectEqual(20240229, leap.toNumber(), "leap day");
-	TestSupport.expectEqual(20240301, new CalendarDay(2026, 2, 28).plusDays(1).toNumber(), "non-leap March");
+	TestSupport.expectEqual(20260301, new CalendarDay(2026, 2, 28).plusDays(1).toNumber(), "non-leap March");
 	TestSupport.expectEqual(20240229, new CalendarDay(2024, 3, 1).plusDays(-1).toNumber(), "back onto leap day");
 	TestSupport.expectEqual(20251231, new CalendarDay(2026, 1, 1).plusDays(-1).toNumber(), "previous year");
 	TestSupport.expectEqual(20260101, new CalendarDay(2025, 12, 31).plusDays(1).toNumber(), "next year");

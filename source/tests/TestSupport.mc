@@ -18,7 +18,7 @@ module TestSupport {
 	}
 
 	function openStore(cap as Number) as Fixture {
-		return new Fixture();
+		return new Fixture(cap);
 	}
 
 	// Monday 5 October 2026. A run that day and Thursday 8 October is 2 days off.
