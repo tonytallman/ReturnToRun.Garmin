@@ -40,6 +40,10 @@ There is no migration from the old `WorkoutIndex` storage key; no installed copi
 
 The current screen reads the recommendation when it opens. Choosing another workout in the picker changes only that session. Reaching cool-down logs that workout as `Good` for today, which is the old "advance by one" step. There is no rating screen yet. Starting a workout and leaving it no longer writes storage.
 
+The in-progress screen shows the segment name and the remaining time. Run and walk segments also show the repeat, such as `1/8`: the current repeat out of the workout's repeat count. A run and the walk after it share that number. Warm-up (index 0) and cool-down (the last index, which is the final walk) do not. The count is between the name and the countdown, at screen-relative `15%` and `33%`, so it stays on the round 240x240 fenix 5X face. The countdown stays centered.
+
+Every segment vibrates when it starts, including the first warm-up. Runs use the run pattern. Warm-up, walk, and cool-down use the walk pattern. Workout complete keeps its own pattern. Each of the last five seconds of a segment (5, 4, 3, 2, 1) plays one short tone when the device has `Attention.playTone` and `System.getDeviceSettings().tonesOn` is true. Those beeps do not vibrate. The next segment's vibration follows the last beep. Which seconds beep, which repeat a segment index is, and which alert a segment gets are pure functions in `CountdownTones`, `IntervalCount`, and `SegmentAlerts`. They do not import the UI.
+
 `AppSettings.mc` is unused. It is not part of this saved state.
 
 Day differences use a civil calendar, not 86400-second chunks, so a daylight-saving change does not add or remove a day off.

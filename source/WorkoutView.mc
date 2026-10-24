@@ -11,6 +11,7 @@ class WorkoutView extends WatchUi.View {
 	var timeLeft;
 	var countdownLabel;
 	var activityNameLabel;
+	var intervalCountLabel;
 
 	function initialize(workoutIndex) {
 		View.initialize();
@@ -29,10 +30,12 @@ class WorkoutView extends WatchUi.View {
 		setLayout(Rez.Layouts.WorkoutView(dc));
 		countdownLabel = View.findDrawableById("CountdownLabel");
 		activityNameLabel = View.findDrawableById("ActivityNameLabel");
+		intervalCountLabel = View.findDrawableById("IntervalCountLabel");
 		timer = new Timer.Timer();
 		timer.start(method(:timerCallback), 1000, true);
 
 		showCurrentActivityName();
+		showIntervalCount();
 		showTimeLeft();
 	}
     
@@ -47,9 +50,9 @@ class WorkoutView extends WatchUi.View {
 		}
 
 		timeLeft = currentActivity.seconds;
-		showTimeLeft();
-
 		showCurrentActivityName();
+		showIntervalCount();
+		showTimeLeft();
 
 		attentionForNewActivity(currentActivity.type);
 
@@ -81,10 +84,21 @@ class WorkoutView extends WatchUi.View {
 		}
 	}
 
+	function showIntervalCount() {
+		if ((intervalCountLabel == null) || (workout == null)) {
+			return;
+		}
+		var label = IntervalCount.labelFor(currentActivityIndex as Number, workout.repeatCount as Number);
+		intervalCountLabel.setText(label);
+	}
+
 	function timerCallback() as Void {
 		timeLeft -= 1;
+		// Beep on 5..1, then start the next segment (and its vibration) at 0.
 		if (timeLeft == 0) {
 			setCurrentActivity(currentActivityIndex + 1);
+		} else if (CountdownTones.shouldPlay(timeLeft as Number)) {
+			playCountdownTone();
 		}
 
 		showTimeLeft();
