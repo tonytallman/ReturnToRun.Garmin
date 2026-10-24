@@ -86,7 +86,7 @@ function testCurrentUiMapping(logger as Test.Logger) as Boolean {
 	var gateway = new MemoryStorageGateway();
 	var store = new HistoryStore(gateway, 10, program.maxId());
 	store.load();
-	var services = new AppServices(program, new Progress(store), gateway);
+	var services = new AppServices(program, new Progress(store));
 	TestSupport.expectEqual(40, services.workoutCount(), "count");
 	TestSupport.expectEqual(0, services.recommendedWorkoutIndex(), "empty history recommends the first");
 	var first = services.workoutAtIndex(0) as Workout;

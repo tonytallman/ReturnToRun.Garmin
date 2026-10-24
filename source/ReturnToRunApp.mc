@@ -20,7 +20,6 @@ class ReturnToRunApp extends Application.AppBase {
 	function getServices() as AppServices {
 		if (services == null) {
 			var created = AppServices.production();
-			created.start();
 			services = created;
 			return created;
 		}

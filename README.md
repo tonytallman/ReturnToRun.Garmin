@@ -34,9 +34,9 @@ Program completion is that same result before clamping. If it would be 41 or hig
 
 The weekly rule is 4 to 6 runs, at most one a day. Even with today's run, fewer than 3 earlier entries in the window cannot make 4. An empty history therefore returns the frequency warning. All three warnings cannot be true together, because six previous days is already at least three runs.
 
-### Migration and the current screen
+### The current screen
 
-On launch, if `WorkoutIndex` is present and history is empty, that 0-based "next workout" index becomes one `Good` entry for the workout it implies, dated yesterday, and the key is removed. Yesterday keeps days off at 0, so the recommendation matches the old index, and today is not already logged. Index 0 (or a negative index) means nothing was completed. A non-numeric value is discarded. Values above 39 clamp to 39, which is also where the old app clamped a finished workout 40, so those two states migrate the same way: recommend workout 40, not complete. If history already exists, a leftover key is deleted and not replayed after a later clear.
+There is no migration from the old `WorkoutIndex` storage key; no installed copies need it.
 
 The current screen reads the recommendation when it opens. Choosing another workout in the picker changes only that session. Reaching cool-down logs that workout as `Good` for today, which is the old "advance by one" step. There is no rating screen yet. Starting a workout and leaving it no longer writes storage.
 

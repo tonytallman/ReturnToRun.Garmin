@@ -5,12 +5,10 @@ import Toybox.Lang;
 class AppServices {
 	var program as WorkoutProgram;
 	var trainingProgress as Progress;
-	private var gateway as StorageGateway;
 
-	function initialize(program as WorkoutProgram, trainingProgress as Progress, gateway as StorageGateway) {
+	function initialize(program as WorkoutProgram, trainingProgress as Progress) {
 		self.program = program;
 		self.trainingProgress = trainingProgress;
-		self.gateway = gateway;
 	}
 
 	static function production() as AppServices {
@@ -18,12 +16,7 @@ class AppServices {
 		var gateway = new ApplicationStorageGateway();
 		var history = new HistoryStore(gateway, HISTORY_ENTRY_CAP, program.maxId());
 		history.load();
-		return new AppServices(program, new Progress(history), gateway);
-	}
-
-	function start() as Void {
-		var migration = new LegacyMigration(program.maxId());
-		migration.apply(gateway, trainingProgress, currentDay());
+		return new AppServices(program, new Progress(history));
 	}
 
 	function currentDay() as CalendarDay {
