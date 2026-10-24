@@ -1,15 +1,46 @@
+import Toybox.Lang;
 using Toybox.Attention;
+using Toybox.System;
 
 function attentionForNewActivity(activityType) {
-	switch (activityType) {
-		case Run:
-			attentionForRunActivity();
-			break;
-		case Walk:
-		case CoolDown:
-			attentionForWalkActivity();
-			break;
+	playSegmentAlert(SegmentAlerts.forActivityType(activityType));
+}
+
+function attentionForWorkoutComplete() {
+	playSegmentAlert(SegmentAlerts.forWorkoutComplete());
+}
+
+function playSegmentAlert(alert as Number) as Void {
+	if (alert == SegmentAlerts.RUN) {
+		attentionForRunActivity();
+		return;
 	}
+	if (alert == SegmentAlerts.WALK) {
+		attentionForWalkActivity();
+		return;
+	}
+	if (alert == SegmentAlerts.WORKOUT_COMPLETE) {
+		attentionForWorkoutCompletePattern();
+	}
+}
+
+// One short beep for each of the last five seconds. This does not vibrate.
+function playCountdownTone() as Void {
+	if (!(Attention has :playTone)) {
+		return;
+	}
+	var settings = System.getDeviceSettings();
+	if (!settings.tonesOn) {
+		return;
+	}
+	if (!(Attention has :ToneProfile)) {
+		return;
+	}
+	// 150 ms at 2500 Hz is one short beep, so the five countdown tones do not run together.
+	var toneProfile = [
+		new Attention.ToneProfile(2500, 150)
+	] as Array<Attention.ToneProfile>;
+	Attention.playTone({:toneProfile=>toneProfile, :repeatCount=>1});
 }
 
 function attentionForRunActivity() {
@@ -36,7 +67,7 @@ function attentionForWalkActivity() {
     }
 }
 
-function attentionForWorkoutComplete() {
+function attentionForWorkoutCompletePattern() {
     if (Attention has :vibrate) {
         var vibrateData = [
             new Attention.VibeProfile(75, 750),
