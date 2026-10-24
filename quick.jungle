@@ -1,0 +1,4 @@
+# Test timing. Passed after monkey.jungle so this resource path replaces that one.
+# Warm-up and cool-down are 15 s and every run and walk is 10 s.
+# resources-program is not on this path, so the two WorkoutProgram resources never collide.
+base.resourcePath = resources;resources-quick

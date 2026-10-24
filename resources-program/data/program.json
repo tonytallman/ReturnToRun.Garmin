@@ -227,19 +227,19 @@
     {
       "id": 38,
       "runSeconds": 1200,
-      "walkSeconds": 60,
+      "walkSeconds": 0,
       "repeatCount": 1
     },
     {
       "id": 39,
       "runSeconds": 1500,
-      "walkSeconds": 60,
+      "walkSeconds": 0,
       "repeatCount": 1
     },
     {
       "id": 40,
       "runSeconds": 1800,
-      "walkSeconds": 60,
+      "walkSeconds": 0,
       "repeatCount": 1
     }
   ]

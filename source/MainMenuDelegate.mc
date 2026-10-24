@@ -1,24 +1,18 @@
-using Toybox.WatchUi;
-using Toybox.System;
+import Toybox.Lang;
+import Toybox.WatchUi;
 
-class MainMenuDelegate extends WatchUi.MenuInputDelegate {
+class MainMenuDelegate extends WatchUi.Menu2InputDelegate {
+	function initialize() {
+		Menu2InputDelegate.initialize();
+	}
 
-	var workoutIndexChangedObserver;
+	function onSelect(item as WatchUi.MenuItem) as Void {
+		if (item.getId() == :run) {
+			openWorkoutList();
+		}
+	}
 
-    function initialize(workoutIndexChangedObserver) {
-        MenuInputDelegate.initialize();
-		self.workoutIndexChangedObserver = workoutIndexChangedObserver;
-    }
-
-    function onMenuItem(item) {
-        if (item == :ChangeWorkout) {
-            var view = new WorkoutPicker(workoutIndexChangedObserver.getWorkoutIndex());
-            var delegate = new WorkoutPickerDelegate(workoutIndexChangedObserver);
-            WatchUi.pushView(view, delegate, WatchUi.SLIDE_IMMEDIATE);
-        } else if (item == :Instructions) {
-            System.println("Instructions");
-        } else if (item == :About) {
-            System.println("About");
-        }
-    }
+	function onBack() as Void {
+		WatchUi.popView(WatchUi.SLIDE_RIGHT);
+	}
 }

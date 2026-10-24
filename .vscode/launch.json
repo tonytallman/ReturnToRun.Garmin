@@ -7,6 +7,14 @@
 			"name": "Run App",
 			"stopAtLaunch": false,
 			"device": "${command:GetTargetDevice}"
+		},
+		{
+			"type": "monkeyc",
+			"request": "launch",
+			"name": "Run Quick",
+			"stopAtLaunch": false,
+			"device": "${command:GetTargetDevice}",
+			"jungleFiles": "monkey.jungle;quick.jungle"
 		}
 	]
 }

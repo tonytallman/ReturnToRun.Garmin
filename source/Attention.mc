@@ -1,27 +1,47 @@
+import Toybox.Attention;
 import Toybox.Lang;
-using Toybox.Attention;
-using Toybox.System;
+import Toybox.System;
 
-function attentionForNewActivity(activityType) {
+function attentionForNewActivity(activityType) as Void {
 	playSegmentAlert(SegmentAlerts.forActivityType(activityType));
 }
 
-function attentionForWorkoutComplete() {
+function attentionForWorkoutComplete() as Void {
 	playSegmentAlert(SegmentAlerts.forWorkoutComplete());
 }
 
 function playSegmentAlert(alert as Number) as Void {
-	if (alert == SegmentAlerts.RUN) {
-		attentionForRunActivity();
-		return;
-	}
-	if (alert == SegmentAlerts.WALK) {
-		attentionForWalkActivity();
-		return;
-	}
 	if (alert == SegmentAlerts.WORKOUT_COMPLETE) {
-		attentionForWorkoutCompletePattern();
+		vibrateWorkoutComplete();
+		return;
 	}
+	vibrateSegment();
+}
+
+// Connect IQ has no system vibration preset. One strong pulse is the segment cue.
+function vibrateSegment() as Void {
+	if (!(Attention has :vibrate)) {
+		return;
+	}
+	var vibrateData = [
+		new Attention.VibeProfile(100, 1000)
+	] as Array<Attention.VibeProfile>;
+	Attention.vibrate(vibrateData);
+}
+
+// Three pulses so the end of the workout is distinct from a segment change.
+function vibrateWorkoutComplete() as Void {
+	if (!(Attention has :vibrate)) {
+		return;
+	}
+	var vibrateData = [
+		new Attention.VibeProfile(100, 500),
+		new Attention.VibeProfile(0, 250),
+		new Attention.VibeProfile(100, 500),
+		new Attention.VibeProfile(0, 250),
+		new Attention.VibeProfile(100, 500)
+	] as Array<Attention.VibeProfile>;
+	Attention.vibrate(vibrateData);
 }
 
 // One short beep for each of the last five seconds. This does not vibrate.
@@ -41,59 +61,4 @@ function playCountdownTone() as Void {
 		new Attention.ToneProfile(2500, 150)
 	] as Array<Attention.ToneProfile>;
 	Attention.playTone({:toneProfile=>toneProfile, :repeatCount=>1});
-}
-
-function attentionForRunActivity() {
-    if (Attention has :vibrate) {
-        var vibrateData = [
-            new Attention.VibeProfile(100, 500),
-            new Attention.VibeProfile( 0, 250),
-            new Attention.VibeProfile(100, 500),
-            new Attention.VibeProfile( 0, 250),
-            new Attention.VibeProfile(100, 500)
-        ];
-
-        Attention.vibrate(vibrateData);
-    }
-}
-
-function attentionForWalkActivity() {
-    if (Attention has :vibrate) {
-        var vibrateData = [
-            new Attention.VibeProfile(75, 1500)
-        ];
-
-        Attention.vibrate(vibrateData);
-    }
-}
-
-function attentionForWorkoutCompletePattern() {
-    if (Attention has :vibrate) {
-        var vibrateData = [
-            new Attention.VibeProfile(75, 750),
-            new Attention.VibeProfile( 0, 250),
-            new Attention.VibeProfile(75, 750),
-            new Attention.VibeProfile( 0, 250),
-            new Attention.VibeProfile(75, 750),
-            new Attention.VibeProfile( 0, 250)
-        ];
-
-        Attention.vibrate(vibrateData);
-    }
-}
-
-function attentionRampDown() {
-    if (Attention has :vibrate) {
-        var vibrateData = [
-            new Attention.VibeProfile(70, 100),
-            new Attention.VibeProfile(60, 100),
-            new Attention.VibeProfile(50, 100),
-            new Attention.VibeProfile(40, 100),
-            new Attention.VibeProfile(30, 100),
-            new Attention.VibeProfile(20, 100),
-            new Attention.VibeProfile(10, 100)
-        ];
-
-        Attention.vibrate(vibrateData);
-    }
 }

@@ -1,7 +1,7 @@
 import Toybox.Application;
 import Toybox.Lang;
 
-// Composition root for the current UI and the screens added in later phases.
+// Composition root for the screens.
 class AppServices {
 	var program as WorkoutProgram;
 	var trainingProgress as Progress;
@@ -62,16 +62,4 @@ class AppServices {
 
 function appServices() as AppServices {
 	return (Application.getApp() as ReturnToRunApp).getServices();
-}
-
-function getNumberOfWorkouts() as Number {
-	return appServices().workoutCount();
-}
-
-function getWorkoutAtIndex(index as Number) as Workout? {
-	return appServices().workoutAtIndex(index);
-}
-
-function getSavedWorkoutIndex() as Number {
-	return appServices().recommendedWorkoutIndex();
 }

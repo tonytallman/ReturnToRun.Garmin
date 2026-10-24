@@ -1,117 +1,230 @@
+import Toybox.Graphics;
 import Toybox.Lang;
-using Toybox.Timer;
-using Toybox.WatchUi;
+import Toybox.Timer;
+import Toybox.WatchUi;
 
 class WorkoutView extends WatchUi.View {
-	var workout;
-	var workoutIndex;
-	var currentActivityIndex;
-	var currentActivity;
+	var workout as Workout;
+	var workoutIndex as Number;
+	var currentActivityIndex as Number;
+	var currentActivity as Activity?;
+	var session as WorkoutSession.Machine;
+	var leaveTimer as LeaveTimer;
+	var timer as Timer.Timer?;
+	var visible as Boolean;
+	var timeLeft as Number;
+	var pausedText as String;
+	var timeLeftSuffix as String;
+	var countdownLabel as WatchUi.Text?;
+	var activityNameLabel as WatchUi.Text?;
+	var intervalCountLabel as WatchUi.Text?;
+	var remainingLabel as WatchUi.Text?;
+	var pausedLabel as WatchUi.Text?;
 
-	var timer;
-	var timeLeft;
-	var countdownLabel;
-	var activityNameLabel;
-	var intervalCountLabel;
-
-	function initialize(workoutIndex) {
+	function initialize(workoutIndex as Number) {
 		View.initialize();
 		self.workoutIndex = workoutIndex;
-		self.workout = getWorkoutAtIndex(workoutIndex);
+		session = new WorkoutSession.Machine();
+		leaveTimer = new LeaveTimer();
+		pausedText = "";
+		timeLeftSuffix = "";
+		visible = false;
+		timeLeft = 0;
+		currentActivityIndex = 0;
+		currentActivity = null;
+		var loaded = appServices().workoutAtIndex(workoutIndex);
+		if (loaded == null) {
+			workout = new Workout(0, 0, 1, 0, 0);
+		} else {
+			workout = loaded as Workout;
+		}
 		setCurrentActivity(0);
 	}
 
-	function dispose() {
-		timer.stop();
-		timer = null;
-	}
-
-	// Load your resources here
-	function onLayout(dc) {
+	function onLayout(dc as Graphics.Dc) as Void {
 		setLayout(Rez.Layouts.WorkoutView(dc));
-		countdownLabel = View.findDrawableById("CountdownLabel");
-		activityNameLabel = View.findDrawableById("ActivityNameLabel");
-		intervalCountLabel = View.findDrawableById("IntervalCountLabel");
-		timer = new Timer.Timer();
-		timer.start(method(:timerCallback), 1000, true);
-
+		countdownLabel = View.findDrawableById("CountdownLabel") as WatchUi.Text?;
+		activityNameLabel = View.findDrawableById("ActivityNameLabel") as WatchUi.Text?;
+		intervalCountLabel = View.findDrawableById("IntervalCountLabel") as WatchUi.Text?;
+		remainingLabel = View.findDrawableById("RemainingLabel") as WatchUi.Text?;
+		pausedLabel = View.findDrawableById("PausedLabel") as WatchUi.Text?;
+		pausedText = WatchUi.loadResource(Rez.Strings.Paused) as String;
+		timeLeftSuffix = WatchUi.loadResource(Rez.Strings.TimeLeftSuffix) as String;
 		showCurrentActivityName();
 		showIntervalCount();
 		showTimeLeft();
 	}
-    
-	function setCurrentActivity(activityIndex) {
-		currentActivityIndex = activityIndex;
 
+	function onShow() as Void {
+		visible = true;
+		if (leaveTimer.schedule()) {
+			stopTicking();
+			return;
+		}
+		if (session.isTiming()) {
+			startTicking();
+		}
+		showTimeLeft();
+	}
+
+	function onHide() as Void {
+		visible = false;
+		stopTicking();
+	}
+
+	// Yes on "End workout?". If this view is already showing, the confirm dialog
+	// closed before the answer was delivered, so pop from here. If the dialog is
+	// still up, onShow pops once the flag is set.
+	function confirmEnd() as Void {
+		if (session.onConfirmEnd() != WorkoutSession.DISCARD) {
+			return;
+		}
+		stopTicking();
+		ScreenStack.requestReturnToMain();
+		if (visible) {
+			leaveTimer.schedule();
+		}
+	}
+
+	function declineEnd() as Void {
+		session.onDeclineEnd();
+		showTimeLeft();
+	}
+
+	function onSelectPressed() as Void {
+		apply(session.onSelect());
+	}
+
+	function onBackPressed() as Void {
+		apply(session.onBack());
+	}
+
+	function apply(action as Number) as Void {
+		if (action == WorkoutSession.PAUSE) {
+			stopTicking();
+			showTimeLeft();
+			return;
+		}
+		if (action == WorkoutSession.RESUME) {
+			startTicking();
+			showTimeLeft();
+			return;
+		}
+		if (action == WorkoutSession.ASK_TO_END) {
+			stopTicking();
+			showTimeLeft();
+			var message = WatchUi.loadResource(Rez.Strings.EndWorkoutConfirm) as String;
+			var dialog = new WatchUi.Confirmation(message);
+			var dialogDelegate = new EndWorkoutDelegate(self);
+			WatchUi.pushView(dialog, dialogDelegate, WatchUi.SLIDE_IMMEDIATE);
+		}
+	}
+
+	function setCurrentActivity(activityIndex as Number) as Void {
+		currentActivityIndex = activityIndex;
 		currentActivity = workout.getActivityAtIndex(currentActivityIndex);
 		if (currentActivity == null) {
-			timer.stop();
+			session.onCompleted();
+			stopTicking();
 			attentionForWorkoutComplete();
+			ScreenStack.requestReturnToMain();
+			WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
 			return;
 		}
 
-		timeLeft = currentActivity.seconds;
+		var activity = currentActivity as Activity;
+		timeLeft = activity.seconds;
 		showCurrentActivityName();
 		showIntervalCount();
 		showTimeLeft();
+		attentionForNewActivity(activity.type);
 
-		attentionForNewActivity(currentActivity.type);
-
-		// Reaching cool-down is enough to log the workout. Rating Good advances the
-		// recommendation by one, which is what saving the next index used to do.
-		if (currentActivity.type == CoolDown) {
+		// Reaching cool-down logs the workout as Good. Leaving before that does not.
+		if (activity.type == CoolDown) {
 			appServices().recordCompletedWorkout(workoutIndex);
 		}
 	}
 
-	function showCurrentActivityName() {
-		var activityName = "";    	
-		switch (currentActivity.type) {
-			case WarmUp:
-				activityName =  WatchUi.loadResource(Rez.Strings.WarmUp);
-				break;
-			case CoolDown:
-				activityName =  WatchUi.loadResource(Rez.Strings.CoolDown);
-				break;
-			case Walk:
-				activityName =  WatchUi.loadResource(Rez.Strings.Walk);
-				break;
-			case Run:
-				activityName =  WatchUi.loadResource(Rez.Strings.Run);
-				break;
-		}
-		if (activityNameLabel != null) {
-			activityNameLabel.setText(activityName);
-		}
-	}
-
-	function showIntervalCount() {
-		if ((intervalCountLabel == null) || (workout == null)) {
+	function showCurrentActivityName() as Void {
+		if ((activityNameLabel == null) || (currentActivity == null)) {
 			return;
 		}
-		var label = IntervalCount.labelFor(currentActivityIndex as Number, workout.repeatCount as Number);
-		intervalCountLabel.setText(label);
+		var activity = currentActivity as Activity;
+		var activityName = "";
+		if (activity.type == WarmUp) {
+			activityName = WatchUi.loadResource(Rez.Strings.WarmUp) as String;
+		} else if (activity.type == CoolDown) {
+			activityName = WatchUi.loadResource(Rez.Strings.CoolDown) as String;
+		} else if (activity.type == Walk) {
+			activityName = WatchUi.loadResource(Rez.Strings.Walk) as String;
+		} else if (activity.type == Run) {
+			activityName = WatchUi.loadResource(Rez.Strings.Run) as String;
+		}
+		(activityNameLabel as WatchUi.Text).setText(activityName);
+	}
+
+	function showIntervalCount() as Void {
+		if (intervalCountLabel == null) {
+			return;
+		}
+		var label = IntervalCount.labelFor(currentActivityIndex, workout.repeatCount, workout.hasWalks());
+		(intervalCountLabel as WatchUi.Text).setText(label);
 	}
 
 	function timerCallback() as Void {
-		timeLeft -= 1;
-		// Beep on 5..1, then start the next segment (and its vibration) at 0.
-		if (timeLeft == 0) {
+		if (!session.isTiming()) {
+			return;
+		}
+		timeLeft = timeLeft - 1;
+		if (timeLeft <= 0) {
 			setCurrentActivity(currentActivityIndex + 1);
-		} else if (CountdownTones.shouldPlay(timeLeft as Number)) {
+			return;
+		}
+		if (CountdownTones.shouldPlay(timeLeft)) {
 			playCountdownTone();
 		}
-
 		showTimeLeft();
 	}
 
-	function showTimeLeft() {        
-		var string = getTimeAsString(timeLeft);
-
+	function showTimeLeft() as Void {
+		var segment = getTimeAsString(timeLeft);
 		if (countdownLabel != null) {
-			countdownLabel.setText(string);
+			var countdown = countdownLabel as WatchUi.Text;
+			countdown.setText(segment);
+			if (session.showsPaused()) {
+				countdown.setColor(Graphics.COLOR_YELLOW);
+			} else {
+				countdown.setColor(Graphics.COLOR_WHITE);
+			}
 		}
-
+		if (remainingLabel != null) {
+			var remaining = WorkoutDuration.remainingSeconds(workout, currentActivityIndex, timeLeft);
+			var remainingText = getTimeAsString(remaining) + " " + timeLeftSuffix;
+			(remainingLabel as WatchUi.Text).setText(remainingText);
+		}
+		if (pausedLabel != null) {
+			var paused = pausedLabel as WatchUi.Text;
+			if (session.showsPaused()) {
+				paused.setText(pausedText);
+			} else {
+				paused.setText("");
+			}
+		}
 		WatchUi.requestUpdate();
+	}
+
+	function startTicking() as Void {
+		if (timer == null) {
+			timer = new Timer.Timer();
+		}
+		var running = timer as Timer.Timer;
+		running.stop();
+		running.start(method(:timerCallback), 1000, true);
+	}
+
+	function stopTicking() as Void {
+		if (timer != null) {
+			(timer as Timer.Timer).stop();
+		}
 	}
 }
