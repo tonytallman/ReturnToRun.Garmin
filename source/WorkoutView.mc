@@ -16,7 +16,6 @@ class WorkoutView extends WatchUi.View {
 		View.initialize();
 		self.workoutIndex = workoutIndex;
 		self.workout = getWorkoutAtIndex(workoutIndex);
-		saveWorkoutIndex(workoutIndex);
 		setCurrentActivity(0);
 	}
 
@@ -54,9 +53,10 @@ class WorkoutView extends WatchUi.View {
 
 		attentionForNewActivity(currentActivity.type);
 
-		// Reaching the CoolDown activity is good enough to progress to the next workout next time.
+		// Reaching cool-down is enough to log the workout. Rating Good advances the
+		// recommendation by one, which is what saving the next index used to do.
 		if (currentActivity.type == CoolDown) {
-			saveWorkoutIndex(workoutIndex + 1);
+			appServices().recordCompletedWorkout(workoutIndex);
 		}
 	}
 
