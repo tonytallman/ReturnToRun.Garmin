@@ -23,11 +23,11 @@ class ProgramCompleteView extends WatchUi.View {
 		dc.clear();
 
 		dc.setColor(Graphics.COLOR_GREEN, Graphics.COLOR_TRANSPARENT);
-		dc.drawText(centerX, height * 24 / 100, Graphics.FONT_SMALL, title, center);
+		dc.drawText(centerX, height * 21 / 100, Graphics.FONT_SMALL, title, center);
 
 		var wrapped = TextWrap.wrap(message, width * 80 / 100, new DcTextMeasure(dc, Graphics.FONT_XTINY));
 		dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
-		dc.drawText(centerX, height * 58 / 100, Graphics.FONT_XTINY, wrapped, center);
+		dc.drawText(centerX, height * 60 / 100, Graphics.FONT_XTINY, wrapped, center);
 	}
 }
 
