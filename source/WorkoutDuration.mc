@@ -1,8 +1,8 @@
 import Toybox.Lang;
 
 // Total and remaining time for a workout, using the same sequence as
-// Workout.getActivityAtIndex: warm-up, run/walk repeats, and cool-down,
-// with the last walk replaced by the cool-down.
+// Workout.getActivityAtIndex: warm-up, run/walk repeats including the walk
+// before cool-down, and cool-down.
 module WorkoutDuration {
 	function totalSeconds(workout as Workout) as Number {
 		var total = 0;

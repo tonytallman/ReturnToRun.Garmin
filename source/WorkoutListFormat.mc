@@ -3,9 +3,9 @@ import Toybox.Lang;
 // Menu labels for one program workout. The words come from the caller so the
 // strings stay in resources and these rules can be tested without the UI.
 module WorkoutListFormat {
-	// A single repeat has no walk interval: that walk is the cool-down.
+	// Every run is followed by a walk, so any walk time means the workout has walks.
 	function includesWalk(walkSeconds as Number, repeatCount as Number) as Boolean {
-		return (walkSeconds > 0) && (repeatCount > 1);
+		return (walkSeconds > 0) && (repeatCount > 0);
 	}
 
 	// Whole minutes are "1" or "30". Anything else is "m:ss", including "0:10".

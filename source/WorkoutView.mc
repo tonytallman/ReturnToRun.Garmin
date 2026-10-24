@@ -167,7 +167,7 @@ class WorkoutView extends WatchUi.View {
 		if (intervalCountLabel == null) {
 			return;
 		}
-		var label = IntervalCount.labelFor(currentActivityIndex, workout.repeatCount);
+		var label = IntervalCount.labelFor(currentActivityIndex, workout.repeatCount, workout.hasWalks());
 		(intervalCountLabel as WatchUi.Text).setText(label);
 	}
 

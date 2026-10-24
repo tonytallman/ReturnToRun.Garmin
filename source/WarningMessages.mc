@@ -12,4 +12,13 @@ module WarningMessages {
 		}
 		return null;
 	}
+
+	// The warning shown after the one at position, or null when it was the last.
+	function nextPosition(position as Number, count as Number) as Number? {
+		var next = position + 1;
+		if ((next < 0) || (next >= count)) {
+			return null;
+		}
+		return next;
+	}
 }

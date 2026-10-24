@@ -1,7 +1,7 @@
 import Toybox.Lang;
 
-// Pre-run warnings. At most one warning applies: the first match in priority
-// order, so the warning screen always has a single message. Consecutive-day
+// Pre-run warnings. Every warning that applies is returned in priority order.
+// The warning screen shows them one at a time, in that order. Consecutive-day
 // warnings are about calendar days that have at least one entry.
 module PreRunWarnings {
 	const ALREADY_LOGGED_TODAY = 1;
@@ -9,15 +9,16 @@ module PreRunWarnings {
 
 	const PREVIOUS_WINDOW_DAYS = 6;
 
-	// The highest-priority warning for today, or null when none applies.
-	function evaluate(history as HistoryStore, today as CalendarDay) as Number? {
+	// Every warning that applies today, highest priority first.
+	function evaluate(history as HistoryStore, today as CalendarDay) as Array<Number> {
+		var warnings = [] as Array<Number>;
 		if (hasEntryOn(history, today)) {
-			return ALREADY_LOGGED_TODAY;
+			warnings.add(ALREADY_LOGGED_TODAY);
 		}
 		if (consecutivePreviousDays(history, today) >= PREVIOUS_WINDOW_DAYS) {
-			return SEVEN_CONSECUTIVE_DAYS;
+			warnings.add(SEVEN_CONSECUTIVE_DAYS);
 		}
-		return null;
+		return warnings;
 	}
 
 	function hasEntryOn(history as HistoryStore, day as CalendarDay) as Boolean {

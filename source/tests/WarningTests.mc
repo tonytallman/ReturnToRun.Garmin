@@ -9,48 +9,48 @@ function testPreRunWarnings(logger as Test.Logger) as Boolean {
 	TestSupport.expectEqual(2, PreRunWarnings.SEVEN_CONSECUTIVE_DAYS, "streak code");
 
 	var empty = TestSupport.openStore(100).progress;
-	TestSupport.expectNull(empty.warning(today), "empty history has no warning");
+	TestSupport.expectWarnings(empty.warnings(today), null, null, "empty history has no warning");
 
 	var already = TestSupport.openStore(100).progress;
 	already.addEntry(today, 4, Rating.OK);
 	already.addEntry(today, 4, Rating.GOOD);
-	TestSupport.expectEqual(PreRunWarnings.ALREADY_LOGGED_TODAY, already.warning(today), "two logs today are one warning");
+	TestSupport.expectWarnings(already.warnings(today), PreRunWarnings.ALREADY_LOGGED_TODAY, null, "two logs today are one warning");
 
 	var yesterday = TestSupport.openStore(100).progress;
 	yesterday.addEntry(today.plusDays(-1), 4, Rating.OK);
-	TestSupport.expectNull(yesterday.warning(today), "a run yesterday is fine");
+	TestSupport.expectWarnings(yesterday.warnings(today), null, null, "a run yesterday is fine");
 
 	var streak = TestSupport.openStore(100).progress;
 	for (var offset = -6; offset <= -1; offset++) {
 		streak.addEntry(today.plusDays(offset), 4, Rating.OK);
 	}
-	TestSupport.expectEqual(PreRunWarnings.SEVEN_CONSECUTIVE_DAYS, streak.warning(today), "six previous days");
+	TestSupport.expectWarnings(streak.warnings(today), PreRunWarnings.SEVEN_CONSECUTIVE_DAYS, null, "six previous days");
 
 	var almost = TestSupport.openStore(100).progress;
 	for (var recent = -5; recent <= -1; recent++) {
 		almost.addEntry(today.plusDays(recent), 4, Rating.OK);
 	}
-	TestSupport.expectNull(almost.warning(today), "five previous days is not seven");
+	TestSupport.expectWarnings(almost.warnings(today), null, null, "five previous days is not seven");
 
 	var doubled = TestSupport.openStore(100).progress;
 	for (var near = -5; near <= -1; near++) {
 		doubled.addEntry(today.plusDays(near), 4, Rating.OK);
 	}
 	doubled.addEntry(today.plusDays(-1), 5, Rating.OK);
-	TestSupport.expectNull(doubled.warning(today), "six entries over five days is not seven days");
+	TestSupport.expectWarnings(doubled.warnings(today), null, null, "six entries over five days is not seven days");
 
 	var broken = TestSupport.openStore(100).progress;
 	broken.addEntry(today.plusDays(-1), 4, Rating.OK);
 	for (var older = -6; older <= -3; older++) {
 		broken.addEntry(today.plusDays(older), 4, Rating.OK);
 	}
-	TestSupport.expectNull(broken.warning(today), "a gap stops the streak");
+	TestSupport.expectWarnings(broken.warnings(today), null, null, "a gap stops the streak");
 
 	var both = TestSupport.openStore(100).progress;
 	both.addEntry(today, 9, Rating.OK);
 	for (var day = -6; day <= -1; day++) {
 		both.addEntry(today.plusDays(day), 4, Rating.OK);
 	}
-	TestSupport.expectEqual(PreRunWarnings.ALREADY_LOGGED_TODAY, both.warning(today), "already ran today outranks seven days");
+	TestSupport.expectWarnings(both.warnings(today), PreRunWarnings.ALREADY_LOGGED_TODAY, PreRunWarnings.SEVEN_CONSECUTIVE_DAYS, "both apply, already ran today first");
 	return true;
 }

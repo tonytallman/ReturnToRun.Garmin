@@ -2,10 +2,13 @@ import Toybox.Graphics;
 import Toybox.Lang;
 import Toybox.WatchUi;
 
-// The pre-run warning on one round-screen page, with Continue and Cancel.
+// One pre-run warning on a round-screen page, with Continue and Cancel.
+// Continue moves to the next warning, then to the workout.
 // Positions are fractions of the display so the text stays inside the circle.
 class WarningView extends WatchUi.View {
 	var workoutIndex as Number;
+	var warnings as Array<Number>;
+	var position as Number;
 	var message as String;
 	var continueText as String;
 	var cancelText as String;
@@ -13,15 +16,17 @@ class WarningView extends WatchUi.View {
 	var closed as Boolean;
 	var leaveTimer as LeaveTimer;
 
-	function initialize(workoutIndex as Number, warning as Number) {
+	function initialize(workoutIndex as Number, warnings as Array<Number>, position as Number) {
 		View.initialize();
 		self.workoutIndex = workoutIndex;
+		self.warnings = warnings;
+		self.position = position;
 		focusContinue = true;
 		closed = false;
 		leaveTimer = new LeaveTimer();
 		var oncePerDay = WatchUi.loadResource(Rez.Strings.OncePerDayWarning) as String;
 		var sixPerWeek = WatchUi.loadResource(Rez.Strings.SixPerWeekWarning) as String;
-		var text = WarningMessages.messageFor(warning, oncePerDay, sixPerWeek);
+		var text = WarningMessages.messageFor(warnings[position] as Number, oncePerDay, sixPerWeek);
 		message = (text != null) ? text as String : "";
 		continueText = WatchUi.loadResource(Rez.Strings.Continue) as String;
 		cancelText = WatchUi.loadResource(Rez.Strings.Cancel) as String;
@@ -85,7 +90,7 @@ class WarningView extends WatchUi.View {
 			return;
 		}
 		closed = true;
-		startWorkout(workoutIndex);
+		continuePastWarning(workoutIndex, warnings, position);
 	}
 
 	function cancel() as Void {

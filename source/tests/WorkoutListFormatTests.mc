@@ -13,14 +13,14 @@ function testWorkoutListLabels(logger as Test.Logger) as Boolean {
 	TestSupport.expectEqual("0:05", WorkoutListFormat.segmentClock(5), "padded seconds");
 
 	TestSupport.expectTrue(WorkoutListFormat.includesWalk(60, 3), "repeats keep a walk");
-	TestSupport.expectFalse(WorkoutListFormat.includesWalk(60, 1), "the only walk is the cool-down");
+	TestSupport.expectTrue(WorkoutListFormat.includesWalk(60, 1), "one repeat still walks before cool-down");
 	TestSupport.expectFalse(WorkoutListFormat.includesWalk(0, 4), "a zero walk is not a walk");
 	TestSupport.expectFalse(WorkoutListFormat.includesWalk(0, 1), "one repeat and no walk");
 
 	TestSupport.expectEqual("#1  R1 W1 ×3", WorkoutListFormat.title(1, 60, 60, 3, "R", "W", "×"), "intervals");
-	TestSupport.expectEqual("#40  R30", WorkoutListFormat.title(40, 1800, 60, 1, "R", "W", "×"), "single run omits the walk and the repeat");
-	TestSupport.expectEqual("#33  R9", WorkoutListFormat.title(33, 540, 60, 1, "R", "W", "×"), "nine minute run");
-	TestSupport.expectEqual("#34  R9 W1 ×2", WorkoutListFormat.title(34, 540, 60, 2, "R", "W", "×"), "two repeats keep one walk");
+	TestSupport.expectEqual("#40  R30", WorkoutListFormat.title(40, 1800, 0, 1, "R", "W", "×"), "continuous run has no walk or repeat");
+	TestSupport.expectEqual("#33  R9 W1", WorkoutListFormat.title(33, 540, 60, 1, "R", "W", "×"), "nine minute run, then a walk");
+	TestSupport.expectEqual("#34  R9 W1 ×2", WorkoutListFormat.title(34, 540, 60, 2, "R", "W", "×"), "two repeats, each with a walk");
 	TestSupport.expectEqual("#8  R1:30 W0:45 ×2", WorkoutListFormat.title(8, 90, 45, 2, "R", "W", "×"), "partial minutes");
 	TestSupport.expectEqual("#5  R2 ×4", WorkoutListFormat.title(5, 120, 0, 4, "R", "W", "×"), "repeats without a walk");
 
@@ -47,9 +47,9 @@ function testCatalogListLabels(logger as Test.Logger) as Boolean {
 	var lastWorkout = new Workout(last.runSeconds, last.walkSeconds, last.repeatCount, program.warmUpSeconds, program.coolDownSeconds);
 	var firstTotal = WorkoutDuration.totalSeconds(firstWorkout);
 	var lastTotal = WorkoutDuration.totalSeconds(lastWorkout);
-	TestSupport.expectEqual(900, firstTotal, "workout 1 is 15 min");
+	TestSupport.expectEqual(960, firstTotal, "workout 1 is 16 min");
 	TestSupport.expectEqual(2400, lastTotal, "workout 40 is 40 min");
-	TestSupport.expectEqual("15 min with walks", WorkoutListFormat.subtitle(firstTotal, WorkoutListFormat.includesWalk(first.walkSeconds, first.repeatCount), "min", "with walks"), "workout 1 subtitle");
+	TestSupport.expectEqual("16 min with walks", WorkoutListFormat.subtitle(firstTotal, WorkoutListFormat.includesWalk(first.walkSeconds, first.repeatCount), "min", "with walks"), "workout 1 subtitle");
 	TestSupport.expectEqual("40 min", WorkoutListFormat.subtitle(lastTotal, WorkoutListFormat.includesWalk(last.walkSeconds, last.repeatCount), "min", "with walks"), "workout 40 subtitle");
 	return true;
 }
