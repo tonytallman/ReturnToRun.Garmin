@@ -30,8 +30,11 @@ class ReturnToRunApp extends Application.AppBase {
 		return services as AppServices;
 	}
 
-	// Return the initial view of your application here
+	// Return the initial view of your application here.
+	// The program and history load here so pressing Run only builds the list.
+	// The watch stops an app whose single callback runs too long.
 	function getInitialView() {
+		getServices();
 		var view = new MainMenuView();
 		var delegate = new MainMenuDelegate();
 		return [view, delegate];
