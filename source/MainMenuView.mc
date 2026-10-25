@@ -8,6 +8,8 @@ class MainMenuView extends WatchUi.Menu2 {
 		Menu2.initialize({:title=>title});
 		addItem(new WatchUi.MenuItem(label, null, :run, null));
 		addItem(new WatchUi.MenuItem(WatchUi.loadResource(Rez.Strings.History) as String, null, :history, null));
+		addItem(new WatchUi.MenuItem(WatchUi.loadResource(Rez.Strings.Instructions) as String, null, :instructions, null));
+		addItem(new WatchUi.MenuItem(WatchUi.loadResource(Rez.Strings.About) as String, null, :about, null));
 	}
 
 	function onShow() as Void {

@@ -1,6 +1,6 @@
 # Return to Run
 
-A Garmin Connect IQ watch app for a return-to-run program after injury. The first screen is Run, then the workout list, pre-run warnings, the in-progress workout, and the post-run rating, plus a History screen to review, edit, add, and delete entries. Each workout is recorded as a running activity and saved to Garmin Connect. Instructions and About come later.
+A Garmin Connect IQ watch app for a return-to-run program after injury. The first screen is Run, then the workout list, pre-run warnings, the in-progress workout, and the post-run rating, plus a History screen to review, edit, add, and delete entries, Instructions, and About. Each workout is recorded as a running activity and saved to Garmin Connect.
 
 ## Architecture
 
@@ -39,7 +39,7 @@ There is no check for too few recent runs.
 
 There is no migration from the old `WorkoutIndex` storage key; no installed copies need it.
 
-The first screen is a Menu2 titled with the app name. Its items are Run and History. Back from that menu exits. Instructions and About are later phases.
+The first screen is a Menu2 titled with the app name. Its items are Run, History, Instructions, and About. Back from that menu exits.
 
 Run opens a Menu2 with one item per workout. The label is `#1  R1 W1 ×3`: the id, run, walk, and repeat count. A whole number of minutes is `R1` or `R30`; anything else is `m:ss`, such as `R1:30`. A workout with no walk omits `W` and a single repeat omits the count, so workout 33 is `#33  R9 W1` and workout 40 is `#40  R30`. The subtitle is the total of that activity sequence, rounded to the nearest minute (30 seconds and above rounds up). Workout 1 is `16 min with walks`: warm-up, three runs, three walks (the last one before cool-down), and cool-down. A workout with no walk interval omits `with walks`. The recommended workout is focused, and its subtitle is prefixed with a star.
 
@@ -65,9 +65,19 @@ The History list is rebuilt in place (items deleted and re-added) when it is sho
 
 The Workout and How did it go? titles on the reused menus are hidden on this watch while the focused item is in the middle, the same known issue as the rating title after a run.
 
+### Instructions and About
+
+Instructions is a Menu2 of topics: Program, Workout list, Ratings, Days off, Warnings, and Buttons. Each topic opens a `TextPageView`: a green title and the body in `FONT_XTINY`, a page at a time. Down shows the next page and Up the previous one; small arrows show when there is more above or below, and Back returns to the topic list. All of the text is in `resources/strings/strings.xml` (`Help*` strings). In those strings `|` starts a new line and `||` leaves a blank line, because `\n` is not reliably escaped in Connect IQ string resources.
+
+The view wraps the body once in `onLayout` with `TextWrap` and keeps the lines, so `onUpdate` only draws. Lines are 72% of the screen wide and the body runs from 27% to 85% of the height, which keeps every line inside the round face of the fēnix 5X; the lines per page come from the font height. `TextPages` (splitting on `|`, wrapping each piece, and breaking a link after each `/` since it has no spaces) and `TextPager` (page count, first and end line, next and previous) are UI-free and unit tested. A test also checks that no word in the help text is longer than 16 characters, since `TextWrap` never splits a word.
+
+About uses the same view. It shows the app name, `Version 0.0.1`, and the repository link `github.com/tonytallman/ReturnToRun.Garmin` as text. Where `Communications.openWebPage` exists (API 1.3, so on the fēnix 5X), it adds "Press Start to open the link on your phone." and Start sends the link to the phone through Garmin Connect Mobile, which needs the phone connected. That is why the manifest asks for the Communications permission.
+
+The version shown comes from one place, the `AppVersion` string resource, because Connect IQ 3.1 cannot read the manifest version at run time. `tools/check-version.sh` fails if it differs from the `version` attribute of `iq:application` in `manifest.xml`; run it whenever either changes. A unit test checks that the resource is `major.minor.patch` (`AppVersion.isWellFormed`).
+
 ### Recording
 
-`WorkoutRecording.Recorder` owns the recording lifecycle and talks to a `RecordingPort`. `FitRecordingPort` is the real port: it turns on continuous GPS and the heart-rate sensor and creates an `ActivityRecording` session (sport running, sub-sport generic, named after the app). The workout starts recording when it opens, stops the session timer on pause, starts it again on resume, and adds a lap at every segment change after the warm-up. Save and discard turn GPS and the sensor back off. Save is idempotent, so the end prompt and the rating can both call it. If the app is stopped with a recording still open, `ReturnToRunApp.onStop` saves it. The FIT file reaches Garmin Connect on the watch's next sync. `Activity.SPORT_RUNNING` needs API 3.2 and the fēnix 5X is 3.1.6, so the code uses the deprecated `ActivityRecording.SPORT_RUNNING` and `SUB_SPORT_GENERIC`, which have the same values; the compiler warns about them. The manifest asks for the Fit, Positioning, and Sensor permissions.
+`WorkoutRecording.Recorder` owns the recording lifecycle and talks to a `RecordingPort`. `FitRecordingPort` is the real port: it turns on continuous GPS and the heart-rate sensor and creates an `ActivityRecording` session (sport running, sub-sport generic, named after the app). The workout starts recording when it opens, stops the session timer on pause, starts it again on resume, and adds a lap at every segment change after the warm-up. Save and discard turn GPS and the sensor back off. Save is idempotent, so the end prompt and the rating can both call it. If the app is stopped with a recording still open, `ReturnToRunApp.onStop` saves it. The FIT file reaches Garmin Connect on the watch's next sync. `Activity.SPORT_RUNNING` needs API 3.2 and the fēnix 5X is 3.1.6, so the code uses the deprecated `ActivityRecording.SPORT_RUNNING` and `SUB_SPORT_GENERIC`, which have the same values; the compiler warns about them. The manifest asks for the Fit, Positioning, and Sensor permissions, plus Communications for the About link.
 
 Every segment, including warm-up and cool-down, starts with one vibration: duty cycle 100 for 1000 ms. Connect IQ has no built-in vibration preset, so that single pulse is the segment cue. Workout complete is three 500 ms pulses at the same duty cycle, separated by 250 ms gaps. Each of the last five seconds of a segment (5, 4, 3, 2, 1) plays one short tone when the device has `Attention.playTone` and `System.getDeviceSettings().tonesOn` is true. Those beeps do not vibrate, and they do not play while paused. The next segment's vibration follows the last beep. Which seconds beep, which repeat a segment index is, which alert a segment gets, the list text, the duration totals, the warning message, text wrapping, the workout session transitions (pause, end prompt, save, discard, rating), and the recording lifecycle are UI-free (`CountdownTones`, `IntervalCount`, `SegmentAlerts`, `WorkoutListFormat`, `WorkoutDuration`, `WarningMessages`, `TextWrap`, `WorkoutSession`, `WorkoutRecording`). They do not import the UI, and the recorder is tested with a fake port.
 
@@ -100,5 +110,11 @@ monkeydo bin/ReturnToRun-quick.prg fenix5x
 ```
 
 `monkey.jungle` sets `base.resourcePath` to `resources;resources-program`. `quick.jungle` sets it to `resources;resources-quick` and is only passed for the quick build, so the two `WorkoutProgram` resources are never compiled together. Repeat counts and ids in the quick file match the real catalog (40 workouts). VS Code's Run Quick launch configuration passes the same jungle list and still asks for the target device.
+
+Check the version before a release:
+
+```sh
+tools/check-version.sh
+```
 
 `monkeydo` can take a test name after `-t` to run one test. Tests live in `source/tests` and use `(:test)` functions, so a normal build leaves them out. Do not commit the developer key or anything under `bin/`.
