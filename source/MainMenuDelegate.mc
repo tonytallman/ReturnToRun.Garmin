@@ -11,6 +11,10 @@ class MainMenuDelegate extends WatchUi.Menu2InputDelegate {
 			openWorkoutList();
 		} else if (item.getId() == :history) {
 			openHistory();
+		} else if (item.getId() == :instructions) {
+			openInstructions();
+		} else if (item.getId() == :about) {
+			openAbout();
 		}
 	}
 
