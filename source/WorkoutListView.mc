@@ -4,8 +4,8 @@ import Toybox.WatchUi;
 class WorkoutListView extends WatchUi.Menu2 {
 	var leaveTimer as LeaveTimer;
 
-	function initialize() {
-		var title = WatchUi.loadResource(Rez.Strings.Run) as String;
+	// Run uses this list, and so does History's Add workout with its own title.
+	function initialize(title as String) {
 		Menu2.initialize({:title=>title});
 		leaveTimer = new LeaveTimer();
 

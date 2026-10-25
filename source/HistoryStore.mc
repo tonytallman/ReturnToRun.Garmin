@@ -17,6 +17,8 @@ class HistoryStore {
 	private var entryCap as Number;
 	private var _maxWorkoutId as Number;
 	private var programCompleteShown as Boolean;
+	// Position of the entry from the latest successful add, or -1.
+	var lastAddedIndex as Number;
 
 	function initialize(gateway as StorageGateway, entryCap as Number, maxWorkoutId as Number) {
 		self.gateway = gateway;
@@ -24,6 +26,7 @@ class HistoryStore {
 		self.entryCap = entryCap;
 		self._maxWorkoutId = maxWorkoutId;
 		self.programCompleteShown = false;
+		self.lastAddedIndex = -1;
 	}
 
 	function load() as Void {
@@ -103,6 +106,7 @@ class HistoryStore {
 	// is placed ahead of those older same-day entries, and every one of them is kept.
 	// An entry that would be the oldest one past the cap is rejected and the store is unchanged.
 	function add(date as CalendarDay, workoutId as Number, rating as Number) as Boolean {
+		lastAddedIndex = -1;
 		if ((workoutId < FIRST_WORKOUT_ID) || (workoutId > _maxWorkoutId) || !Rating.isValid(rating)) {
 			return false;
 		}
@@ -130,6 +134,7 @@ class HistoryStore {
 		}
 		entries = updated;
 		trimToCap();
+		lastAddedIndex = insertionIndex;
 		save();
 		return true;
 	}

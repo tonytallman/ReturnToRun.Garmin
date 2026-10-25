@@ -1,6 +1,6 @@
 # Return to Run
 
-A Garmin Connect IQ watch app for a return-to-run program after injury. The first screen is Run, then the workout list, pre-run warnings, the in-progress workout, and the post-run rating. Each workout is recorded as a running activity and saved to Garmin Connect. History, Instructions, and About come later.
+A Garmin Connect IQ watch app for a return-to-run program after injury. The first screen is Run, then the workout list, pre-run warnings, the in-progress workout, and the post-run rating, plus a History screen to review, edit, add, and delete entries. Each workout is recorded as a running activity and saved to Garmin Connect. Instructions and About come later.
 
 ## Architecture
 
@@ -14,6 +14,7 @@ Workout definitions live in `resources-program/data/program.json` and load throu
 - `recommend(today)` and `warning(today)`, both pure functions of history plus the date the caller passes in
 - `logWorkout(date, id, rating)`, which adds the entry and returns whether the program-complete screen should show now
 - `shouldShowProgramComplete(today)` and `markProgramCompleteShown()`
+- `changeRating(index, rating, today)` and `addWorkout(date, id, rating, today)` for History; each returns whether the program-complete screen should show now (see below). `lastAddedIndex()` is where the last add landed, or -1 if the cap rejected it
 
 The recommended workout is never stored. It is derived from the newest entry.
 
@@ -23,7 +24,7 @@ Ratings move the last workout by -1, 0, +1, or +2 (`Bad`, `OK`, `Good`, `Great`)
 
 Otherwise the recommendation is `last workout + rating step - penalty`, clamped to 1..40. `Bad` on workout 1 stays on 1. `Good` or `Great` past 40 stays on 40. Empty history recommends workout 1.
 
-Program completion is that same result before clamping. If it would be 41 or higher, `Recommendation.programComplete` is true. That is true for a workout just logged and for a rating change on the newest entry. The UI asks `shouldShowProgramComplete` and, after showing the screen, calls `markProgramCompleteShown`. The flag is not set merely because completion was detected, and `clear()` does not reset it. Logging workout 1 does reset it, including a backdated workout 1 that is not the newest entry, so a later completion can show the screen again. An add that the cap rejects does not reset it. The signal is derived from the newest entry and today, so enough days off can clear it again. `logWorkout` returns `shouldShowProgramComplete` after a successful add, so the rating screen and a later History rating change (phase 4) use the same rule. With a full history, logging today's run drops the oldest entry as usual and can still show the screen. An entry the cap rejects (only possible when future-dated entries fill the store) logs nothing and shows nothing, although the FIT activity is already saved.
+Program completion is that same result before clamping. If it would be 41 or higher, `Recommendation.programComplete` is true. That is true for a workout just logged and for a rating change on the newest entry. The UI asks `shouldShowProgramComplete` and, after showing the screen, calls `markProgramCompleteShown`. The flag is not set merely because completion was detected, and `clear()` does not reset it. Logging workout 1 does reset it, including a backdated workout 1 that is not the newest entry, so a later completion can show the screen again. An add that the cap rejects does not reset it. The signal is derived from the newest entry and today, so enough days off can clear it again. `logWorkout` returns `shouldShowProgramComplete` after a successful add, so the rating screen and History use the same rule: `changeRating` returns it only when the changed entry is the newest (index 0), and `addWorkout` only when the added entry became the newest. Changing a rating can also take completion away (for example Good to OK on 40); the flag is unchanged either way. With a full history, logging today's run drops the oldest entry as usual and can still show the screen. An entry the cap rejects (only possible when future-dated entries fill the store) logs nothing and shows nothing, although the FIT activity is already saved.
 
 ### Pre-run warnings
 
@@ -38,7 +39,7 @@ There is no check for too few recent runs.
 
 There is no migration from the old `WorkoutIndex` storage key; no installed copies need it.
 
-The first screen is a Menu2 titled with the app name. Its only item is Run. Back from that menu exits. History, Instructions, and About are later phases.
+The first screen is a Menu2 titled with the app name. Its items are Run and History. Back from that menu exits. Instructions and About are later phases.
 
 Run opens a Menu2 with one item per workout. The label is `#1  R1 W1 ×3`: the id, run, walk, and repeat count. A whole number of minutes is `R1` or `R30`; anything else is `m:ss`, such as `R1:30`. A workout with no walk omits `W` and a single repeat omits the count, so workout 33 is `#33  R9 W1` and workout 40 is `#40  R30`. The subtitle is the total of that activity sequence, rounded to the nearest minute (30 seconds and above rounds up). Workout 1 is `16 min with walks`: warm-up, three runs, three walks (the last one before cool-down), and cool-down. A workout with no walk interval omits `with walks`. The recommended workout is focused, and its subtitle is prefixed with a star.
 
@@ -47,6 +48,22 @@ Choosing a workout runs `PreRunWarnings`. No warning starts the workout. Otherwi
 The in-progress screen shows the step (Warm up, Run, Walk, or Cool down) above a large centered countdown, the time left in the whole workout, and the repeat such as `1/8`. The step is at `10%`, the countdown is centered, the workout time remaining is at `73%`, and the repeat stays centered at the bottom (`85%`). Start/Stop pauses and resumes. While paused, the countdown turns yellow and a Paused label is shown. The timer and the five-second tones stop while paused. Back while running pauses, so Back alone never quits. Back while paused opens "End workout?", a Menu2 with Resume (focused, so a stray press keeps the run), Save, and Discard. Back on that menu stays paused. Discard throws the recording away and returns to the main menu with no history entry. Save saves the recording and goes to the rating. When the last segment reaches zero, the recording stops and the rating replaces the workout.
 
 The rating is a Menu2 titled "How did it go?" with Bad, OK, Good, and Great. Good is focused, so its title shows only after scrolling up to Bad. Back does nothing; a finished run must be rated. Choosing a rating saves the recording if it is not saved yet, logs today, the workout id, and the rating, and returns to the main menu. If that rating takes the recommendation past workout 40 and the program-complete screen has not been shown for this program, "Program complete" is shown instead, once; Select or Back on it returns to the main menu. The recommendation stays at 40.
+
+### History
+
+History is a Menu2 titled History with one item per entry, newest first, such as `Oct 24  #5  Good`: the localized short month and day (no year), the workout id, and the rating. Clear history is the second-to-last item and Add workout is the last; both are always there, even when history is empty. Positions and the focus after an edit come from `HistoryFormat`, which is UI-free.
+
+Building the list does no date math per entry. `HistoryWords` loads the four rating words once and caches the 12 month abbreviations, each formatted once from `Gregorian` on first use. With 100 entries, opening the list, opening an entry, deleting, adding, and rebuilding all ran in the simulator with the watchdog budget lowered to half of the default.
+
+Selecting an entry opens its details, a Menu2 titled `Oct 24  #5` with Rating (the current rating as the subtitle), Delete, and "Delete this & older". Rating opens the rating menu with the current rating focused; choosing one saves it and returns to the History list. Delete asks "Delete entry?", Delete this & older asks "Delete this & older?", and Clear history asks "Clear history?". Each uses the standard Confirmation, so the prompts are kept short enough not to be cut off. Yes makes the change and returns to the list; No or Back changes nothing.
+
+Add workout asks for the date, then the workout, then the rating. The date screen shows the short date large, with Today, Yesterday, or the weekday under it. It starts at today; Down goes back a day, Up goes forward a day but never past today, and there is no lower limit. `DateStepper` holds that logic and is UI-free. The workout step reuses the workout list (titled Workout, with today's recommendation starred and focused), and the rating step reuses the rating menu with Good focused. The new entry is added at its date and the list focuses it. An add that the cap rejects (older than a full history) adds nothing, silently.
+
+A rating change on the newest entry, or an added entry that becomes the newest, uses the same program-complete rule as a logged run: if it applies and the screen has not been shown for this program, "Program complete" is shown once, and closing it returns to the History list. The recommendation and the pre-run warnings are derived from history, so they follow every edit, delete, and add with no extra bookkeeping.
+
+The History list is rebuilt in place (items deleted and re-added) when it is shown again after `AppServices.historyVersion` changed, instead of replacing the view. Screens above it get back to it through `ScreenStack`: an edit asks for a return to History, each screen above the list pops itself when shown (`LeaveTimer`), and the list stops the unwinding. A return to the main menu, as after a run, takes priority and passes through History.
+
+The Workout and How did it go? titles on the reused menus are hidden on this watch while the focused item is in the middle, the same known issue as the rating title after a run.
 
 ### Recording
 

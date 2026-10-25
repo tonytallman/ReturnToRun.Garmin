@@ -44,6 +44,39 @@ class Progress {
 		return history.setRating(index, rating);
 	}
 
+	// History's rating change. Returns true when the program-complete screen
+	// should show now: the entry is the newest, the new rating takes the
+	// recommendation past the last workout, and the screen has not been shown
+	// for this program. The same rule as logWorkout; the flag is not touched.
+	function changeRating(index as Number, rating as Number, today as CalendarDay) as Boolean {
+		if (!history.setRating(index, rating)) {
+			return false;
+		}
+		if (index != 0) {
+			return false;
+		}
+		return shouldShowProgramComplete(today);
+	}
+
+	// History's Add Workout, on any date up to today. Returns true when the
+	// program-complete screen should show now, which needs the added entry to be
+	// the newest. A backdated entry behind a newer one changes nothing shown.
+	// An entry the cap rejects adds nothing and shows nothing.
+	function addWorkout(date as CalendarDay, workoutId as Number, rating as Number, today as CalendarDay) as Boolean {
+		if (!addEntry(date, workoutId, rating)) {
+			return false;
+		}
+		if (history.lastAddedIndex != 0) {
+			return false;
+		}
+		return shouldShowProgramComplete(today);
+	}
+
+	// Where the latest successful add landed in the newest-first list, or -1.
+	function lastAddedIndex() as Number {
+		return history.lastAddedIndex;
+	}
+
 	function deleteAt(index as Number) as Boolean {
 		return history.deleteAt(index);
 	}

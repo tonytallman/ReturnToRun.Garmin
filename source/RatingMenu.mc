@@ -1,16 +1,17 @@
 import Toybox.Lang;
 import Toybox.WatchUi;
 
-// "How did it go?" The item ids are the Rating values. Focus starts on Good,
-// the rating that moves on to the next workout.
+// "How did it go?" The item ids are the Rating values, in that order, so the
+// focus index is the rating. After a run focus starts on Good, the rating that
+// moves on to the next workout; History starts on the entry's own rating.
 class RatingMenu extends WatchUi.Menu2 {
-	function initialize() {
+	function initialize(focusRating as Number) {
 		Menu2.initialize({:title=>WatchUi.loadResource(Rez.Strings.RatingTitle) as String});
 		addItem(new WatchUi.MenuItem(WatchUi.loadResource(Rez.Strings.RatingBad) as String, null, Rating.BAD, null));
 		addItem(new WatchUi.MenuItem(WatchUi.loadResource(Rez.Strings.RatingOk) as String, null, Rating.OK, null));
 		addItem(new WatchUi.MenuItem(WatchUi.loadResource(Rez.Strings.RatingGood) as String, null, Rating.GOOD, null));
 		addItem(new WatchUi.MenuItem(WatchUi.loadResource(Rez.Strings.RatingGreat) as String, null, Rating.GREAT, null));
-		setFocus(2);
+		setFocus(Rating.isValid(focusRating) ? focusRating : Rating.GOOD);
 	}
 }
 
