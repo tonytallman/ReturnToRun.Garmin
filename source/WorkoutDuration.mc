@@ -5,15 +5,7 @@ import Toybox.Lang;
 // before cool-down, and cool-down.
 module WorkoutDuration {
 	function totalSeconds(workout as Workout) as Number {
-		var total = 0;
-		var count = workout.getActivityCount();
-		for (var index = 0; index < count; index++) {
-			var activity = workout.getActivityAtIndex(index);
-			if (activity != null) {
-				total = total + (activity as Activity).seconds;
-			}
-		}
-		return total;
+		return workout.totalSeconds();
 	}
 
 	// Seconds left in the current segment, plus every segment after it.
@@ -27,10 +19,7 @@ module WorkoutDuration {
 			total = 0;
 		}
 		for (var index = segmentIndex + 1; index < count; index++) {
-			var activity = workout.getActivityAtIndex(index);
-			if (activity != null) {
-				total = total + (activity as Activity).seconds;
-			}
+			total = total + workout.secondsAtIndex(index);
 		}
 		return total;
 	}

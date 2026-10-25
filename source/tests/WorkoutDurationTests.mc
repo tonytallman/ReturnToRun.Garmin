@@ -37,3 +37,28 @@ function testWorkoutDuration(logger as Test.Logger) as Boolean {
 	TestSupport.expectEqual(2, WorkoutDuration.roundedMinutes(90), "90 seconds rounds up");
 	return true;
 }
+
+// The direct total and per-segment lengths must match the full segment
+// sequence for every workout in the program.
+(:test)
+function testWorkoutTotalsMatchSegments(logger as Test.Logger) as Boolean {
+	logger.debug("workout totals match segments");
+	var program = WorkoutProgram.load();
+	TestSupport.expectTrue(program.maxId() > 0, "program has workouts");
+	for (var id = FIRST_WORKOUT_ID; id <= program.maxId(); id++) {
+		var definition = program.workoutById(id) as WorkoutDefinition;
+		var workout = new Workout(definition.runSeconds, definition.walkSeconds, definition.repeatCount, program.warmUpSeconds, program.coolDownSeconds);
+		var sum = 0;
+		var count = workout.getActivityCount();
+		for (var index = 0; index < count; index++) {
+			var seconds = (workout.getActivityAtIndex(index) as Activity).seconds;
+			TestSupport.expectEqual(seconds, workout.secondsAtIndex(index), "segment " + index.toString() + " of workout " + id.toString());
+			sum = sum + seconds;
+		}
+		TestSupport.expectEqual(sum, WorkoutDuration.totalSeconds(workout), "total of workout " + id.toString());
+	}
+	var intervals = new Workout(60, 60, 3, 300, 300);
+	TestSupport.expectEqual(0, intervals.secondsAtIndex(-1), "negative index");
+	TestSupport.expectEqual(0, intervals.secondsAtIndex(8), "past the last segment");
+	return true;
+}

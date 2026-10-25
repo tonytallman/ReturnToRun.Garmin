@@ -30,7 +30,8 @@ class Workout {
 	}
 
 	function getActivityAtIndex(index as Number) as Activity? {
-		if ((index < 0) || (index >= getActivityCount())) {
+		var count = getActivityCount();
+		if ((index < 0) || (index >= count)) {
 			return null;
 		}
 
@@ -38,7 +39,7 @@ class Workout {
 			return createWarmUpActivity(warmUpSeconds);
 		}
 
-		if (index == (getActivityCount() - 1)) {
+		if (index == (count - 1)) {
 			return createCoolDownActivity(coolDownSeconds);
 		}
 
@@ -46,5 +47,33 @@ class Workout {
 			return createRunActivity(runSeconds);
 		}
 		return createWalkActivity(walkSeconds);
+	}
+
+	// The length of one segment without building an Activity. Out of range is 0.
+	function secondsAtIndex(index as Number) as Number {
+		var count = getActivityCount();
+		if ((index < 0) || (index >= count)) {
+			return 0;
+		}
+		if (index == 0) {
+			return warmUpSeconds;
+		}
+		if (index == (count - 1)) {
+			return coolDownSeconds;
+		}
+		if (!hasWalks() || ((index % 2) == 1)) {
+			return runSeconds;
+		}
+		return walkSeconds;
+	}
+
+	// Warm-up, every run, every walk, and cool-down, worked out directly so the
+	// workout list stays cheap to build on the watch.
+	function totalSeconds() as Number {
+		var perRepeat = runSeconds;
+		if (hasWalks()) {
+			perRepeat = perRepeat + walkSeconds;
+		}
+		return warmUpSeconds + (repeatCount * perRepeat) + coolDownSeconds;
 	}
 }

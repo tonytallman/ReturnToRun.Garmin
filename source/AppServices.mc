@@ -1,10 +1,12 @@
 import Toybox.Application;
 import Toybox.Lang;
+import Toybox.WatchUi;
 
 // Composition root for the screens.
 class AppServices {
 	var program as WorkoutProgram;
 	var trainingProgress as Progress;
+	var activeRecorder as WorkoutRecording.Recorder?;
 
 	function initialize(program as WorkoutProgram, trainingProgress as Progress) {
 		self.program = program;
@@ -40,11 +42,25 @@ class AppServices {
 		return new Workout(workoutDefinition.runSeconds, workoutDefinition.walkSeconds, workoutDefinition.repeatCount, program.warmUpSeconds, program.coolDownSeconds);
 	}
 
-	// The current UI has no rating screen. Reaching cool-down records Good, which
-	// advances the recommendation by one, matching the old stored-index increment.
-	function recordCompletedWorkout(zeroBasedIndex as Number) as Void {
-		var today = currentDay();
-		trainingProgress.addEntry(today, zeroBasedIndex + 1, Rating.GOOD);
+	// Logs a rated run on today's date. Returns true when the program-complete
+	// screen should show.
+	function logWorkout(zeroBasedIndex as Number, rating as Number) as Boolean {
+		return trainingProgress.logWorkout(currentDay(), zeroBasedIndex + 1, rating);
+	}
+
+	// One recorder per workout. The app keeps the latest so it can save an
+	// unfinished run if the app is stopped.
+	function newRecorder() as WorkoutRecording.Recorder {
+		var name = WatchUi.loadResource(Rez.Strings.AppName) as String;
+		var recorder = new WorkoutRecording.Recorder(new FitRecordingPort(name));
+		activeRecorder = recorder;
+		return recorder;
+	}
+
+	function finishActiveRecording() as Void {
+		if (activeRecorder != null) {
+			(activeRecorder as WorkoutRecording.Recorder).save();
+		}
 	}
 
 	function warningsForToday() as Array<Number> {

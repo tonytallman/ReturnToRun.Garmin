@@ -46,7 +46,7 @@ class WarningView extends WatchUi.View {
 
 		// The message alone, wrapped to fit the wide middle of the round face.
 		// There is no title, so a full sentence has room for four lines.
-		var wrapped = wrapText(dc, message, Graphics.FONT_XTINY, width * 84 / 100);
+		var wrapped = TextWrap.wrap(message, width * 84 / 100, new DcTextMeasure(dc, Graphics.FONT_XTINY));
 		dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
 		dc.drawText(centerX, height * 37 / 100, Graphics.FONT_XTINY, wrapped, center);
 
@@ -99,32 +99,5 @@ class WarningView extends WatchUi.View {
 		}
 		closed = true;
 		WatchUi.popView(WatchUi.SLIDE_RIGHT);
-	}
-
-	// Greedy word wrap with dc.getTextWidthInPixels, which every Connect IQ
-	// version has. Lines are joined with "\n" for one centered drawText.
-	function wrapText(dc as Graphics.Dc, text as String, font as Graphics.FontType, maxWidth as Number) as String {
-		var result = "";
-		var line = "";
-		var rest = text;
-		while (rest.length() > 0) {
-			var space = rest.find(" ");
-			var word = (space == null) ? rest : rest.substring(0, space as Number) as String;
-			rest = (space == null) ? "" : rest.substring((space as Number) + 1, rest.length()) as String;
-			if (word.length() == 0) {
-				continue;
-			}
-			var candidate = (line.length() == 0) ? word : line + " " + word;
-			if ((line.length() > 0) && (dc.getTextWidthInPixels(candidate, font) > maxWidth)) {
-				result = (result.length() == 0) ? line : result + "\n" + line;
-				line = word;
-			} else {
-				line = candidate;
-			}
-		}
-		if (line.length() > 0) {
-			result = (result.length() == 0) ? line : result + "\n" + line;
-		}
-		return result;
 	}
 }

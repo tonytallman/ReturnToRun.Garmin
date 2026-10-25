@@ -13,8 +13,12 @@ class ReturnToRunApp extends Application.AppBase {
 	function onStart(state) {
 	}
 
-	// onStop() is called when your application is exiting
+	// onStop() is called when your application is exiting.
+	// A run still in progress is saved rather than lost.
 	function onStop(state) {
+		if (services != null) {
+			(services as AppServices).finishActiveRecording();
+		}
 	}
 
 	function getServices() as AppServices {
@@ -26,8 +30,11 @@ class ReturnToRunApp extends Application.AppBase {
 		return services as AppServices;
 	}
 
-	// Return the initial view of your application here
+	// Return the initial view of your application here.
+	// The program and history load here so pressing Run only builds the list.
+	// The watch stops an app whose single callback runs too long.
 	function getInitialView() {
+		getServices();
 		var view = new MainMenuView();
 		var delegate = new MainMenuDelegate();
 		return [view, delegate];
