@@ -27,4 +27,17 @@
     <string id="MinuteAbbrev">min</string>
     <string id="WithWalks">with walks</string>
     <string id="RecommendedMark">* </string>
+    <string id="History">History</string>
+    <string id="ClearHistory">Clear history</string>
+    <string id="AddWorkout">Add workout</string>
+    <string id="RatingLabel">Rating</string>
+    <string id="Delete">Delete</string>
+    <string id="DeleteOlder">Delete this &amp; older</string>
+    <string id="ConfirmDelete">Delete entry?</string>
+    <string id="ConfirmDeleteOlder">Delete this &amp; older?</string>
+    <string id="ConfirmClear">Clear history?</string>
+    <string id="DateTitle">Date</string>
+    <string id="WorkoutTitle">Workout</string>
+    <string id="Today">Today</string>
+    <string id="Yesterday">Yesterday</string>
 </strings>

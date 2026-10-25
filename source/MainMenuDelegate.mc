@@ -9,6 +9,8 @@ class MainMenuDelegate extends WatchUi.Menu2InputDelegate {
 	function onSelect(item as WatchUi.MenuItem) as Void {
 		if (item.getId() == :run) {
 			openWorkoutList();
+		} else if (item.getId() == :history) {
+			openHistory();
 		}
 	}
 

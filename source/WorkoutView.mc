@@ -99,7 +99,7 @@ class WorkoutView extends WatchUi.View {
 			return;
 		}
 		recorder.save();
-		WatchUi.switchToView(new RatingMenu(), new RatingDelegate(self), WatchUi.SLIDE_LEFT);
+		WatchUi.switchToView(new RatingMenu(Rating.GOOD), new RatingDelegate(self), WatchUi.SLIDE_LEFT);
 	}
 
 	// Discard on "End workout?". Nothing is saved or logged. Closing the prompt
@@ -123,7 +123,7 @@ class WorkoutView extends WatchUi.View {
 		var services = appServices();
 		if (services.logWorkout(workoutIndex, rating)) {
 			services.markProgramCompleteShown();
-			WatchUi.switchToView(new ProgramCompleteView(), new ProgramCompleteDelegate(), WatchUi.SLIDE_LEFT);
+			WatchUi.switchToView(new ProgramCompleteView(), new ProgramCompleteDelegate(false), WatchUi.SLIDE_LEFT);
 			return;
 		}
 		ScreenStack.requestReturnToMain();
@@ -187,7 +187,7 @@ class WorkoutView extends WatchUi.View {
 		stopTicking();
 		recorder.pause();
 		attentionForWorkoutComplete();
-		WatchUi.switchToView(new RatingMenu(), new RatingDelegate(self), WatchUi.SLIDE_LEFT);
+		WatchUi.switchToView(new RatingMenu(Rating.GOOD), new RatingDelegate(self), WatchUi.SLIDE_LEFT);
 	}
 
 	function showCurrentActivityName() as Void {

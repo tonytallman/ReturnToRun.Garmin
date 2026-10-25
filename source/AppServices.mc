@@ -7,6 +7,10 @@ class AppServices {
 	var program as WorkoutProgram;
 	var trainingProgress as Progress;
 	var activeRecorder as WorkoutRecording.Recorder?;
+	// Bumped on every History edit so the History list knows to rebuild.
+	var historyVersion as Number = 0;
+	// The item the History list focuses after its next rebuild.
+	var historyFocus as Number = 0;
 
 	function initialize(program as WorkoutProgram, trainingProgress as Progress) {
 		self.program = program;
@@ -45,6 +49,8 @@ class AppServices {
 	// Logs a rated run on today's date. Returns true when the program-complete
 	// screen should show.
 	function logWorkout(zeroBasedIndex as Number, rating as Number) as Boolean {
+		historyFocus = 0;
+		historyChanged();
 		return trainingProgress.logWorkout(currentDay(), zeroBasedIndex + 1, rating);
 	}
 
@@ -61,6 +67,55 @@ class AppServices {
 		if (activeRecorder != null) {
 			(activeRecorder as WorkoutRecording.Recorder).save();
 		}
+	}
+
+	function historySize() as Number {
+		return trainingProgress.size();
+	}
+
+	function historyEntryAt(index as Number) as HistoryEntry? {
+		return trainingProgress.entryAt(index);
+	}
+
+	// Returns true when the program-complete screen should show now.
+	function changeHistoryRating(index as Number, rating as Number) as Boolean {
+		var show = trainingProgress.changeRating(index, rating, currentDay());
+		historyFocus = index;
+		historyChanged();
+		return show;
+	}
+
+	function deleteHistoryAt(index as Number) as Void {
+		trainingProgress.deleteAt(index);
+		historyFocus = HistoryFormat.focusAfterDelete(index, trainingProgress.size());
+		historyChanged();
+	}
+
+	function deleteHistoryAtAndOlder(index as Number) as Void {
+		trainingProgress.deleteAtAndOlder(index);
+		historyFocus = HistoryFormat.focusAfterDelete(index, trainingProgress.size());
+		historyChanged();
+	}
+
+	function clearHistory() as Void {
+		trainingProgress.clear();
+		historyFocus = HistoryFormat.addPosition(0);
+		historyChanged();
+	}
+
+	// Returns true when the program-complete screen should show now.
+	function addHistoryWorkout(date as CalendarDay, zeroBasedIndex as Number, rating as Number) as Boolean {
+		var show = trainingProgress.addWorkout(date, zeroBasedIndex + 1, rating, currentDay());
+		var added = trainingProgress.lastAddedIndex();
+		if (added >= 0) {
+			historyFocus = added;
+		}
+		historyChanged();
+		return show;
+	}
+
+	function historyChanged() as Void {
+		historyVersion = historyVersion + 1;
 	}
 
 	function warningsForToday() as Array<Number> {

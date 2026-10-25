@@ -31,13 +31,16 @@ class ProgramCompleteView extends WatchUi.View {
 	}
 }
 
-// Select or Back closes the screen and returns to the main menu.
+// Select or Back closes the screen. After a run it returns to the main menu;
+// after a History edit it returns to the History list.
 class ProgramCompleteDelegate extends WatchUi.BehaviorDelegate {
 	var closed as Boolean;
+	var toHistory as Boolean;
 
-	function initialize() {
+	function initialize(toHistory as Boolean) {
 		BehaviorDelegate.initialize();
 		closed = false;
+		self.toHistory = toHistory;
 	}
 
 	function onSelect() as Boolean {
@@ -55,7 +58,11 @@ class ProgramCompleteDelegate extends WatchUi.BehaviorDelegate {
 			return;
 		}
 		closed = true;
-		ScreenStack.requestReturnToMain();
+		if (toHistory) {
+			ScreenStack.requestReturnToHistory();
+		} else {
+			ScreenStack.requestReturnToMain();
+		}
 		WatchUi.popView(WatchUi.SLIDE_RIGHT);
 	}
 }
