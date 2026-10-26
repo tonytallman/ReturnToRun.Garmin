@@ -47,9 +47,9 @@
     <string id="RepoLink">github.com/tonytallman/ReturnToRun.Garmin</string>
     <string id="OpenOnPhoneHint">Press Start to open the link on your phone.</string>
     <string id="HelpProgramTitle">Program</string>
-    <string id="HelpProgram">40 workouts of running and walking.|Each starts with a 5-minute warm-up walk and ends with a 5-minute cool-down walk.|A 1-minute walk comes before the cool-down, except #38 to #40.|Run at most once a day, 4 to 6 times a week.|Saved workouts sync to Garmin Connect as runs.</string>
+    <string id="HelpProgram">40 workouts of running and walking.|Each starts with a 5-minute warm-up walk and ends with a 5-minute cool-down walk.|Run at most once a day, 4 to 6 times a week.|Saved workouts sync to Garmin Connect as runs.</string>
     <string id="HelpListTitle">Workout list</string>
-    <string id="HelpList">#1  R1 W1 &#215;3 means run 1 min, walk 1 min, 3 times.|R1:30 means run 1:30.|No W: no walk.|No &#215;: once.|Second line: total time, including warm-up and cool-down.|* marks the recommended workout.</string>
+    <string id="HelpList">#1  R1 W1 &#215;3 means run 1 min, walk 1 min, 3 times.|No W: no walk.|No &#215;: once.|Second line: total time, including warm-up and cool-down.|* marks the recommended workout.</string>
     <string id="HelpRatingsTitle">Ratings</string>
     <string id="HelpRatings">Rate how each workout felt. Your next workout:|Bad: back one.|OK: same one.|Good: next one.|Great: skip one.|Never below #1 or past #40.</string>
     <string id="HelpDaysOffTitle">Days off</string>
