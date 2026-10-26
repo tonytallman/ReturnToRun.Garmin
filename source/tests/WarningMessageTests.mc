@@ -4,8 +4,8 @@ import Toybox.Test;
 (:test)
 function testWarningMessages(logger as Test.Logger) as Boolean {
 	logger.debug("warning messages");
-	var daily = "It is recommended that you run no more than once per day.";
-	var weekly = "It is recommended that you run no more than six times per week.";
+	var daily = "Running more than once a day is not recommended.";
+	var weekly = "Running more than six days a week is not recommended.";
 	TestSupport.expectEqual(daily, WarningMessages.messageFor(PreRunWarnings.ALREADY_LOGGED_TODAY, daily, weekly), "already ran");
 	TestSupport.expectEqual(weekly, WarningMessages.messageFor(PreRunWarnings.SEVEN_CONSECUTIVE_DAYS, daily, weekly), "seven days");
 	TestSupport.expectNull(WarningMessages.messageFor(0, daily, weekly), "unknown code");

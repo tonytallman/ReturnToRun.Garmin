@@ -114,7 +114,12 @@ class AddRatingDelegate extends WatchUi.Menu2InputDelegate {
 		if (!(id instanceof Number)) {
 			return;
 		}
-		var show = appServices().addHistoryWorkout(date, workoutIndex, id as Number);
+		var services = appServices();
+		if (services.isTooOldForHistory(date)) {
+			showAddTooOld();
+			return;
+		}
+		var show = services.addHistoryWorkout(date, workoutIndex, id as Number);
 		finishHistoryEdit(show);
 	}
 }

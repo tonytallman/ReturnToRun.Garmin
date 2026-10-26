@@ -72,6 +72,12 @@ class Progress {
 		return shouldShowProgramComplete(today);
 	}
 
+	// True when History's Add Workout on this date would be rejected by the
+	// cap: the history is full and the date is older than every entry.
+	function isTooOldToAdd(date as CalendarDay) as Boolean {
+		return history.isTooOldToAdd(date);
+	}
+
 	// Where the latest successful add landed in the newest-first list, or -1.
 	function lastAddedIndex() as Number {
 		return history.lastAddedIndex;

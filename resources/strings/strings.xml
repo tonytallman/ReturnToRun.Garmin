@@ -16,11 +16,12 @@
     <string id="RatingGood">Good</string>
     <string id="RatingGreat">Great</string>
     <string id="ProgramCompleteTitle">Program complete</string>
+    <string id="AddTooOldMessage">This workout is older than all 100 saved workouts, so it wasn't added. History keeps only the 100 most recent.</string>
     <string id="ProgramCompleteMessage">Congratulations! You finished the program. Keep running #40, or pick #1 to start over.</string>
     <string id="Continue">Continue</string>
     <string id="Cancel">Cancel</string>
-    <string id="OncePerDayWarning">It is recommended that you run no more than once per day.</string>
-    <string id="SixPerWeekWarning">It is recommended that you run no more than six times per week.</string>
+    <string id="OncePerDayWarning">Running more than once a day is not recommended.</string>
+    <string id="SixPerWeekWarning">Running more than six days a week is not recommended.</string>
     <string id="RunAbbrev">R</string>
     <string id="WalkAbbrev">W</string>
     <string id="TimesMark">&#215;</string>
@@ -47,7 +48,7 @@
     <string id="RepoLink">github.com/tonytallman/ReturnToRun.Garmin</string>
     <string id="OpenOnPhoneHint">Press Start to open the link on your phone.</string>
     <string id="HelpProgramTitle">Program</string>
-    <string id="HelpProgram">40 workouts of running and walking.|Each starts with a 5-minute warm-up walk and ends with a 5-minute cool-down walk.|Run at most once a day, 4 to 6 times a week.|Saved workouts sync to Garmin Connect as runs.</string>
+    <string id="HelpProgram">40 workouts of running and walking.|Each starts with a 5-minute warm-up walk and ends with a 5-minute cool-down walk.|Run at most once a day, 4 to 6 times a week.|Saved workouts sync to Garmin Connect as runs.||Check with your doctor before starting a running program.</string>
     <string id="HelpListTitle">Workout list</string>
     <string id="HelpList">#1  R1 W1 &#215;3 means run 1 min, walk 1 min, 3 times.|No W: no walk.|No &#215;: once.|Second line: total time, including warm-up and cool-down.|* marks the recommended workout.</string>
     <string id="HelpRatingsTitle">Ratings</string>

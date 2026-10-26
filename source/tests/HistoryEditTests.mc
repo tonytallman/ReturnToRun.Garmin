@@ -78,12 +78,17 @@ function testHistoryAddWithCap(logger as Test.Logger) as Boolean {
 	logger.debug("history add with the cap");
 	var today = new CalendarDay(2026, 10, 24);
 	var progress = TestSupport.openStore(3).progress;
+	TestSupport.expectFalse(progress.isTooOldToAdd(today.plusDays(-100)), "an empty history takes any date");
 	progress.addWorkout(today.plusDays(-3), 2, Rating.GOOD, today);
 	progress.addWorkout(today.plusDays(-2), 3, Rating.GOOD, today);
 	progress.addWorkout(today.plusDays(-1), 4, Rating.GOOD, today);
 	progress.addWorkout(today, 5, Rating.GOOD, today);
 	TestSupport.expectEqual(3, progress.size(), "stays at the cap");
 	TestSupport.expectEntry(progress.entryAt(2), 2026, 10, 22, 3, Rating.GOOD, "the oldest dropped");
+	TestSupport.expectTrue(progress.isTooOldToAdd(today.plusDays(-10)), "older than a full history is too old");
+	TestSupport.expectTrue(progress.isTooOldToAdd(today.plusDays(-3)), "the day before the oldest is too old");
+	TestSupport.expectFalse(progress.isTooOldToAdd(today.plusDays(-2)), "the oldest entry's day is not too old");
+	TestSupport.expectFalse(progress.isTooOldToAdd(today), "today is not too old");
 	TestSupport.expectFalse(progress.addWorkout(today.plusDays(-10), 1, Rating.GOOD, today), "older than a full history");
 	TestSupport.expectEqual(-1, progress.lastAddedIndex(), "nothing added");
 	TestSupport.expectEqual(3, progress.size(), "still full");

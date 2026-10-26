@@ -15,6 +15,7 @@ Workout definitions live in `resources-program/data/program.json` and load throu
 - `logWorkout(date, id, rating)`, which adds the entry and returns whether the program-complete screen should show now
 - `shouldShowProgramComplete(today)` and `markProgramCompleteShown()`
 - `changeRating(index, rating, today)` and `addWorkout(date, id, rating, today)` for History; each returns whether the program-complete screen should show now (see below). `lastAddedIndex()` is where the last add landed, or -1 if the cap rejected it
+- `isTooOldToAdd(date)`, true when the history is full and an entry on that date would be older than every entry, so the cap would reject it (`HistoryStore.isTooOldToAdd`, the same rule `add` uses)
 
 The recommended workout is never stored. It is derived from the newest entry.
 
@@ -30,8 +31,8 @@ Program completion is that same result before clamping. If it would be 41 or hig
 
 `PreRunWarnings.evaluate` returns every warning that applies, in this priority order:
 
-1. `ALREADY_LOGGED_TODAY` — any entry dated today. Message: "It is recommended that you run no more than once per day."
-2. `SEVEN_CONSECUTIVE_DAYS` — each of the previous 6 calendar days has at least one entry, so a run today would be the 7th day in a row. Message: "It is recommended that you run no more than six times per week."
+1. `ALREADY_LOGGED_TODAY` — any entry dated today. Message: "Running more than once a day is not recommended."
+2. `SEVEN_CONSECUTIVE_DAYS` — each of the previous 6 calendar days has at least one entry, so a run today would be the 7th day in a row. Message: "Running more than six days a week is not recommended."
 
 There is no check for too few recent runs.
 
@@ -57,7 +58,7 @@ Building the list does no date math per entry. `HistoryWords` loads the four rat
 
 Selecting an entry opens its details, a Menu2 titled `Oct 24  #5` with Rating (the current rating as the subtitle), Delete, and "Delete this & older". Rating opens the rating menu with the current rating focused; choosing one saves it and returns to the History list. Delete asks "Delete workout?", Delete this & older asks "Delete this & older?", and Clear history asks "Clear all history?". Each uses the standard Confirmation, so the prompts are kept short enough not to be cut off. Yes makes the change and returns to the list; No or Back changes nothing.
 
-Add workout asks for the date, then the workout, then the rating. The date screen shows the short date large, with Today, Yesterday, or the weekday under it. It starts at today; Down goes back a day, Up goes forward a day but never past today, and there is no lower limit. `DateStepper` holds that logic and is UI-free. The workout step reuses the workout list (titled Workout, with today's recommendation starred and focused), and the rating step reuses the rating menu with Good focused. The new entry is added at its date and the list focuses it. An add that the cap rejects (older than a full history) adds nothing, silently.
+Add workout asks for the date, then the workout, then the rating. The date screen shows the short date large, with Today, Yesterday, or the weekday under it. It starts at today; Down goes back a day, Up goes forward a day but never past today, and there is no lower limit. `DateStepper` holds that logic and is UI-free. The workout step reuses the workout list (titled Workout, with today's recommendation starred and focused), and the rating step reuses the rating menu with Good focused. The new entry is added at its date and the list focuses it. An add that the cap would reject (the history is full and the date is older than all 100 entries) adds nothing. The rating step is replaced by a `NoticeView` that says "This workout is older than all 100 saved workouts, so it wasn't added. History keeps only the 100 most recent." (`AddTooOldMessage`); Start or Back returns to the History list. The decision is `Progress.isTooOldToAdd`, which is UI-free and unit tested.
 
 A rating change on the newest entry, or an added entry that becomes the newest, uses the same program-complete rule as a logged run: if it applies and the screen has not been shown for this program, "Program complete" is shown once, and closing it returns to the History list. The recommendation and the pre-run warnings are derived from history, so they follow every edit, delete, and add with no extra bookkeeping.
 
@@ -67,7 +68,7 @@ The Workout and How did it go? titles on the reused menus are hidden on this wat
 
 ### Instructions and About
 
-Instructions is a Menu2 of topics: Program, Workout list, Ratings, Days off, Warnings, and Buttons. Each topic opens a `TextPageView`: a green title and the body in `FONT_XTINY`, a page at a time. Down shows the next page and Up the previous one; small arrows show when there is more above or below, and Back returns to the topic list. All of the text is in `resources/strings/strings.xml` (`Help*` strings). In those strings `|` starts a new line and `||` leaves a blank line, because `\n` is not reliably escaped in Connect IQ string resources.
+Instructions is a Menu2 of topics: Program, Workout list, Ratings, Days off, Warnings, and Buttons. Each topic opens a `TextPageView`: a green title and the body in `FONT_XTINY`, a page at a time. Down shows the next page and Up the previous one; small arrows show when there is more above or below, and Back returns to the topic list. All of the text is in `resources/strings/strings.xml` (`Help*` strings). The Program topic ends with "Check with your doctor before starting a running program." In those strings `|` starts a new line and `||` leaves a blank line, because `\n` is not reliably escaped in Connect IQ string resources.
 
 The view wraps and pages the body once in `onLayout` with `TextWrap` and keeps the lines, so `onUpdate` only draws. Lines are 72% of the screen wide and the body runs from 27% to 85% of the height, which keeps every line inside the round face of the fēnix 5X; the lines per page come from the font height. Each sentence starts a new line (a `|` piece is split into sentences at `. `). Pages break between sentences: a page takes as many whole sentences as fit, so a sentence is never split across pages, and a blank line that does not fit stays at the end of its page so no page starts blank. Only a sentence taller than a whole page is split at line boundaries. `TextPages` (splitting on `|` and into sentences, wrapping each sentence, choosing the first line of each page, and breaking a link after each `/` since it has no spaces) and `TextPager` (page count, first and end line, next and previous) are UI-free and unit tested. A test also checks that no word in the help text is longer than 16 characters, since `TextWrap` never splits a word.
 
