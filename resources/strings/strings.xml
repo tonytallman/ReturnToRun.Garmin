@@ -16,7 +16,7 @@
     <string id="RatingGood">Good</string>
     <string id="RatingGreat">Great</string>
     <string id="ProgramCompleteTitle">Program complete</string>
-    <string id="ProgramCompleteMessage">You finished the return-to-run program. Keep running the last workout, or start again at workout 1.</string>
+    <string id="ProgramCompleteMessage">Congratulations! You finished the program. Keep running #40, or pick #1 to start over.</string>
     <string id="Continue">Continue</string>
     <string id="Cancel">Cancel</string>
     <string id="OncePerDayWarning">It is recommended that you run no more than once per day.</string>
@@ -33,9 +33,9 @@
     <string id="RatingLabel">Rating</string>
     <string id="Delete">Delete</string>
     <string id="DeleteOlder">Delete this &amp; older</string>
-    <string id="ConfirmDelete">Delete entry?</string>
+    <string id="ConfirmDelete">Delete workout?</string>
     <string id="ConfirmDeleteOlder">Delete this &amp; older?</string>
-    <string id="ConfirmClear">Clear history?</string>
+    <string id="ConfirmClear">Clear all history?</string>
     <string id="DateTitle">Date</string>
     <string id="WorkoutTitle">Workout</string>
     <string id="Today">Today</string>
@@ -47,15 +47,15 @@
     <string id="RepoLink">github.com/tonytallman/ReturnToRun.Garmin</string>
     <string id="OpenOnPhoneHint">Press Start to open the link on your phone.</string>
     <string id="HelpProgramTitle">Program</string>
-    <string id="HelpProgram">40 workouts of running and walking.|Each starts with a 5-minute warm-up walk and ends with a 5-minute cool-down walk.|A 1-minute walk comes before the cool-down, except #38 to #40.|Run at most once a day, 4 to 6 times a week.|Every run is recorded to Garmin Connect.</string>
+    <string id="HelpProgram">40 workouts of running and walking.|Each starts with a 5-minute warm-up walk and ends with a 5-minute cool-down walk.|A 1-minute walk comes before the cool-down, except #38 to #40.|Run at most once a day, 4 to 6 times a week.|Saved workouts sync to Garmin Connect as runs.</string>
     <string id="HelpListTitle">Workout list</string>
-    <string id="HelpList">#1  R1 W1 &#215;3 means run 1 min, walk 1 min, 3 times.|R1:30 means run 1:30.|No W: no walk.|No &#215;: once.|Below it: total time, warm-up and cool-down included.|* marks the recommended workout.</string>
+    <string id="HelpList">#1  R1 W1 &#215;3 means run 1 min, walk 1 min, 3 times.|R1:30 means run 1:30.|No W: no walk.|No &#215;: once.|Second line: total time, including warm-up and cool-down.|* marks the recommended workout.</string>
     <string id="HelpRatingsTitle">Ratings</string>
-    <string id="HelpRatings">Rate each run when it ends. Your next workout:|Bad: back one|OK: same one|Good: next one|Great: skip one|Never below #1 or past #40.</string>
+    <string id="HelpRatings">Rate how each workout felt. Your next workout:|Bad: back one.|OK: same one.|Good: next one.|Great: skip one.|Never below #1 or past #40.</string>
     <string id="HelpDaysOffTitle">Days off</string>
-    <string id="HelpDaysOff">Full days between your last run and today move you back after the rating:|0 to 2: no change|3: back one|4: back two|5: back three|6+: restart at #1</string>
+    <string id="HelpDaysOff">Full days between your last run and today move you back after the rating:|Ran Monday, today Thursday: 2 days off.|0 to 2: no change.|3: back one.|4: back two.|5: back three.|6+: restart at #1.</string>
     <string id="HelpWarningsTitle">Warnings</string>
-    <string id="HelpWarnings">Before a run you may be warned:|Once per day: you already ran today.|Six per week: you ran each of the last 6 days.|Continue runs anyway. Cancel goes back.</string>
+    <string id="HelpWarnings">Before a workout you may see a warning:|Once per day: you already ran today.|Six per week: you ran each of the last 6 days.|Continue shows the next warning, or starts the workout. Cancel goes back.</string>
     <string id="HelpButtonsTitle">Buttons</string>
-    <string id="HelpButtons">During a workout:|Start: pause or resume.|Back: pause.|Back while paused: End workout?|Resume: keep going.|Save: save and rate it.|Discard: delete it, not logged.|After the cool-down it ends and asks for a rating.</string>
+    <string id="HelpButtons">During a workout:|Start: pause or resume.|Back: pause.|Back while paused: the End workout? menu.|Resume: keep going.|Save: keep it and rate it.|Discard: delete it. Nothing is logged.|Pick a rating to finish. Back stays on this screen.|After the cool-down it ends and asks for a rating.</string>
 </strings>

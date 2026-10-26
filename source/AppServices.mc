@@ -1,6 +1,5 @@
 import Toybox.Application;
 import Toybox.Lang;
-import Toybox.WatchUi;
 
 // Composition root for the screens.
 class AppServices {
@@ -56,8 +55,8 @@ class AppServices {
 
 	// One recorder per workout. The app keeps the latest so it can save an
 	// unfinished run if the app is stopped.
-	function newRecorder() as WorkoutRecording.Recorder {
-		var name = WatchUi.loadResource(Rez.Strings.AppName) as String;
+	function newRecorder(workoutId as Number) as WorkoutRecording.Recorder {
+		var name = RecordingActivityName.forWorkout(workoutId);
 		var recorder = new WorkoutRecording.Recorder(new FitRecordingPort(name));
 		activeRecorder = recorder;
 		return recorder;
