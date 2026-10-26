@@ -243,8 +243,12 @@ class WorkoutView extends WatchUi.View {
 			}
 		}
 		if (remainingLabel != null) {
-			var remaining = WorkoutDuration.remainingSeconds(workout, currentActivityIndex, timeLeft);
-			var remainingText = getTimeAsString(remaining) + " " + timeLeftSuffix;
+			// Time left until cool-down; cool-down itself shows none.
+			var remainingText = "";
+			if (WorkoutDuration.showsRemaining(workout, currentActivityIndex)) {
+				var remaining = WorkoutDuration.remainingBeforeCoolDown(workout, currentActivityIndex, timeLeft);
+				remainingText = getTimeAsString(remaining) + " " + timeLeftSuffix;
+			}
 			(remainingLabel as WatchUi.Text).setText(remainingText);
 		}
 		if (pausedLabel != null) {
