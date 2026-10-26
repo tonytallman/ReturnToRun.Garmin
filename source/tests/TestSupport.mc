@@ -128,4 +128,28 @@ module TestSupport {
 		}
 		return 1;
 	}
+
+	// A block of n placeholder lines, standing in for one wrapped sentence.
+	function textBlock(n as Number) as Array<String> {
+		var block = [] as Array<String>;
+		for (var i = 0; i < n; i++) {
+			block.add("x");
+		}
+		return block;
+	}
+
+	function textBlocks(sizes as Array<Number>) as Array<Array<String> > {
+		var blocks = [] as Array<Array<String> >;
+		for (var i = 0; i < sizes.size(); i++) {
+			blocks.add(textBlock(sizes[i]));
+		}
+		return blocks;
+	}
+
+	function expectStarts(expected as Array<Number>, actual as Array<Number>, message as String) as Void {
+		expectEqual(expected.size(), actual.size(), message + ": page count");
+		for (var i = 0; i < expected.size() && i < actual.size(); i++) {
+			expectEqual(expected[i], actual[i], message + ": page " + (i + 1));
+		}
+	}
 }

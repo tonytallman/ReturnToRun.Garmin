@@ -26,7 +26,7 @@ class WorkoutView extends WatchUi.View {
 		View.initialize();
 		self.workoutIndex = workoutIndex;
 		session = new WorkoutSession.Machine();
-		recorder = appServices().newRecorder();
+		recorder = appServices().newRecorder(workoutIndex + 1);
 		leaveTimer = new LeaveTimer();
 		pausedText = "";
 		timeLeftSuffix = "";

@@ -3,8 +3,8 @@ import Toybox.Lang;
 import Toybox.WatchUi;
 
 // A title and a body of static text, paged with Up and Down.
-// The body is wrapped once, in onLayout, and the lines are kept, so redraws
-// and page turns do no text measuring. Positions are fractions of the display
+// The body is wrapped and paged once, in onLayout, and the lines are kept, so
+// redraws and page turns do no text measuring. Positions are fractions of the display
 // so every line stays inside the round face.
 class TextPageView extends WatchUi.View {
 	var title as String;
@@ -17,7 +17,7 @@ class TextPageView extends WatchUi.View {
 		self.title = title;
 		self.body = body;
 		lines = [] as Array<String>;
-		pager = new TextPager(0, 1);
+		pager = new TextPager(0, [0] as Array<Number>);
 	}
 
 	// The body runs from 27% to 85% of the height. At those edges the circle
@@ -26,8 +26,9 @@ class TextPageView extends WatchUi.View {
 		var height = dc.getHeight();
 		var lineHeight = dc.getFontHeight(Graphics.FONT_XTINY);
 		var bodyHeight = height * 58 / 100;
-		lines = TextPages.lines(body, dc.getWidth() * 72 / 100, new DcTextMeasure(dc, Graphics.FONT_XTINY));
-		pager = new TextPager(lines.size(), bodyHeight / lineHeight);
+		var blocks = TextPages.blocks(body, dc.getWidth() * 72 / 100, new DcTextMeasure(dc, Graphics.FONT_XTINY));
+		lines = TextPages.flatten(blocks);
+		pager = new TextPager(lines.size(), TextPages.pageStarts(blocks, bodyHeight / lineHeight));
 	}
 
 	function onUpdate(dc as Graphics.Dc) as Void {
