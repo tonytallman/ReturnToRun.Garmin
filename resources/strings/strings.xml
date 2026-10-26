@@ -57,5 +57,5 @@
     <string id="HelpWarningsTitle">Warnings</string>
     <string id="HelpWarnings">Before a workout you may see a warning:|Once per day: you already ran today.|Six per week: you ran each of the last 6 days.|Continue shows the next warning, or starts the workout. Cancel goes back.</string>
     <string id="HelpButtonsTitle">Buttons</string>
-    <string id="HelpButtons">During a workout:|Start: pause or resume.|Back: pause.|Back while paused: the End workout? menu.|Resume: keep going.|Save: keep it and rate it.|Discard: delete it. Nothing is logged.|Pick a rating to finish. Back stays on this screen.|After the cool-down it ends and asks for a rating.</string>
+    <string id="HelpButtons">During a workout:|Start: pause or resume.|Back: pause.|Back while paused: the End workout? menu.|Resume: keep going.|Save: keep it and rate it.|Discard: delete it. Nothing is logged.|After the cool-down it ends and asks for a rating.|Pick a rating to finish. Back stays on this screen.</string>
 </strings>

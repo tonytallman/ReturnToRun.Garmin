@@ -5,8 +5,8 @@ import Toybox.WatchUi;
 (:test)
 function testTextPager(logger as Test.Logger) as Boolean {
 	logger.debug("text paging");
-	var pager = new TextPager(13, 5);
-	TestSupport.expectEqual(3, pager.pageCount(), "13 lines at 5 a page");
+	var pager = new TextPager(13, [0, 5, 10] as Array<Number>);
+	TestSupport.expectEqual(3, pager.pageCount(), "three pages");
 	TestSupport.expectEqual(0, pager.firstLine(), "starts at the top");
 	TestSupport.expectEqual(5, pager.endLine(), "first page");
 	TestSupport.expectFalse(pager.hasPrevious(), "nothing above the top");
@@ -23,16 +23,39 @@ function testTextPager(logger as Test.Logger) as Boolean {
 	TestSupport.expectTrue(pager.previous(), "Up");
 	TestSupport.expectEqual(5, pager.firstLine(), "back to the second page");
 
-	var exact = new TextPager(10, 5);
-	TestSupport.expectEqual(2, exact.pageCount(), "an exact multiple has no empty page");
-	var short = new TextPager(3, 5);
+	var short = new TextPager(3, [0] as Array<Number>);
 	TestSupport.expectEqual(1, short.pageCount(), "fits on one page");
 	TestSupport.expectFalse(short.hasNext(), "no arrow when it fits");
-	var empty = new TextPager(0, 5);
+	var empty = new TextPager(0, [] as Array<Number>);
 	TestSupport.expectEqual(1, empty.pageCount(), "empty text is one page");
+	TestSupport.expectEqual(0, empty.firstLine(), "starting at the top");
 	TestSupport.expectEqual(0, empty.endLine(), "with no lines");
-	var tiny = new TextPager(3, 0);
-	TestSupport.expectEqual(3, tiny.pageCount(), "at least one line a page");
+	return true;
+}
+
+(:test)
+function testTextPageBreaks(logger as Test.Logger) as Boolean {
+	logger.debug("page breaks between sentences");
+	TestSupport.expectStarts([0], TextPages.pageStarts(TestSupport.textBlocks([2, 2]), 5), "fits on one page");
+	TestSupport.expectStarts([0], TextPages.pageStarts(TestSupport.textBlocks([5]), 5), "exactly one page");
+	TestSupport.expectStarts([0, 5], TextPages.pageStarts(TestSupport.textBlocks([1, 1, 1, 1, 1, 1]), 5), "fills a page with whole sentences");
+	TestSupport.expectStarts([0, 4], TextPages.pageStarts(TestSupport.textBlocks([2, 2, 2]), 5), "the third sentence moves whole to page two");
+	TestSupport.expectStarts([0, 3, 6], TextPages.pageStarts(TestSupport.textBlocks([3, 3, 3]), 5), "never splits a sentence");
+	TestSupport.expectStarts([0, 5], TextPages.pageStarts(TestSupport.textBlocks([5, 5]), 5), "an exact fill has no empty page");
+	TestSupport.expectStarts([0, 5], TextPages.pageStarts(TestSupport.textBlocks([7]), 5), "an oversize sentence splits at a line");
+	TestSupport.expectStarts([0, 2, 7], TextPages.pageStarts(TestSupport.textBlocks([2, 7, 1]), 5), "an oversize sentence starts a page");
+	TestSupport.expectStarts([0, 5], TextPages.pageStarts(TestSupport.textBlocks([10]), 5), "two full pages, no empty third");
+	TestSupport.expectStarts([0], TextPages.pageStarts([] as Array<Array<String> >, 5), "empty input is one page");
+	TestSupport.expectStarts([0, 1, 2], TextPages.pageStarts(TestSupport.textBlocks([1, 1, 1]), 0), "at least one line a page");
+
+	var withBlank = TestSupport.textBlocks([5]);
+	withBlank.add([""] as Array<String>);
+	withBlank.add(TestSupport.textBlock(1));
+	TestSupport.expectStarts([0, 6], TextPages.pageStarts(withBlank, 5), "a blank line never starts a page");
+	var blankFits = TestSupport.textBlocks([2]);
+	blankFits.add([""] as Array<String>);
+	blankFits.add(TestSupport.textBlock(3));
+	TestSupport.expectStarts([0, 3], TextPages.pageStarts(blankFits, 5), "a blank line that fits stays");
 	return true;
 }
 
@@ -48,6 +71,17 @@ function testTextPages(logger as Test.Logger) as Boolean {
 	TestSupport.expectEqual("", lines[3], "|| leaves a blank line");
 	TestSupport.expectEqual("ee", lines[4], "after the blank line");
 	TestSupport.expectEqual(1, TextPages.lines("one", 100, measure).size(), "no breaks");
+
+	var blocks = TextPages.blocks("Aa bb. Cc dd.|Is it? no.", 1000, measure);
+	TestSupport.expectEqual(3, blocks.size(), "one block per sentence");
+	TestSupport.expectEqual("Aa bb.", blocks[0][0], "first sentence keeps its period");
+	TestSupport.expectEqual("Cc dd.", blocks[1][0], "second sentence starts a line");
+	TestSupport.expectEqual("Is it? no.", blocks[2][0], "only a period ends a sentence");
+	var wrapped = TextPages.blocks("aa bb cc", 50, measure);
+	TestSupport.expectEqual(1, wrapped.size(), "a wrapped sentence is one block");
+	TestSupport.expectEqual(2, wrapped[0].size(), "of two lines");
+	TestSupport.expectEqual(1, TextPages.blocks("", 50, measure).size(), "empty text is one blank block");
+
 	TestSupport.expectEqual("github.com/|tonytallman/|ReturnToRun.Garmin",
 		TextPages.breakAfterSlashes("github.com/tonytallman/ReturnToRun.Garmin"), "the link breaks after each slash");
 	TestSupport.expectEqual("plain", TextPages.breakAfterSlashes("plain"), "no slash, no break");

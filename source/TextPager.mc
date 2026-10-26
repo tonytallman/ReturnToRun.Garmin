@@ -1,32 +1,31 @@
 import Toybox.Lang;
 
 // Which lines of a long text are on screen. Up and Down move a whole page.
+// Pages are given by the first line of each page (see TextPages.pageStarts),
+// so a page can end early to keep a sentence whole.
 // UI-free so the paging is unit tested.
 class TextPager {
 	var lineCount as Number;
-	var linesPerPage as Number;
+	var starts as Array<Number>;
 	var page as Number;
 
-	function initialize(lineCount as Number, linesPerPage as Number) {
+	function initialize(lineCount as Number, starts as Array<Number>) {
 		self.lineCount = (lineCount < 0) ? 0 : lineCount;
-		self.linesPerPage = (linesPerPage < 1) ? 1 : linesPerPage;
+		self.starts = (starts.size() == 0) ? [0] as Array<Number> : starts;
 		page = 0;
 	}
 
 	function pageCount() as Number {
-		if (lineCount == 0) {
-			return 1;
-		}
-		return (lineCount + linesPerPage - 1) / linesPerPage;
+		return starts.size();
 	}
 
 	// The first line on the current page, and one past its last.
 	function firstLine() as Number {
-		return page * linesPerPage;
+		return starts[page];
 	}
 
 	function endLine() as Number {
-		var end = firstLine() + linesPerPage;
+		var end = (page + 1 < starts.size()) ? starts[page + 1] : lineCount;
 		return (end > lineCount) ? lineCount : end;
 	}
 
