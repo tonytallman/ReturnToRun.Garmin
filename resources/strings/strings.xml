@@ -42,7 +42,7 @@
     <string id="Yesterday">Yesterday</string>
     <string id="Instructions">Instructions</string>
     <string id="About">About</string>
-    <string id="AppVersion">0.0.1</string>
+    <string id="AppVersion">1.0.0</string>
     <string id="VersionLabel">Version</string>
     <string id="RepoLink">github.com/tonytallman/ReturnToRun.Garmin</string>
     <string id="OpenOnPhoneHint">Press Start to open the link on your phone.</string>
