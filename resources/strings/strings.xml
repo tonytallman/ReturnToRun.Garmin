@@ -51,7 +51,7 @@
     <string id="HelpListTitle">Workout list</string>
     <string id="HelpList">#1  R1 W1 &#215;3 means run 1 min, walk 1 min, 3 times.|No W: no walk.|No &#215;: once.|Second line: total time, including warm-up and cool-down.|* marks the recommended workout.</string>
     <string id="HelpRatingsTitle">Ratings</string>
-    <string id="HelpRatings">Rate how each workout felt. Your next workout:|Bad: back one.|OK: same one.|Good: next one.|Great: skip one.|Never below #1 or past #40.</string>
+    <string id="HelpRatings">Rate how each workout felt. Your next workout:|Bad: back one.|OK: same one.|Good: next one.|Great: skip one.</string>
     <string id="HelpDaysOffTitle">Days off</string>
     <string id="HelpDaysOff">Full days between your last run and today move you back after the rating:|Ran Monday, today Thursday: 2 days off.|0 to 2: no change.|3: back one.|4: back two.|5: back three.|6+: restart at #1.</string>
     <string id="HelpWarningsTitle">Warnings</string>
