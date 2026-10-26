@@ -99,7 +99,7 @@ class WorkoutView extends WatchUi.View {
 			return;
 		}
 		recorder.save();
-		WatchUi.switchToView(new RatingMenu(Rating.GOOD), new RatingDelegate(self), WatchUi.SLIDE_LEFT);
+		WatchUi.switchToView(new RatingPicker(Rating.GOOD), new RatingDelegate(self), WatchUi.SLIDE_LEFT);
 	}
 
 	// Discard on "End workout?". Nothing is saved or logged. Closing the prompt
@@ -113,7 +113,7 @@ class WorkoutView extends WatchUi.View {
 		WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
 	}
 
-	// A choice on "How did it go?". Saves the run if the end prompt did not,
+	// A choice on "How did it feel?". Saves the run if the end prompt did not,
 	// logs it, then shows program complete once or returns to the main menu.
 	function rate(rating as Number) as Void {
 		if (session.onRated() != WorkoutSession.LOG) {
@@ -187,7 +187,7 @@ class WorkoutView extends WatchUi.View {
 		stopTicking();
 		recorder.pause();
 		attentionForWorkoutComplete();
-		WatchUi.switchToView(new RatingMenu(Rating.GOOD), new RatingDelegate(self), WatchUi.SLIDE_LEFT);
+		WatchUi.switchToView(new RatingPicker(Rating.GOOD), new RatingDelegate(self), WatchUi.SLIDE_LEFT);
 	}
 
 	function showCurrentActivityName() as Void {
