@@ -6,3 +6,12 @@ base.sourcePath = source
 vivoactive3.resourcePath = $(vivoactive3.resourcePath);resources-icon-40x33
 vivoactive3m.resourcePath = $(vivoactive3m.resourcePath);resources-icon-40x33
 vivoactive3mlte.resourcePath = $(vivoactive3mlte.resourcePath);resources-icon-40x33
+# fr55, the Legacy Hero First Avenger and Legacy Saga Darth Vader, and the vivoactive 4 use 35 x 35.
+fr55.resourcePath = $(fr55.resourcePath);resources-icon-35x35
+legacyherofirstavenger.resourcePath = $(legacyherofirstavenger.resourcePath);resources-icon-35x35
+legacysagadarthvader.resourcePath = $(legacysagadarthvader.resourcePath);resources-icon-35x35
+vivoactive4.resourcePath = $(vivoactive4.resourcePath);resources-icon-35x35
+# The Legacy Hero Captain Marvel, Legacy Saga Rey, and vivoactive 4S use 30 x 30.
+legacyherocaptainmarvel.resourcePath = $(legacyherocaptainmarvel.resourcePath);resources-icon-30x30
+legacysagarey.resourcePath = $(legacysagarey.resourcePath);resources-icon-30x30
+vivoactive4s.resourcePath = $(vivoactive4s.resourcePath);resources-icon-30x30

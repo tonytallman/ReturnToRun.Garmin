@@ -146,6 +146,13 @@ Most supported watches use the 40 x 40 icon. The vívoactive 3 family (vivoactiv
 tools/render-icon.py resources/drawables/launcher_icon.svg resources-icon-40x33/drawables/launcher_icon.png 40x33
 ```
 
+Smaller round watches use smaller square icons in the same way: `resources-icon-35x35` (fr55, Legacy Hero First Avenger, Legacy Saga Darth Vader, vívoactive 4) and `resources-icon-30x30` (Legacy Hero Captain Marvel, Legacy Saga Rey, vívoactive 4S):
+
+```sh
+tools/render-icon.py resources/drawables/launcher_icon.svg resources-icon-35x35/drawables/launcher_icon.png 35
+tools/render-icon.py resources/drawables/launcher_icon.svg resources-icon-30x30/drawables/launcher_icon.png 30
+```
+
 When adding a device, check its `launcherIcon` size in `~/.Garmin/ConnectIQ/Devices/<device>/compiler.json`. If it is not 40 x 40, add a `resources-icon-<W>x<H>` folder the same way; otherwise the compiler warns and scales the 40 x 40 icon.
 
 Check the version before a release:
