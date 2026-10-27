@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
+  <title>ReturnToRun launcher icon (variant a)</title>
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <!-- far arm and far leg (behind the body) -->
+    <polyline stroke="#00AA00" stroke-width="4" points="22,15 16,17 12.5,22"/>
+    <polyline stroke="#00AA00" stroke-width="4.5" points="19,22 15,29 7.5,29 6,25.5"/>
+    <!-- torso -->
+    <line stroke="#00AA00" stroke-width="5.5" x1="23" y1="13.2" x2="19" y2="22"/>
+    <!-- near leg and near arm -->
+    <polyline stroke="#00AA00" stroke-width="4.5" points="19,22 26.5,26.5 25,34.5 29.5,35"/>
+    <polyline stroke="#00AA00" stroke-width="4" points="22.5,15 28,18.5 32.5,15"/>
+  </g>
+  <circle fill="#00AA00" cx="27" cy="5.6" r="4"/>
+</svg>

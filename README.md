@@ -112,6 +112,18 @@ monkeydo bin/ReturnToRun-quick.prg fenix5x
 
 `monkey.jungle` sets `base.resourcePath` to `resources;resources-program`. `quick.jungle` sets it to `resources;resources-quick` and is only passed for the quick build, so the two `WorkoutProgram` resources are never compiled together. Repeat counts and ids in the quick file match the real catalog (40 workouts). VS Code's Run Quick launch configuration passes the same jungle list and still asks for the target device.
 
+### Launcher icon
+
+The launcher icon is `resources/drawables/launcher_icon.png`, 40 x 40 px (the fēnix 5X `launcherIcon` size). Its source is `resources/drawables/launcher_icon.svg`, an original running figure in palette greens (00FF00 near limbs, 00AA00 far limbs) on a transparent background. `resources/drawables/icon-variants/` keeps the other designs that were considered (`runner-a`: one shade of 00AA00; `runner-b`: 55FF55 and 00AA00, same pose; `runner-c`: the chosen design). After editing the SVG, render the PNG again:
+
+```sh
+sudo apt install librsvg2-bin   # rsvg-convert; the script also needs Pillow
+tools/render-icon.py            # resources/drawables/launcher_icon.svg -> launcher_icon.png
+tools/render-icon.py resources/drawables/icon-variants/runner-a.svg /tmp/runner-a.png
+```
+
+The script renders at 8x, scales down to 40 x 40, makes pixels under 50% coverage transparent, and snaps every other pixel to the device's 64-colour palette (each channel 00, 55, AA, or FF), so the PNG matches what the watch draws.
+
 Check the version before a release:
 
 ```sh
