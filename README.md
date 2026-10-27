@@ -136,6 +136,14 @@ tools/render-icon.py            # resources/drawables/launcher_icon.svg -> launc
 
 The script renders at 8x, scales down to 40 x 40, makes pixels under 50% coverage transparent, and snaps every other pixel to the device's 64-colour palette (each channel 00, 55, AA, or FF), so the PNG matches what the watch draws.
 
+Most supported watches use the 40 x 40 icon. The vívoactive 3 family (vivoactive3, vivoactive3m, vivoactive3mlte) uses 40 x 33, so `resources-icon-40x33/drawables/launcher_icon.png` holds the same drawing centred on a 40 x 33 canvas, and `monkey.jungle` adds that folder to those devices' resource paths. Render it again too after editing the SVG:
+
+```sh
+tools/render-icon.py resources/drawables/launcher_icon.svg resources-icon-40x33/drawables/launcher_icon.png 40x33
+```
+
+When adding a device, check its `launcherIcon` size in `~/.Garmin/ConnectIQ/Devices/<device>/compiler.json`. If it is not 40 x 40, add a `resources-icon-<W>x<H>` folder the same way; otherwise the compiler warns and scales the 40 x 40 icon.
+
 Check the version before a release:
 
 ```sh

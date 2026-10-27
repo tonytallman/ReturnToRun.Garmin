@@ -2,3 +2,7 @@ project.manifest = manifest.xml
 base.resourcePath = resources;resources-program
 # Only source/. The screen tour (tour.jungle) adds source-tour.
 base.sourcePath = source
+# The vivoactive 3 family's launcher icon is 40 x 33; this folder's LauncherIcon replaces the 40 x 40 one.
+vivoactive3.resourcePath = $(vivoactive3.resourcePath);resources-icon-40x33
+vivoactive3m.resourcePath = $(vivoactive3m.resourcePath);resources-icon-40x33
+vivoactive3mlte.resourcePath = $(vivoactive3mlte.resourcePath);resources-icon-40x33
