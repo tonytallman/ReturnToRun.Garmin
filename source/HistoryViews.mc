@@ -75,7 +75,7 @@ class HistoryListDelegate extends WatchUi.Menu2InputDelegate {
 }
 
 // Workout details: the entry's date and workout as the title, then its rating,
-// Delete, and Delete this & older. Any change returns to the History list.
+// Delete, and Delete older too. Any change returns to the History list.
 class HistoryDetailsView extends WatchUi.Menu2 {
 	var leaveTimer as LeaveTimer;
 
