@@ -10,7 +10,7 @@
     <string id="Resume">Resume</string>
     <string id="Save">Save</string>
     <string id="Discard">Discard</string>
-    <string id="RatingTitle">How did it go?</string>
+    <string id="RatingTitle">How did it feel?</string>
     <string id="RatingBad">Bad</string>
     <string id="RatingOk">OK</string>
     <string id="RatingGood">Good</string>
@@ -58,5 +58,5 @@
     <string id="HelpWarningsTitle">Warnings</string>
     <string id="HelpWarnings">Before a workout you may see a warning:|Once per day: you already ran today.|Six per week: you ran each of the last 6 days.|Continue shows the next warning, or starts the workout. Cancel goes back.</string>
     <string id="HelpButtonsTitle">Buttons</string>
-    <string id="HelpButtons">During a workout:|Start: pause or resume.|Back: pause.|Back while paused: the End workout? menu.|Resume: keep going.|Save: keep it and rate it.|Discard: delete it. Nothing is logged.|After the cool-down it ends and asks for a rating.|Pick a rating to finish. Back stays on this screen.</string>
+    <string id="HelpButtons">During a workout:|Start: pause or resume.|Back: pause.|Back while paused: the End workout? menu.|Resume: keep going.|Save: keep it and rate it.|Discard: delete it. Nothing is logged.|After the cool-down it ends and asks How did it feel?|Up and Down change the rating. Start picks it. Back stays on this screen.</string>
 </strings>

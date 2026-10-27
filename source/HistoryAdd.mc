@@ -93,33 +93,41 @@ class AddWorkoutDelegate extends WatchUi.Menu2InputDelegate {
 	function onSelect(item as WatchUi.MenuItem) as Void {
 		var id = item.getId();
 		if (id instanceof Number) {
-			WatchUi.pushView(new RatingMenu(Rating.GOOD), new AddRatingDelegate(date, id as Number), WatchUi.SLIDE_LEFT);
+			WatchUi.pushView(new RatingPicker(Rating.GOOD), new AddRatingDelegate(date, id as Number), WatchUi.SLIDE_LEFT);
 		}
 	}
 }
 
-// Add workout, step 3: the rating. Adds the entry and returns to History.
-class AddRatingDelegate extends WatchUi.Menu2InputDelegate {
+// Add workout, step 3: the rating. Adds the entry and returns to History, or
+// shows the too-old notice when a full history would not keep it.
+// Back closes the picker and returns to the workout choice; nothing is added.
+class AddRatingDelegate extends WatchUi.PickerDelegate {
 	var date as CalendarDay;
 	var workoutIndex as Number;
 
 	function initialize(date as CalendarDay, workoutIndex as Number) {
-		Menu2InputDelegate.initialize();
+		PickerDelegate.initialize();
 		self.date = date;
 		self.workoutIndex = workoutIndex;
 	}
 
-	function onSelect(item as WatchUi.MenuItem) as Void {
-		var id = item.getId();
-		if (!(id instanceof Number)) {
-			return;
+	function onAccept(values as Array) as Boolean {
+		var rating = RatingChoices.fromPicked(values);
+		if (rating == null) {
+			return true;
 		}
 		var services = appServices();
 		if (services.isTooOldForHistory(date)) {
 			showAddTooOld();
-			return;
+			return true;
 		}
-		var show = services.addHistoryWorkout(date, workoutIndex, id as Number);
+		var show = services.addHistoryWorkout(date, workoutIndex, rating as Number);
 		finishHistoryEdit(show);
+		return true;
+	}
+
+	function onCancel() as Boolean {
+		WatchUi.popView(WatchUi.SLIDE_RIGHT);
+		return true;
 	}
 }

@@ -115,7 +115,7 @@ class HistoryDetailsDelegate extends WatchUi.Menu2InputDelegate {
 		if (id == :rating) {
 			var entry = appServices().historyEntryAt(index);
 			var current = (entry == null) ? Rating.GOOD : (entry as HistoryEntry).rating;
-			WatchUi.pushView(new RatingMenu(current), new HistoryRatingDelegate(index), WatchUi.SLIDE_LEFT);
+			WatchUi.pushView(new RatingPicker(current), new HistoryRatingDelegate(index), WatchUi.SLIDE_LEFT);
 		} else if (id == :delete) {
 			confirmHistoryChange(Rez.Strings.ConfirmDelete, HistoryConfirmDelegate.DELETE, index);
 		} else if (id == :deleteOlder) {
@@ -167,22 +167,28 @@ class HistoryConfirmDelegate extends WatchUi.ConfirmationDelegate {
 
 // Changing a rating. On the newest entry it uses the same program-complete
 // rule as rating a finished run, and the screen shows at most once per program.
-class HistoryRatingDelegate extends WatchUi.Menu2InputDelegate {
+// Back closes the picker and changes nothing.
+class HistoryRatingDelegate extends WatchUi.PickerDelegate {
 	var index as Number;
 
 	function initialize(index as Number) {
-		Menu2InputDelegate.initialize();
+		PickerDelegate.initialize();
 		self.index = index;
 	}
 
-	function onSelect(item as WatchUi.MenuItem) as Void {
-		var id = item.getId();
-		if (!(id instanceof Number)) {
-			return;
+	function onAccept(values as Array) as Boolean {
+		var rating = RatingChoices.fromPicked(values);
+		if (rating == null) {
+			return true;
 		}
-		var services = appServices();
-		var show = services.changeHistoryRating(index, id as Number);
+		var show = appServices().changeHistoryRating(index, rating as Number);
 		finishHistoryEdit(show);
+		return true;
+	}
+
+	function onCancel() as Boolean {
+		WatchUi.popView(WatchUi.SLIDE_RIGHT);
+		return true;
 	}
 }
 
