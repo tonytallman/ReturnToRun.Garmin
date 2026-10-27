@@ -33,7 +33,7 @@
     <string id="AddWorkout">Add workout</string>
     <string id="RatingLabel">Rating</string>
     <string id="Delete">Delete</string>
-    <string id="DeleteOlder">Delete older too</string>
+    <string id="DeleteOlder">Delete this &amp; older</string>
     <string id="ConfirmDelete">Delete workout?</string>
     <string id="ConfirmDeleteOlder">Delete this &amp; older?</string>
     <string id="ConfirmClear">Clear all history?</string>
