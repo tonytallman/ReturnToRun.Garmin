@@ -12,8 +12,14 @@ const HISTORY_STORAGE_KEY = "history";
 const PROGRAM_COMPLETE_SHOWN_KEY = "programCompleteShown";
 
 class HistoryStore {
+	// Values per entry in the flat array: date number (yyyymmdd), workout id, rating.
+	static const FIELDS = 3;
+
 	private var gateway as StorageGateway;
-	private var entries as Array<HistoryEntry>;
+	// The history kept as the same flat array that is stored, newest first, so a
+	// full history is one array of numbers rather than an object per entry.
+	// entryAt() builds a HistoryEntry on request; callers hold it only briefly.
+	private var packed as Array<Number>;
 	private var entryCap as Number;
 	private var _maxWorkoutId as Number;
 	private var programCompleteShown as Boolean;
@@ -22,15 +28,19 @@ class HistoryStore {
 
 	function initialize(gateway as StorageGateway, entryCap as Number, maxWorkoutId as Number) {
 		self.gateway = gateway;
-		self.entries = [] as Array<HistoryEntry>;
+		self.packed = [] as Array<Number>;
 		self.entryCap = entryCap;
 		self._maxWorkoutId = maxWorkoutId;
 		self.programCompleteShown = false;
 		self.lastAddedIndex = -1;
 	}
 
+	// The stored format is the one earlier versions wrote, so history they saved
+	// loads as it is. Entries that are not valid are skipped. When every stored
+	// value is already a valid whole Number, the loaded array is kept rather than
+	// copied; otherwise the valid entries are copied, as Numbers, into a new one.
 	function load() as Void {
-		entries = [] as Array<HistoryEntry>;
+		packed = [] as Array<Number>;
 		programCompleteShown = false;
 		var shown = gateway.get(PROGRAM_COMPLETE_SHOWN_KEY);
 		if (shown instanceof Boolean) {
@@ -41,36 +51,40 @@ class HistoryStore {
 			return;
 		}
 		var flat = raw as Array;
-		var count = flat.size() / 3;
-		for (var i = 0; i < count; i++) {
-			var base = i * 3;
-			var dateNumber = asNumber(flat[base] as Object?);
-			var workoutId = asNumber(flat[base + 1] as Object?);
-			var rating = asNumber(flat[base + 2] as Object?);
-			if ((dateNumber == null) || (workoutId == null) || (rating == null)) {
-				continue;
+		var count = flat.size() / FIELDS;
+		var keepAsIs = (flat.size() == count * FIELDS);
+		for (var i = 0; keepAsIs && (i < count); i++) {
+			var base = i * FIELDS;
+			keepAsIs = (flat[base] instanceof Number) && (flat[base + 1] instanceof Number) && (flat[base + 2] instanceof Number)
+				&& isValid(flat[base] as Number, flat[base + 1] as Number, flat[base + 2] as Number);
+		}
+		if (keepAsIs) {
+			packed = flat as Array<Number>;
+		} else {
+			var cleaned = [] as Array<Number>;
+			for (var i = 0; i < count; i++) {
+				var base = i * FIELDS;
+				var dateNumber = asNumber(flat[base] as Object?);
+				var workoutId = asNumber(flat[base + 1] as Object?);
+				var rating = asNumber(flat[base + 2] as Object?);
+				if ((dateNumber != null) && (workoutId != null) && (rating != null) && isValid(dateNumber as Number, workoutId as Number, rating as Number)) {
+					cleaned.add(dateNumber as Number);
+					cleaned.add(workoutId as Number);
+					cleaned.add(rating as Number);
+				}
 			}
-			var date = CalendarDay.fromNumber(dateNumber as Number);
-			if ((date == null) || ((workoutId as Number) < FIRST_WORKOUT_ID) || !Rating.isValid(rating as Number)) {
-				continue;
-			}
-			entries.add(new HistoryEntry(date as CalendarDay, workoutId as Number, rating as Number));
+			packed = cleaned;
 		}
 		trimToCap();
 	}
 
+	// One stored entry: a real calendar date, a workout id of at least 1, and a known rating.
+	private function isValid(dateNumber as Number, workoutId as Number, rating as Number) as Boolean {
+		return (CalendarDay.fromNumber(dateNumber) != null) && (workoutId >= FIRST_WORKOUT_ID) && Rating.isValid(rating);
+	}
+
 	function save() as Void {
-		var flat = [] as Array<Storage.ValueType>;
-		for (var i = 0; i < entries.size(); i++) {
-			var entry = entries[i] as HistoryEntry;
-			var dateValue = (entry.date.toNumber()) as Storage.ValueType;
-			var workoutValue = (entry.workoutId) as Storage.ValueType;
-			var ratingValue = (entry.rating) as Storage.ValueType;
-			flat.add(dateValue);
-			flat.add(workoutValue);
-			flat.add(ratingValue);
-		}
-		gateway.set(HISTORY_STORAGE_KEY, flat);
+		gateway.set(HISTORY_STORAGE_KEY, packed as Array<Storage.ValueType>);
 		gateway.set(PROGRAM_COMPLETE_SHOWN_KEY, programCompleteShown);
 	}
 
@@ -79,14 +93,19 @@ class HistoryStore {
 	}
 
 	function size() as Number {
-		return entries.size();
+		return packed.size() / FIELDS;
 	}
 
 	function entryAt(index as Number) as HistoryEntry? {
-		if ((index < 0) || (index >= entries.size())) {
+		if ((index < 0) || (index >= size())) {
 			return null;
 		}
-		return entries[index] as HistoryEntry;
+		var base = index * FIELDS;
+		var date = CalendarDay.fromNumber(packed[base]);
+		if (date == null) {
+			return null;
+		}
+		return new HistoryEntry(date as CalendarDay, packed[base + 1], packed[base + 2]);
 	}
 
 	function latest() as HistoryEntry? {
@@ -114,18 +133,13 @@ class HistoryStore {
 		if (insertionIndex >= entryCap) {
 			return false;
 		}
-		var entry = new HistoryEntry(date, workoutId, rating);
-		var updated = [] as Array<HistoryEntry>;
-		for (var index = 0; index < entries.size(); index++) {
-			if (index == insertionIndex) {
-				updated.add(entry);
-			}
-			updated.add(entries[index] as HistoryEntry);
-		}
-		if (insertionIndex == entries.size()) {
-			updated.add(entry);
-		}
-		entries = updated;
+		var base = insertionIndex * FIELDS;
+		var updated = packed.slice(0, base);
+		updated.add(date.toNumber());
+		updated.add(workoutId);
+		updated.add(rating);
+		updated.addAll(packed.slice(base, null));
+		packed = updated;
 		trimToCap();
 		lastAddedIndex = insertionIndex;
 		save();
@@ -135,13 +149,14 @@ class HistoryStore {
 	// Where an entry on this date would go: ahead of the first entry on the
 	// same day or older, or at the end.
 	function insertionIndexFor(date as CalendarDay) as Number {
-		for (var i = 0; i < entries.size(); i++) {
-			var existing = entries[i] as HistoryEntry;
-			if (existing.date.compare(date) <= 0) {
+		var dateNumber = date.toNumber();
+		var count = size();
+		for (var i = 0; i < count; i++) {
+			if (packed[i * FIELDS] <= dateNumber) {
 				return i;
 			}
 		}
-		return entries.size();
+		return count;
 	}
 
 	// True when an entry on this date would be the oldest one past the cap, so
@@ -151,26 +166,22 @@ class HistoryStore {
 	}
 
 	function setRating(index as Number, rating as Number) as Boolean {
-		var entry = entryAt(index);
-		if ((entry == null) || !Rating.isValid(rating)) {
+		if ((index < 0) || (index >= size()) || !Rating.isValid(rating)) {
 			return false;
 		}
-		(entry as HistoryEntry).rating = rating;
+		packed[(index * FIELDS) + 2] = rating;
 		save();
 		return true;
 	}
 
 	function deleteAt(index as Number) as Boolean {
-		if ((index < 0) || (index >= entries.size())) {
+		if ((index < 0) || (index >= size())) {
 			return false;
 		}
-		var updated = [] as Array<HistoryEntry>;
-		for (var i = 0; i < entries.size(); i++) {
-			if (i != index) {
-				updated.add(entries[i] as HistoryEntry);
-			}
-		}
-		entries = updated;
+		var base = index * FIELDS;
+		var updated = packed.slice(0, base);
+		updated.addAll(packed.slice(base + FIELDS, null));
+		packed = updated;
 		save();
 		return true;
 	}
@@ -178,26 +189,22 @@ class HistoryStore {
 	// Newest-first, so this entry and everything after it is this entry and all older ones.
 	// Same-day entries that sort after it were added earlier, so they are removed too.
 	function deleteAtAndOlder(index as Number) as Boolean {
-		if ((index < 0) || (index >= entries.size())) {
+		if ((index < 0) || (index >= size())) {
 			return false;
 		}
-		var updated = [] as Array<HistoryEntry>;
-		for (var i = 0; i < index; i++) {
-			updated.add(entries[i] as HistoryEntry);
-		}
-		entries = updated;
+		packed = packed.slice(0, index * FIELDS);
 		save();
 		return true;
 	}
 
 	function clear() as Void {
-		entries = [] as Array<HistoryEntry>;
+		packed = [] as Array<Number>;
 		save();
 	}
 
 	function trimToCap() as Void {
-		if (entries.size() > entryCap) {
-			entries = entries.slice(0, entryCap) as Array<HistoryEntry>;
+		if (size() > entryCap) {
+			packed = packed.slice(0, entryCap * FIELDS);
 		}
 	}
 }

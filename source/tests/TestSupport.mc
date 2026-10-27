@@ -152,4 +152,15 @@ module TestSupport {
 			expectEqual(expected[i], actual[i], message + ": page " + (i + 1));
 		}
 	}
+
+	// The stored history array, value by value.
+	function expectStored(gateway as MemoryStorageGateway, expected as Array<Number>, message as String) as Void {
+		var stored = gateway.get(HISTORY_STORAGE_KEY);
+		Test.assertMessage(stored instanceof Array, message + ": stored as an array");
+		var values = stored as Array;
+		Test.assertEqualMessage(expected.size(), values.size(), message + ": size");
+		for (var i = 0; i < expected.size(); i++) {
+			Test.assertEqualMessage(expected[i], values[i], message + ": value " + i);
+		}
+	}
 }
