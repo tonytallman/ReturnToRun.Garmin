@@ -110,14 +110,7 @@ class HistoryStore {
 		if ((workoutId < FIRST_WORKOUT_ID) || (workoutId > _maxWorkoutId) || !Rating.isValid(rating)) {
 			return false;
 		}
-		var insertionIndex = entries.size();
-		for (var i = 0; i < entries.size(); i++) {
-			var existing = entries[i] as HistoryEntry;
-			if (existing.date.compare(date) <= 0) {
-				insertionIndex = i;
-				break;
-			}
-		}
+		var insertionIndex = insertionIndexFor(date);
 		if (insertionIndex >= entryCap) {
 			return false;
 		}
@@ -137,6 +130,24 @@ class HistoryStore {
 		lastAddedIndex = insertionIndex;
 		save();
 		return true;
+	}
+
+	// Where an entry on this date would go: ahead of the first entry on the
+	// same day or older, or at the end.
+	function insertionIndexFor(date as CalendarDay) as Number {
+		for (var i = 0; i < entries.size(); i++) {
+			var existing = entries[i] as HistoryEntry;
+			if (existing.date.compare(date) <= 0) {
+				return i;
+			}
+		}
+		return entries.size();
+	}
+
+	// True when an entry on this date would be the oldest one past the cap, so
+	// add() would reject it: the history is full and every entry is newer.
+	function isTooOldToAdd(date as CalendarDay) as Boolean {
+		return insertionIndexFor(date) >= entryCap;
 	}
 
 	function setRating(index as Number, rating as Number) as Boolean {

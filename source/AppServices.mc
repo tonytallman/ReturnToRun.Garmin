@@ -113,6 +113,10 @@ class AppServices {
 		return show;
 	}
 
+	function isTooOldForHistory(date as CalendarDay) as Boolean {
+		return trainingProgress.isTooOldToAdd(date);
+	}
+
 	function historyChanged() as Void {
 		historyVersion = historyVersion + 1;
 	}

@@ -98,7 +98,8 @@ class AddWorkoutDelegate extends WatchUi.Menu2InputDelegate {
 	}
 }
 
-// Add workout, step 3: the rating. Adds the entry and returns to History.
+// Add workout, step 3: the rating. Adds the entry and returns to History, or
+// shows the too-old notice when a full history would not keep it.
 // Back closes the picker and returns to the workout choice; nothing is added.
 class AddRatingDelegate extends WatchUi.PickerDelegate {
 	var date as CalendarDay;
@@ -115,7 +116,12 @@ class AddRatingDelegate extends WatchUi.PickerDelegate {
 		if (rating == null) {
 			return true;
 		}
-		var show = appServices().addHistoryWorkout(date, workoutIndex, rating as Number);
+		var services = appServices();
+		if (services.isTooOldForHistory(date)) {
+			showAddTooOld();
+			return true;
+		}
+		var show = services.addHistoryWorkout(date, workoutIndex, rating as Number);
 		finishHistoryEdit(show);
 		return true;
 	}
