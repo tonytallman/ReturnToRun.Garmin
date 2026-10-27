@@ -25,6 +25,7 @@ import os
 import queue
 import re
 import shutil
+import signal
 import socket
 import subprocess
 import sys
@@ -215,6 +216,13 @@ def close_error_dialogs():
         xdisplay.close()
 
 
+def stop_group(proc, sig):
+    try:
+        os.killpg(proc.pid, sig)
+    except ProcessLookupError:
+        pass
+
+
 def tour(bindir, device, prg, outdir, timeout, full):
     """Runs the tour once. Returns (finished, shots, error) where error is true when
     the simulator showed an error dialog (it is closed again)."""
@@ -261,11 +269,13 @@ def tour(bindir, device, prg, outdir, timeout, full):
                     finished = True
                     break
     finally:
-        proc.terminate()
+        # monkeydo is a shell script that starts Java; stop its whole process
+        # group so no Java process is left behind.
+        stop_group(proc, signal.SIGTERM)
         try:
             proc.wait(timeout=5)
         except subprocess.TimeoutExpired:
-            proc.kill()
+            stop_group(proc, signal.SIGKILL)
     if not full:
         contact_sheet(outdir, device)
     return finished, shots, error
