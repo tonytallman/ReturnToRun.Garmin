@@ -3,7 +3,7 @@
   <g fill="none" stroke-linecap="round" stroke-linejoin="round">
     <!-- far arm and far leg (behind the body) -->
     <polyline stroke="#00AA00" stroke-width="4" points="23,14 16.5,15 12,19.5"/>
-    <polyline stroke="#00AA00" stroke-width="4.5" points="18.5,21.5 13,28.5 5,30.5 3.5,26"/>
+    <polyline stroke="#00AA00" stroke-width="4.5" points="18.5,21.5 13,28.5 6,28.5 4,34"/>
     <!-- torso -->
     <line stroke="#00FF00" stroke-width="5.5" x1="24.2" y1="12.8" x2="18.5" y2="21.5"/>
     <!-- near leg and near arm -->
