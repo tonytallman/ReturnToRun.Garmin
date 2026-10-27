@@ -23,7 +23,9 @@ class ProgramCompleteView extends WatchUi.View {
 		dc.clear();
 
 		dc.setColor(Graphics.COLOR_GREEN, Graphics.COLOR_TRANSPARENT);
-		dc.drawText(centerX, height * 21 / 100, Graphics.FONT_SMALL, title, center);
+		var titleY = height * 21 / 100;
+		var titleFont = TitleFit.font(dc, title, titleY, [Graphics.FONT_SMALL, Graphics.FONT_TINY] as Array<Graphics.FontType>);
+		dc.drawText(centerX, titleY, titleFont, title, center);
 
 		var wrapped = TextWrap.wrap(message, width * 80 / 100, new DcTextMeasure(dc, Graphics.FONT_XTINY));
 		dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
