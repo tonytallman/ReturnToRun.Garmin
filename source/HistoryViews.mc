@@ -2,22 +2,28 @@ import Toybox.Lang;
 import Toybox.WatchUi;
 
 function openHistory() as Void {
-	WatchUi.pushView(new HistoryListView(), new HistoryListDelegate(), WatchUi.SLIDE_LEFT);
+	var list = new HistoryListView();
+	WatchUi.pushView(list, new HistoryListDelegate(list), WatchUi.SLIDE_LEFT);
 }
 
 // Every saved workout, newest first, then Clear history and Add workout.
 // Items are built from the stored numbers with cached words, so a full history
 // stays cheap. After an edit the list rebuilds itself when it shows again.
+// While a screen opened from the list is showing (an entry's details and its
+// rating picker, Clear history, or Add workout), the list's items are released
+// to free memory, and the list is rebuilt with the same item in focus on return.
 class HistoryListView extends WatchUi.Menu2 {
 	var leaveTimer as LeaveTimer;
 	var builtVersion as Number;
 	var builtItems as Number;
+	var releaseWhenHidden as Boolean;
 
 	function initialize() {
 		Menu2.initialize({:title=>WatchUi.loadResource(Rez.Strings.History) as String});
 		leaveTimer = new LeaveTimer();
 		builtVersion = -1;
 		builtItems = 0;
+		releaseWhenHidden = false;
 		appServices().historyFocus = 0;
 		build();
 	}
@@ -39,34 +45,59 @@ class HistoryListView extends WatchUi.Menu2 {
 		setFocus(HistoryFormat.clampFocus(services.historyFocus, count));
 	}
 
+	function release() as Void {
+		for (var index = builtItems - 1; index >= 0; index--) {
+			deleteItem(index);
+		}
+		builtItems = 0;
+	}
+
+	// Called with the selected item's position just before a screen opens over
+	// the list. Menu2 cannot report its focus later, so it is kept here.
+	function releaseOnHide(focus as Number) as Void {
+		appServices().historyFocus = focus;
+		releaseWhenHidden = true;
+	}
+
+	function onHide() as Void {
+		if (releaseWhenHidden) {
+			releaseWhenHidden = false;
+			release();
+		}
+	}
+
 	function onShow() as Void {
 		ScreenStack.atHistory();
 		if (leaveTimer.schedule()) {
 			return;
 		}
-		if (appServices().historyVersion != builtVersion) {
-			for (var index = builtItems - 1; index >= 0; index--) {
-				deleteItem(index);
-			}
-			builtItems = 0;
+		if ((builtItems == 0) || (appServices().historyVersion != builtVersion)) {
+			release();
 			build();
 		}
 	}
 }
 
 class HistoryListDelegate extends WatchUi.Menu2InputDelegate {
-	function initialize() {
+	var list as HistoryListView;
+
+	function initialize(list as HistoryListView) {
 		Menu2InputDelegate.initialize();
+		self.list = list;
 	}
 
 	function onSelect(item as WatchUi.MenuItem) as Void {
 		var id = item.getId();
+		var count = appServices().historySize();
 		if (id instanceof Number) {
+			list.releaseOnHide(id as Number);
 			var view = new HistoryDetailsView(id as Number);
 			WatchUi.pushView(view, new HistoryDetailsDelegate(id as Number), WatchUi.SLIDE_LEFT);
 		} else if (id == :clear) {
+			list.releaseOnHide(HistoryFormat.clearPosition(count));
 			confirmHistoryChange(Rez.Strings.ConfirmClear, HistoryConfirmDelegate.CLEAR, 0);
 		} else if (id == :add) {
+			list.releaseOnHide(HistoryFormat.addPosition(count));
 			var stepper = new DateStepper(appServices().currentDay());
 			var dateView = new AddDateView(stepper);
 			WatchUi.pushView(dateView, new AddDateDelegate(dateView), WatchUi.SLIDE_LEFT);

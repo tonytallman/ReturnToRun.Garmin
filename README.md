@@ -64,6 +64,8 @@ A rating change on the newest entry, or an added entry that becomes the newest, 
 
 The History list is rebuilt in place (items deleted and re-added) when it is shown again after `AppServices.historyVersion` changed, instead of replacing the view. Screens above it get back to it through `ScreenStack`: an edit asks for a return to History, each screen above the list pops itself when shown (`LeaveTimer`), and the list stops the unwinding. A return to the main menu, as after a run, takes priority and passes through History.
 
+While a screen opened from the list is showing (an entry's details and its rating picker, the Clear history confirmation, or Add workout's steps), the list deletes its items to free memory and rebuilds them when it is shown again. Menu2 cannot report which item is focused, so the list keeps the position of the item that was selected (`AppServices.historyFocus`) and focuses it again on return, or the item `HistoryFormat` picks after an edit. With 100 entries on the Forerunner 245, this brings the peak with the rating picker open over the details from about 88 KB to about 70 KB, so the History list itself (about 86 KB) is now the largest use.
+
 The Workout title on the reused workout list is hidden on this watch while the focused item is in the middle, a known Menu2 issue. The rating picker's title is always shown.
 
 ### Help and About

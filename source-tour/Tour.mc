@@ -169,7 +169,8 @@ module Tour {
 			show(new RatingPicker(Rating.GOOD), new RatingDelegate(view));
 		} else if (name.equals("history-list")) {
 			workoutView = null;
-			show(new HistoryListView(), new HistoryListDelegate());
+			var list = new HistoryListView();
+			show(list, new HistoryListDelegate(list));
 		} else if (name.equals("history-details")) {
 			show(new HistoryDetailsView(0), new HistoryDetailsDelegate(0));
 		} else if (name.equals("add-date")) {
