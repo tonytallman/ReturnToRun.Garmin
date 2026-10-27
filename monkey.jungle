@@ -1,2 +1,4 @@
 project.manifest = manifest.xml
 base.resourcePath = resources;resources-program
+# Only source/. The screen tour (tour.jungle) adds source-tour.
+base.sourcePath = source

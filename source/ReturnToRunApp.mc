@@ -34,6 +34,7 @@ class ReturnToRunApp extends Application.AppBase {
 	// The program and history load here so pressing Run only builds the list.
 	// The watch stops an app whose single callback runs too long.
 	function getInitialView() {
+		startTour(self);
 		getServices();
 		var view = new MainMenuView();
 		var delegate = new MainMenuDelegate();

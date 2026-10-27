@@ -1,0 +1,5 @@
+# Screen tour build: monkey.jungle plus this file. See "Screen tour" in README.md.
+# Adds source-tour, which opens every screen in turn on a timer with sample history,
+# and drops the empty startTour stub in source/TourHook.mc.
+base.sourcePath = source;source-tour
+base.excludeAnnotations = notour

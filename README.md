@@ -112,6 +112,19 @@ monkeydo bin/ReturnToRun-quick.prg fenix5x
 
 `monkey.jungle` sets `base.resourcePath` to `resources;resources-program`. `quick.jungle` sets it to `resources;resources-quick` and is only passed for the quick build, so the two `WorkoutProgram` resources are never compiled together. Repeat counts and ids in the quick file match the real catalog (40 workouts). VS Code's Run Quick launch configuration passes the same jungle list and still asks for the target device.
 
+### Screen tour
+
+The tour build opens every screen in turn on a timer, so a device can be checked in the simulator without pressing anything. `tour.jungle` adds `source-tour` and excludes the `:notour` stub in `source/TourHook.mc`; the normal build never compiles `source-tour`. The tour keeps 100 sample history entries in memory (one a day ending today, so the history is full and both pre-run warnings apply) and never touches `Application.Storage`. It shows the main menu, the workout list, both warnings, warm-up, run, run paused, walk, cool-down, the rating picker, the History list and details, Add workout's date and workout steps, the too-old notice, Program complete, the Instructions menu, every page of every help topic, and every page of About. After each screen has drawn it prints `TOUR <nn> <name> used=<bytes> total=<bytes>`, then `TOUR END`.
+
+```sh
+tools/device-tour.py fenix5x fr245      # builds, runs, and captures each device in turn
+tools/device-tour.py vivoactive3 --out /tmp/shots --full
+```
+
+The script needs python3-xlib and Pillow and an X display. It starts the simulator if it is not running, builds `bin/tour-<device>.prg` with `monkey.jungle;tour.jungle` (key from `--key`, `$CIQ_DEVELOPER_KEY`, or `~/Garmin/keys/developer_key.der`), runs it with `monkeydo`, and on each marker grabs the simulator window. Screens are cropped to the watch display and saved as `<out>/<device>/<nn>-<name>.png` (default `bin/tour`), with `tour.log` (the app output, including memory at each screen) and `contact.png` (every screen on one sheet); `--full` keeps the whole window instead. The window is read through X, so it does not need to be in front, and nothing is typed into it. Before it starts, the script copies the simulator's app storage (`/tmp/com.garmin.connectiq/GARMIN/APPS`), its `Settings` folder, and `~/.Garmin/ConnectIQ/simulator.ini` aside, and puts them back when it finishes or fails.
+
+The memory figures in `tour.log` include the tour code itself (a few KB), so they are a little above the normal build's.
+
 ### Launcher icon
 
 The launcher icon is `resources/drawables/launcher_icon.png`, 40 x 40 px (the fēnix 5X `launcherIcon` size). Its source is `resources/drawables/launcher_icon.svg`, an original running figure in palette greens (00FF00 near limbs, 00AA00 far limbs) on a transparent background. After editing the SVG, render the PNG again:

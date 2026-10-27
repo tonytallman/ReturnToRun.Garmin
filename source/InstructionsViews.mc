@@ -49,14 +49,18 @@ function openInstructions() as Void {
 // About: app name, version, and the repository link as text. Start asks the
 // phone (through Garmin Connect Mobile) to open the link.
 function openAbout() as Void {
+	var view = aboutView();
+	WatchUi.pushView(view, new AboutDelegate(view), WatchUi.SLIDE_LEFT);
+}
+
+function aboutView() as TextPageView {
 	var version = AppVersion.label(WatchUi.loadResource(Rez.Strings.VersionLabel) as String, WatchUi.loadResource(Rez.Strings.AppVersion) as String);
 	var link = TextPages.breakAfterSlashes(WatchUi.loadResource(Rez.Strings.RepoLink) as String);
 	var body = version + "||" + link;
 	if (Communications has :openWebPage) {
 		body += "||" + (WatchUi.loadResource(Rez.Strings.OpenOnPhoneHint) as String);
 	}
-	var view = new TextPageView(WatchUi.loadResource(Rez.Strings.AppName) as String, body);
-	WatchUi.pushView(view, new AboutDelegate(view), WatchUi.SLIDE_LEFT);
+	return new TextPageView(WatchUi.loadResource(Rez.Strings.AppName) as String, body);
 }
 
 class AboutDelegate extends TextPageDelegate {
