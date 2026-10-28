@@ -155,6 +155,12 @@ tools/render-icon.py resources/drawables/launcher_icon.svg resources-icon-35x35/
 tools/render-icon.py resources/drawables/launcher_icon.svg resources-icon-30x30/drawables/launcher_icon.png 30
 ```
 
+The round AMOLED watches (Venu, Forerunner 165/265/570/965/970, fēnix 8/9 and epix, MARQ, D2, Descent, Approach S50/S70/S72, vívoactive 5/6) use larger square icons: `resources-icon-54x54`, `-56x56`, `-60x60`, `-61x61`, `-65x65` and `-70x70`. `monkey.jungle` lists which device uses which folder. Render them all again after editing the SVG:
+
+```sh
+for n in 54 56 60 61 65 70; do tools/render-icon.py resources/drawables/launcher_icon.svg resources-icon-${n}x${n}/drawables/launcher_icon.png $n; done
+```
+
 When adding a device, check its `launcherIcon` size in `~/.Garmin/ConnectIQ/Devices/<device>/compiler.json`. If it is not 40 x 40, add a `resources-icon-<W>x<H>` folder the same way; otherwise the compiler warns and scales the 40 x 40 icon.
 
 Check the version before a release:
