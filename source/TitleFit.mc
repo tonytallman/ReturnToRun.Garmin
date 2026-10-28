@@ -31,12 +31,28 @@ module TitleFit {
 		if (settings.screenShape == System.SCREEN_SHAPE_ROUND) {
 			room = chordWidth(settings.screenWidth, screenY);
 		}
-		room -= 2 * MARGIN;
-		for (var index = 0; index < fonts.size() - 1; index++) {
-			if (dc.getTextWidthInPixels(text, fonts[index]) <= room) {
-				return fonts[index];
+		return fontWithin(dc, text, room, fonts);
+	}
+
+	// The first of the fonts whose text fits in room pixels, keeping MARGIN
+	// clear on each side, or the last one if none do.
+	function fontWithin(dc as Graphics.Dc, text as String, room as Number, fonts as Array<Graphics.FontType>) as Graphics.FontType {
+		var widths = new Array<Number>[fonts.size()];
+		for (var index = 0; index < fonts.size(); index++) {
+			widths[index] = dc.getTextWidthInPixels(text, fonts[index]);
+		}
+		return fonts[firstFitting(widths, room - 2 * MARGIN)];
+	}
+
+	// The index of the first width that is at most room, or the last index if
+	// none is.
+	function firstFitting(widths as Array<Number>, room as Number) as Number {
+		var last = widths.size() - 1;
+		for (var index = 0; index < last; index++) {
+			if (widths[index] <= room) {
+				return index;
 			}
 		}
-		return fonts[fonts.size() - 1];
+		return last;
 	}
 }
