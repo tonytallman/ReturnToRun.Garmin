@@ -17,6 +17,9 @@ function testHistoryFormat(logger as Test.Logger) as Boolean {
 	TestSupport.expectEqual(2, HistoryFormat.focusAfterDelete(2, 5), "the next older entry takes its place");
 	TestSupport.expectEqual(1, HistoryFormat.focusAfterDelete(2, 2), "deleting the oldest focuses the new oldest");
 	TestSupport.expectEqual(1, HistoryFormat.focusAfterDelete(0, 0), "empty history focuses Add");
+	TestSupport.expectEqual(false, HistoryFormat.shouldSetFocus(0, true), "first build on the first item leaves focus alone, so the title shows");
+	TestSupport.expectEqual(true, HistoryFormat.shouldSetFocus(3, true), "first build elsewhere sets focus");
+	TestSupport.expectEqual(true, HistoryFormat.shouldSetFocus(0, false), "a rebuild always sets focus");
 	return true;
 }
 

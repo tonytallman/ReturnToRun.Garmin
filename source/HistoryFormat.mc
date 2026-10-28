@@ -38,6 +38,15 @@ module HistoryFormat {
 		return requested;
 	}
 
+	// Whether build() should call setFocus. The first time the list is built
+	// with the first item selected it does not: Menu2 starts there anyway, and on
+	// watches with the white menu style (Venu, vivoactive 5 and similar) setFocus
+	// scrolls the item to the top row, hiding the "History" title. When the list
+	// is rebuilt the old focus may be anywhere, so it is always set.
+	function shouldSetFocus(focus as Number, firstBuild as Boolean) as Boolean {
+		return !(firstBuild && focus == 0);
+	}
+
 	// Focus after deleting entry index (or it and everything older): the entry
 	// that took its place, or the last remaining entry, or Add workout when
 	// history is empty.

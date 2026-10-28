@@ -29,6 +29,7 @@ class HistoryListView extends WatchUi.Menu2 {
 	}
 
 	function build() as Void {
+		var firstBuild = builtVersion < 0;
 		var services = appServices();
 		var words = new HistoryWords();
 		var count = services.historySize();
@@ -42,7 +43,10 @@ class HistoryListView extends WatchUi.Menu2 {
 		addItem(new WatchUi.MenuItem(WatchUi.loadResource(Rez.Strings.AddWorkout) as String, null, :add, null));
 		builtItems = HistoryFormat.itemCount(count);
 		builtVersion = services.historyVersion;
-		setFocus(HistoryFormat.clampFocus(services.historyFocus, count));
+		var focus = HistoryFormat.clampFocus(services.historyFocus, count);
+		if (HistoryFormat.shouldSetFocus(focus, firstBuild)) {
+			setFocus(focus);
+		}
 	}
 
 	function release() as Void {
