@@ -117,22 +117,32 @@ def display_box(device, window):
     device_image = Image.open(os.path.join(folder, sim["image"])).convert("RGBA")
     image_w, image_h = device_image.size
     win_w, win_h = window.size
-    top = win_h - image_h - STATUS_BAR_HEIGHT
+    top = max(0, win_h - image_h - STATUS_BAR_HEIGHT)
     strip = (0, max(0, location["y"] - 40), image_w, max(1, location["y"] - 5))
     reference = device_image.crop(strip)
     mask = reference.split()[3]
     reference = reference.convert("RGB")
 
-    def mismatch(left):
+    def mismatch(spot):
+        left, top = spot
         candidate = window.crop((left, top + strip[1], left + image_w, top + strip[3]))
         return sum(ImageStat.Stat(ImageChops.difference(candidate, reference), mask).mean)
 
-    left = min(range(0, max(0, win_w - image_w) + 1), key=mismatch)
+    # A device image taller than the screen allows clamps the window, so the
+    # image no longer sits right above the status bar. Search near the top of
+    # the window as well as the expected spot, coarsely and then finely.
+    lefts = range(0, max(0, win_w - image_w) + 1)
+    tops = sorted(set(range(0, TOP_SEARCH + 1)) | {top})
+    left, top = min(((l, t) for l in lefts[::4] for t in tops[::4]), key=mismatch)
+    left, top = min(((l, t) for l in range(max(0, left - 4), min(lefts[-1], left + 4) + 1)
+                     for t in range(max(0, top - 4), top + 5)), key=mismatch)
     return (left + location["x"], top + location["y"], left + location["x"] + location["width"], top + location["y"] + location["height"])
 
 
 # Below the device image the simulator window has a status bar of this height.
 STATUS_BAR_HEIGHT = 20
+# How far down the window to look for a device image that does not fit.
+TOP_SEARCH = 80
 
 
 def capture(path, device=None):
