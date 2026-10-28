@@ -19,7 +19,7 @@ class HistoryListView extends WatchUi.Menu2 {
 	var releaseWhenHidden as Boolean;
 
 	function initialize() {
-		Menu2.initialize({:title=>WatchUi.loadResource(Rez.Strings.History) as String});
+		Menu2.initialize({:title=>MenuTitle.of(WatchUi.loadResource(Rez.Strings.History) as String)});
 		leaveTimer = new LeaveTimer();
 		builtVersion = -1;
 		builtItems = 0;
@@ -121,7 +121,7 @@ class HistoryDetailsView extends WatchUi.Menu2 {
 			title = words.shortDate(found.date) + "  #" + found.workoutId.toString();
 			ratingWord = words.rating(found.rating);
 		}
-		Menu2.initialize({:title=>title});
+		Menu2.initialize({:title=>MenuTitle.of(title)});
 		leaveTimer = new LeaveTimer();
 		addItem(new WatchUi.MenuItem(WatchUi.loadResource(Rez.Strings.RatingLabel) as String, ratingWord, :rating, null));
 		addItem(new WatchUi.MenuItem(WatchUi.loadResource(Rez.Strings.Delete) as String, null, :delete, null));

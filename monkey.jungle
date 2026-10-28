@@ -15,3 +15,11 @@ vivoactive4.resourcePath = $(vivoactive4.resourcePath);resources-icon-35x35
 legacyherocaptainmarvel.resourcePath = $(legacyherocaptainmarvel.resourcePath);resources-icon-30x30
 legacysagarey.resourcePath = $(legacysagarey.resourcePath);resources-icon-30x30
 vivoactive4s.resourcePath = $(vivoactive4s.resourcePath);resources-icon-30x30
+# Watches whose system Menu2 wraps a title such as "Return to Run" onto a second line and cuts it off.
+# resources-menu-title turns DrawnMenuTitles on, so their menu titles are drawn on one line (MenuTitle).
+vivoactive3.resourcePath = $(vivoactive3.resourcePath);resources-menu-title
+vivoactive3m.resourcePath = $(vivoactive3m.resourcePath);resources-menu-title
+vivoactive3mlte.resourcePath = $(vivoactive3mlte.resourcePath);resources-menu-title
+fr55.resourcePath = $(fr55.resourcePath);resources-menu-title
+legacysagadarthvader.resourcePath = $(legacysagadarthvader.resourcePath);resources-menu-title
+legacyherofirstavenger.resourcePath = $(legacyherofirstavenger.resourcePath);resources-menu-title

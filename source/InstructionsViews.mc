@@ -10,7 +10,7 @@ function openTextPage(titleId as ResourceId, bodyId as ResourceId) as Void {
 // The instruction topics. Each item opens one paged text screen.
 class InstructionsMenu extends WatchUi.Menu2 {
 	function initialize() {
-		Menu2.initialize({:title=>WatchUi.loadResource(Rez.Strings.Instructions) as String});
+		Menu2.initialize({:title=>MenuTitle.of(WatchUi.loadResource(Rez.Strings.Instructions) as String)});
 		var topics = InstructionsMenu.topics();
 		for (var i = 0; i < topics.size(); i++) {
 			var topic = topics[i] as Array<ResourceId>;
