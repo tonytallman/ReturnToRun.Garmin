@@ -15,21 +15,17 @@ class ProgramCompleteView extends WatchUi.View {
 	}
 
 	function onUpdate(dc as Graphics.Dc) as Void {
-		var width = dc.getWidth();
 		var height = dc.getHeight();
-		var centerX = width / 2;
-		var center = Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER;
 		dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
 		dc.clear();
 
-		dc.setColor(Graphics.COLOR_GREEN, Graphics.COLOR_TRANSPARENT);
+		dc.setColor(Palette.title(), Graphics.COLOR_TRANSPARENT);
 		var titleY = height * 21 / 100;
-		var titleFont = TitleFit.font(dc, title, titleY, [Graphics.FONT_SMALL, Graphics.FONT_TINY, Graphics.FONT_XTINY] as Array<Graphics.FontType>);
-		dc.drawText(centerX, titleY, titleFont, title, center);
+		TitleFit.draw(dc, title, titleY, [Graphics.FONT_SMALL, Graphics.FONT_TINY, Graphics.FONT_XTINY] as Array<Graphics.FontType>);
 
-		var wrapped = TextWrap.wrap(message, width * 80 / 100, new DcTextMeasure(dc, Graphics.FONT_XTINY));
 		dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
-		dc.drawText(centerX, height * 60 / 100, Graphics.FONT_XTINY, wrapped, center);
+		// Below the subscreen and the title split in two beside it.
+		Subscreen.drawMessage(dc, message, height * 60 / 100, 80, Subscreen.below(titleY + dc.getFontHeight(Graphics.FONT_SMALL) + 2));
 	}
 }
 

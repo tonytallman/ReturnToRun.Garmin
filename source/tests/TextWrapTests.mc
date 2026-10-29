@@ -20,6 +20,7 @@ function testTextWrap(logger as Test.Logger) as Boolean {
 	TestSupport.expectEqual("", TextWrap.wrap("", 100, measure), "empty text");
 	TestSupport.expectEqual("one two", TextWrap.wrap("one two", 70, measure), "fits exactly");
 	TestSupport.expectEqual("one\ntwo", TextWrap.wrap("one two", 60, measure), "one pixel short wraps");
+	TestSupport.expectEqual("aa\nbb cc\ndd", TextWrap.wrapLines("aa bb cc dd", [20, 50] as Array<Number>, measure), "each line wraps to its own width");
 	TestSupport.expectEqual("aa bb\ncc dd\nee", TextWrap.wrap("aa bb cc dd ee", 50, measure), "several lines");
 	TestSupport.expectEqual("a\nlongword\nb", TextWrap.wrap("a longword b", 30, measure), "a long word keeps its own line");
 	TestSupport.expectEqual("a b", TextWrap.wrap("  a   b  ", 100, measure), "extra spaces collapse");

@@ -33,6 +33,14 @@ class DcTextMeasure extends TextMeasure {
 // Used instead of Graphics.fitTextToArea, out of caution about the watch firmware.
 module TextWrap {
 	function wrap(text as String, maxWidth as Number, measure as TextMeasure) as String {
+		return wrapLines(text, [maxWidth] as Array<Number>, measure);
+	}
+
+	// The same, with line n wrapped to widths[n] (the last width repeats), for
+	// lines beside the Instinct subscreen or near the round edge.
+	function wrapLines(text as String, widths as Array<Number>, measure as TextMeasure) as String {
+		var lines = 0;
+		var last = widths.size() - 1;
 		var result = "";
 		var line = "";
 		var rest = text;
@@ -44,8 +52,9 @@ module TextWrap {
 				continue;
 			}
 			var candidate = (line.length() == 0) ? word : line + " " + word;
-			if ((line.length() > 0) && (measure.widthOf(candidate) > maxWidth)) {
+			if ((line.length() > 0) && (measure.widthOf(candidate) > widths[(lines < last) ? lines : last])) {
 				result = (result.length() == 0) ? line : result + "\n" + line;
+				lines += 1;
 				line = word;
 			} else {
 				line = candidate;

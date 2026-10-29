@@ -49,22 +49,28 @@ class WarningView extends WatchUi.View {
 
 		// The message alone, wrapped to fit the wide middle of the round face.
 		// There is no title, so a full sentence has room for four lines.
-		var wrapped = TextWrap.wrap(message, width * 84 / 100, new DcTextMeasure(dc, Graphics.FONT_XTINY));
 		dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
-		dc.drawText(centerX, height * 37 / 100, Graphics.FONT_XTINY, wrapped, center);
+		var messageBottom = Subscreen.drawMessage(dc, message, height * 37 / 100, 84, height * 16 / 100);
 
 		// The highlight bar and the focused action share one center line.
 		var continueY = WarningLayout.continueY(height);
 		var cancelY = WarningLayout.cancelY(height);
-		var focusY = focusContinue ? continueY : cancelY;
 		var barWidth = width * 58 / 100;
 		var barHeight = dc.getFontHeight(Graphics.FONT_SMALL) + 4;
-		dc.setColor(Graphics.COLOR_DK_BLUE, Graphics.COLOR_TRANSPARENT);
+		// On the Instinct, a message wrapped beside the subscreen can run longer,
+		// so both actions move down below it. (These watches have no touch.)
+		var overlap = messageBottom + barHeight / 2 + 2 - continueY;
+		if ((overlap > 0) && (Subscreen.box() != null)) {
+			continueY += overlap;
+			cancelY += overlap;
+		}
+		var focusY = focusContinue ? continueY : cancelY;
+		dc.setColor(Palette.focusBar(), Graphics.COLOR_TRANSPARENT);
 		dc.fillRectangle((width - barWidth) / 2, focusY - (barHeight / 2), barWidth, barHeight);
 
-		dc.setColor(focusContinue ? Graphics.COLOR_WHITE : Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT);
+		dc.setColor(focusContinue ? Palette.focusText() : Palette.dim(), Graphics.COLOR_TRANSPARENT);
 		dc.drawText(centerX, continueY, Graphics.FONT_SMALL, continueText, center);
-		dc.setColor(focusContinue ? Graphics.COLOR_LT_GRAY : Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
+		dc.setColor(focusContinue ? Palette.dim() : Palette.focusText(), Graphics.COLOR_TRANSPARENT);
 		dc.drawText(centerX, cancelY, Graphics.FONT_SMALL, cancelText, center);
 	}
 

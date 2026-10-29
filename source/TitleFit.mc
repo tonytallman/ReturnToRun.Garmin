@@ -39,6 +39,49 @@ module TitleFit {
 		return fontWithin(dc, text, room, fonts);
 	}
 
+	// Draws a one-line title centered at screenY with the first of the fonts
+	// that fits. If the title's rows reach the subscreen (Instinct), it is
+	// centered in the room to the subscreen's left instead.
+	function draw(dc as Graphics.Dc, text as String, screenY as Number, fonts as Array<Graphics.FontType>) as Void {
+		var width = dc.getWidth();
+		var center = Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER;
+		var sub = Subscreen.box();
+		if (sub != null) {
+			var right = Subscreen.rightEdge(width, screenY, dc.getFontHeight(fonts[0]), sub.x, sub.y + sub.height);
+			if (right < width) {
+				var left = Subscreen.leftEdge(width, screenY - dc.getFontHeight(fonts[0]) / 2);
+				var room = right - left;
+				var fitted = fontWithin(dc, text, room, fonts);
+				if (dc.getTextWidthInPixels(text, fitted) > room - 2 * MARGIN) {
+					// Too long even in the smallest font: two lines.
+					text = splitInTwo(text);
+					fitted = fontWithin(dc, text, room, fonts);
+				}
+				dc.drawText((left + right) / 2, screenY, fitted, text, center);
+				return;
+			}
+		}
+		dc.drawText(width / 2, screenY, font(dc, text, screenY, fonts), text, center);
+	}
+
+	// The text with the space nearest its middle made a line break.
+	function splitInTwo(text as String) as String {
+		var middle = text.length() / 2;
+		var best = -1;
+		for (var index = 0; index < text.length(); index++) {
+			if (text.substring(index, index + 1).equals(" ")) {
+				var distance = (index - middle).abs();
+				if ((best < 0) || (distance < (best - middle).abs())) {
+					best = index;
+				}
+			}
+		}
+		if (best < 0) {
+			return text;
+		}
+		return text.substring(0, best) + "\n" + text.substring(best + 1, text.length());
+	}
+
 	// The first of the fonts whose text fits in room pixels, keeping MARGIN
 	// clear on each side, or the last one if none do.
 	function fontWithin(dc as Graphics.Dc, text as String, room as Number, fonts as Array<Graphics.FontType>) as Graphics.FontType {

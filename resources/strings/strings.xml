@@ -31,6 +31,8 @@
     <string id="History">History</string>
     <string id="ClearHistory">Clear history</string>
     <string id="AddWorkout">Add workout</string>
+    <string id="OlderWorkouts">Older workouts</string>
+    <string id="NewerWorkouts">Newer workouts</string>
     <string id="RatingLabel">Rating</string>
     <string id="Delete">Delete</string>
     <string id="DeleteOlder">Delete this &amp; older</string>

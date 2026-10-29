@@ -113,3 +113,29 @@ venusq.resourcePath = $(venusq.resourcePath);resources-tap-pause
 venusq2.resourcePath = $(venusq2.resourcePath);resources-tap-pause
 venusq2m.resourcePath = $(venusq2m.resourcePath);resources-tap-pause
 venusqm.resourcePath = $(venusqm.resourcePath);resources-tap-pause
+
+# Group E (Instinct family). The black-and-white screens use launcher icons rendered from
+# resources/drawables/launcher_icon_mono.svg with tools/render-icon.py ... mono, and resources-mono
+# (Palette draws white instead of green, yellow, gray, and blue there).
+# 62x62 (rendered with mono)
+descentg1.resourcePath = $(descentg1.resourcePath);resources-icon-mono-62x62;resources-mono
+instinct2.resourcePath = $(instinct2.resourcePath);resources-icon-mono-62x62;resources-mono
+instinct2x.resourcePath = $(instinct2x.resourcePath);resources-icon-mono-62x62;resources-mono
+instinct3solar45mm.resourcePath = $(instinct3solar45mm.resourcePath);resources-icon-mono-62x62;resources-mono
+instincte45mm.resourcePath = $(instincte45mm.resourcePath);resources-icon-mono-62x62;resources-mono
+# 54x54
+instinct2s.resourcePath = $(instinct2s.resourcePath);resources-icon-mono-54x54;resources-mono
+# 52x52
+instincte40mm.resourcePath = $(instincte40mm.resourcePath);resources-icon-mono-52x52;resources-mono
+# 26x26
+instinctcrossover.resourcePath = $(instinctcrossover.resourcePath);resources-icon-mono-26x26;resources-mono
+# The Instinct 3 AMOLED watches use 60 x 60 and the Instinct Crossover AMOLED 38 x 38, rendered in color.
+instinct3amoled45mm.resourcePath = $(instinct3amoled45mm.resourcePath);resources-icon-60x60
+instinct3amoled50mm.resourcePath = $(instinct3amoled50mm.resourcePath);resources-icon-60x60
+instinctcrossoveramoled.resourcePath = $(instinctcrossoveramoled.resourcePath);resources-icon-38x38
+# 96 KB watches cannot hold 100 history items at once; resources-low-memory shows the history 30 at a time.
+descentg1.resourcePath = $(descentg1.resourcePath);resources-low-memory
+instinct2.resourcePath = $(instinct2.resourcePath);resources-low-memory
+instinct2s.resourcePath = $(instinct2s.resourcePath);resources-low-memory
+instinct2x.resourcePath = $(instinct2x.resourcePath);resources-low-memory
+instinctcrossover.resourcePath = $(instinctcrossover.resourcePath);resources-low-memory

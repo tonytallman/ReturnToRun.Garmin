@@ -21,3 +21,15 @@ function testTitleFitFirstFitting(logger as Test.Logger) as Boolean {
 	TestSupport.expectEqual(0, TitleFit.firstFitting([150] as Array<Number>, 100), "a single font");
 	return true;
 }
+
+(:test)
+function testSubscreenRoom(logger as Test.Logger) as Boolean {
+	logger.debug("text kept out of the Instinct subscreen");
+	TestSupport.expectEqual(107, Subscreen.rightEdge(176, 30, 20, 113, 62), "a title on the subscreen's rows stops left of it");
+	TestSupport.expectEqual(176, Subscreen.rightEdge(176, 80, 20, 113, 62), "a line below it has the full width");
+	TestSupport.expectEqual(3, Subscreen.lineCount("a\nb\nc"), "line count");
+	TestSupport.expectEqual("Program\ncomplete", TitleFit.splitInTwo("Program complete"), "a long title splits in two");
+	TestSupport.expectEqual("How did\nit feel?", TitleFit.splitInTwo("How did it feel?"), "at the space nearest the middle");
+	TestSupport.expectEqual("Help", TitleFit.splitInTwo("Help"), "one word stays");
+	return true;
+}

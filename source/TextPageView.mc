@@ -25,7 +25,7 @@ class TextPageView extends WatchUi.View {
 	function onLayout(dc as Graphics.Dc) as Void {
 		var height = dc.getHeight();
 		var lineHeight = dc.getFontHeight(Graphics.FONT_XTINY);
-		var bodyHeight = height * 58 / 100;
+		var bodyHeight = height * 85 / 100 - Subscreen.below(height * 27 / 100);
 		var blocks = TextPages.blocks(body, dc.getWidth() * 72 / 100, new DcTextMeasure(dc, Graphics.FONT_XTINY));
 		lines = TextPages.flatten(blocks);
 		pager = new TextPager(lines.size(), TextPages.pageStarts(blocks, bodyHeight / lineHeight));
@@ -39,11 +39,11 @@ class TextPageView extends WatchUi.View {
 		dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
 		dc.clear();
 
-		dc.setColor(Graphics.COLOR_GREEN, Graphics.COLOR_TRANSPARENT);
-		dc.drawText(centerX, height * 17 / 100, Graphics.FONT_TINY, title, center);
+		dc.setColor(Palette.title(), Graphics.COLOR_TRANSPARENT);
+		TitleFit.draw(dc, title, height * 17 / 100, [Graphics.FONT_TINY, Graphics.FONT_XTINY] as Array<Graphics.FontType>);
 
 		var lineHeight = dc.getFontHeight(Graphics.FONT_XTINY);
-		var y = height * 27 / 100 + lineHeight / 2;
+		var y = Subscreen.below(height * 27 / 100) + lineHeight / 2;
 		dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
 		for (var i = pager.firstLine(); i < pager.endLine(); i++) {
 			dc.drawText(centerX, y, Graphics.FONT_XTINY, lines[i], center);

@@ -14,14 +14,12 @@ class NoticeView extends WatchUi.View {
 	}
 
 	function onUpdate(dc as Graphics.Dc) as Void {
-		var width = dc.getWidth();
 		var height = dc.getHeight();
 		dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
 		dc.clear();
 
-		var wrapped = TextWrap.wrap(message, width * 80 / 100, new DcTextMeasure(dc, Graphics.FONT_XTINY));
 		dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
-		dc.drawText(width / 2, height / 2, Graphics.FONT_XTINY, wrapped, Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
+		Subscreen.drawMessage(dc, message, height / 2, 80, height * 16 / 100);
 	}
 }
 

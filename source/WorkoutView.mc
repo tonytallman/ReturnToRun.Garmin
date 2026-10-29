@@ -51,6 +51,22 @@ class WorkoutView extends WatchUi.View {
 		intervalCountLabel = View.findDrawableById("IntervalCountLabel") as WatchUi.Text?;
 		remainingLabel = View.findDrawableById("RemainingLabel") as WatchUi.Text?;
 		pausedLabel = View.findDrawableById("PausedLabel") as WatchUi.Text?;
+		// On the Instinct, the name and Paused sit left of the subscreen.
+		var sub = Subscreen.box();
+		if (sub != null) {
+			var x = (sub.x - Subscreen.GAP) / 2;
+			if (activityNameLabel != null) {
+				var name = activityNameLabel as WatchUi.Text;
+				name.setLocation(x, name.locY);
+			}
+			if (pausedLabel != null) {
+				var paused = pausedLabel as WatchUi.Text;
+				paused.setLocation(x, paused.locY);
+			}
+		}
+		if (pausedLabel != null) {
+			(pausedLabel as WatchUi.Text).setColor(Palette.paused());
+		}
 		pausedText = WatchUi.loadResource(Rez.Strings.Paused) as String;
 		timeLeftSuffix = WatchUi.loadResource(Rez.Strings.TimeLeftSuffix) as String;
 		showCurrentActivityName();
@@ -216,8 +232,17 @@ class WorkoutView extends WatchUi.View {
 		(intervalCountLabel as WatchUi.Text).setText(label);
 	}
 
+	function onUpdate(dc as Graphics.Dc) as Void {
+		View.onUpdate(dc);
+		Subscreen.drawClock(dc);
+	}
+
 	function timerCallback() as Void {
 		if (!session.isTiming()) {
+			// Keeps the subscreen clock current while paused.
+			if (Subscreen.box() != null) {
+				WatchUi.requestUpdate();
+			}
 			return;
 		}
 		timeLeft = timeLeft - 1;
@@ -237,7 +262,7 @@ class WorkoutView extends WatchUi.View {
 			var countdown = countdownLabel as WatchUi.Text;
 			countdown.setText(segment);
 			if (session.showsPaused()) {
-				countdown.setColor(Graphics.COLOR_YELLOW);
+				countdown.setColor(Palette.paused());
 			} else {
 				countdown.setColor(Graphics.COLOR_WHITE);
 			}

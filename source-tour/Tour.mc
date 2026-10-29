@@ -93,7 +93,7 @@ module Tour {
 	const NAMES = [
 		"main-menu", "workout-list", "warning-1", "warning-2",
 		"warm-up", "run", "run-paused", "walk", "cool-down", "rating",
-		"history-list", "history-details", "add-date", "add-workout", "too-old",
+		"history-list", "history-older", "history-details", "add-date", "add-workout", "too-old",
 		"program-complete", "instructions", "help", "about"
 	] as Array<String>;
 
@@ -170,6 +170,12 @@ module Tour {
 		} else if (name.equals("history-list")) {
 			workoutView = null;
 			var list = new HistoryListView();
+			show(list, new HistoryListDelegate(list));
+		} else if (name.equals("history-older")) {
+			// The second page on watches that show the history 30 at a time;
+			// elsewhere the same list as history-list.
+			var list = new HistoryListView();
+			list.turnPage(1);
 			show(list, new HistoryListDelegate(list));
 		} else if (name.equals("history-details")) {
 			show(new HistoryDetailsView(0), new HistoryDetailsDelegate(0));

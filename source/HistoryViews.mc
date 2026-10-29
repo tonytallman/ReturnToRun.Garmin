@@ -1,3 +1,4 @@
+import Toybox.Application;
 import Toybox.Lang;
 import Toybox.WatchUi;
 
@@ -12,11 +13,14 @@ function openHistory() as Void {
 // While a screen opened from the list is showing (an entry's details and its
 // rating picker, Clear history, or Add workout), the list's items are released
 // to free memory, and the list is rebuilt with the same item in focus on return.
+// Watches with little memory show it a page at a time (HistoryPageSize).
 class HistoryListView extends WatchUi.Menu2 {
 	var leaveTimer as LeaveTimer;
 	var builtVersion as Number;
 	var builtItems as Number;
 	var releaseWhenHidden as Boolean;
+	var pageSize as Number;
+	var page as Number;
 
 	function initialize() {
 		Menu2.initialize({:title=>MenuTitle.of(WatchUi.loadResource(Rez.Strings.History) as String)});
@@ -24,6 +28,9 @@ class HistoryListView extends WatchUi.Menu2 {
 		builtVersion = -1;
 		builtItems = 0;
 		releaseWhenHidden = false;
+		var setting = Application.loadResource(Rez.JsonData.HistoryPageSize);
+		pageSize = (setting instanceof Dictionary && setting["size"] instanceof Number) ? setting["size"] as Number : 0;
+		page = 0;
 		appServices().historyFocus = 0;
 		build();
 	}
@@ -33,20 +40,38 @@ class HistoryListView extends WatchUi.Menu2 {
 		var services = appServices();
 		var words = new HistoryWords();
 		var count = services.historySize();
-		for (var index = 0; index < count; index++) {
+		var focus = HistoryFormat.clampFocus(services.historyFocus, count);
+		page = HistoryFormat.pageFor(focus, count, pageSize, page);
+		if (HistoryFormat.hasNewer(page)) {
+			addItem(new WatchUi.MenuItem(WatchUi.loadResource(Rez.Strings.NewerWorkouts) as String, null, :newer, null));
+		}
+		var end = HistoryFormat.pageEnd(page, count, pageSize);
+		for (var index = HistoryFormat.pageFirst(page, pageSize); index < end; index++) {
 			var entry = services.historyEntryAt(index);
 			if (entry != null) {
 				addItem(new WatchUi.MenuItem(words.entryLabel(entry as HistoryEntry), null, index, null));
 			}
 		}
+		if (HistoryFormat.hasOlder(page, count, pageSize)) {
+			addItem(new WatchUi.MenuItem(WatchUi.loadResource(Rez.Strings.OlderWorkouts) as String, null, :older, null));
+		}
 		addItem(new WatchUi.MenuItem(WatchUi.loadResource(Rez.Strings.ClearHistory) as String, null, :clear, null));
 		addItem(new WatchUi.MenuItem(WatchUi.loadResource(Rez.Strings.AddWorkout) as String, null, :add, null));
-		builtItems = HistoryFormat.itemCount(count);
+		builtItems = HistoryFormat.pageItemCount(page, count, pageSize);
 		builtVersion = services.historyVersion;
-		var focus = HistoryFormat.clampFocus(services.historyFocus, count);
-		if (HistoryFormat.shouldSetFocus(focus, firstBuild)) {
-			setFocus(focus);
+		var position = HistoryFormat.pagePosition(focus, page, count, pageSize);
+		if (HistoryFormat.shouldSetFocus(position, firstBuild)) {
+			setFocus(position);
 		}
+	}
+
+	// Older workouts (step 1) or Newer workouts (step -1).
+	function turnPage(step as Number) as Void {
+		var services = appServices();
+		services.historyFocus = HistoryFormat.focusAfterTurn(page, step, services.historySize(), pageSize);
+		release();
+		build();
+		WatchUi.requestUpdate();
 	}
 
 	function release() as Void {
@@ -97,6 +122,10 @@ class HistoryListDelegate extends WatchUi.Menu2InputDelegate {
 			list.releaseOnHide(id as Number);
 			var view = new HistoryDetailsView(id as Number);
 			WatchUi.pushView(view, new HistoryDetailsDelegate(id as Number), WatchUi.SLIDE_LEFT);
+		} else if (id == :older) {
+			list.turnPage(1);
+		} else if (id == :newer) {
+			list.turnPage(-1);
 		} else if (id == :clear) {
 			list.releaseOnHide(HistoryFormat.clearPosition(count));
 			confirmHistoryChange(Rez.Strings.ConfirmClear, HistoryConfirmDelegate.CLEAR, 0);
