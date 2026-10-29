@@ -5,7 +5,8 @@ import Toybox.WatchUi;
 
 // The :title for a Menu2. On most watches it is the text, drawn by the system
 // menu. On watches whose system menu wraps a title such as "Return to Run" onto
-// a second line and cuts it off, monkey.jungle adds resources-menu-title, which
+// a second line and cuts it off, or whose subscreen clips it (the Instincts),
+// monkey.jungle adds resources-menu-title, which
 // turns DrawnMenuTitles on, and the title is a FittedMenuTitle instead.
 module MenuTitle {
 	function of(text as String) as String or WatchUi.Drawable {
@@ -32,9 +33,14 @@ class FittedMenuTitle extends WatchUi.Drawable {
 
 	function draw(dc as Graphics.Dc) as Void {
 		var y = dc.getHeight() / 2;
-		var font = TitleFit.fontWithin(dc, text, dc.getWidth(), FONTS);
 		dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
 		dc.clear();
+		if (Subscreen.box() != null) {
+			// On the Instinct, left of the subscreen, or on two lines.
+			TitleFit.draw(dc, text, y, FONTS);
+			return;
+		}
+		var font = TitleFit.fontWithin(dc, text, dc.getWidth(), FONTS);
 		dc.drawText(dc.getWidth() / 2, y, font, text, Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
 	}
 }

@@ -25,6 +25,14 @@ vivoactive3mlte.resourcePath = $(vivoactive3mlte.resourcePath);resources-menu-ti
 fr55.resourcePath = $(fr55.resourcePath);resources-menu-title
 legacysagadarthvader.resourcePath = $(legacysagadarthvader.resourcePath);resources-menu-title
 legacyherofirstavenger.resourcePath = $(legacyherofirstavenger.resourcePath);resources-menu-title
+# On the Instincts the subscreen clips or wraps the system menu title, so it is drawn too, left of the subscreen.
+descentg1.resourcePath = $(descentg1.resourcePath);resources-menu-title
+instinct2.resourcePath = $(instinct2.resourcePath);resources-menu-title
+instinct2s.resourcePath = $(instinct2s.resourcePath);resources-menu-title
+instinct2x.resourcePath = $(instinct2x.resourcePath);resources-menu-title
+instinct3solar45mm.resourcePath = $(instinct3solar45mm.resourcePath);resources-menu-title
+instincte40mm.resourcePath = $(instincte40mm.resourcePath);resources-menu-title
+instincte45mm.resourcePath = $(instincte45mm.resourcePath);resources-menu-title
 # Group C (round AMOLED) launcher icon sizes, rendered from resources/drawables/launcher_icon.svg with tools/render-icon.py.
 # 54 x 54
 fr165.resourcePath = $(fr165.resourcePath);resources-icon-54x54
