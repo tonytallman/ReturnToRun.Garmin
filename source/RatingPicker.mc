@@ -74,7 +74,21 @@ class RatingPickerText extends WatchUi.Drawable {
 		dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
 		var drawFont = font;
 		if (fitToScreen) {
-			drawFont = TitleFit.font(dc, text, height / 2, [font, Graphics.FONT_TINY, Graphics.FONT_XTINY] as Array<Graphics.FontType>);
+			var fonts = [font, Graphics.FONT_TINY, Graphics.FONT_XTINY] as Array<Graphics.FontType>;
+			if (Subscreen.box() != null) {
+				// On the Instinct, left of the subscreen like the other titles
+				// (the title's dc starts at the screen's left edge). The title
+				// area is too short for two lines, so the smallest font is the
+				// last resort.
+				var room = (Subscreen.box() as Graphics.BoundingBox).x - Subscreen.GAP;
+				if (room > width) {
+					room = width;
+				}
+				drawFont = TitleFit.fontWithin(dc, text, room, fonts);
+				dc.drawText(room / 2, height / 2, drawFont, text, Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
+				return;
+			}
+			drawFont = TitleFit.font(dc, text, height / 2, fonts);
 		}
 		dc.drawText(width / 2, height / 2, drawFont, text, Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
 	}

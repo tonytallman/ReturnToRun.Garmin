@@ -154,3 +154,13 @@ instinct2.resourcePath = $(instinct2.resourcePath);resources-low-memory
 instinct2s.resourcePath = $(instinct2s.resourcePath);resources-low-memory
 instinct2x.resourcePath = $(instinct2x.resourcePath);resources-low-memory
 instinctcrossover.resourcePath = $(instinctcrossover.resourcePath);resources-low-memory
+# The subscreen Instincts and the Crossovers: shorter wording for text that does not fit there.
+descentg1.resourcePath = $(descentg1.resourcePath);resources-short-text
+instinct2.resourcePath = $(instinct2.resourcePath);resources-short-text
+instinct2s.resourcePath = $(instinct2s.resourcePath);resources-short-text
+instinct2x.resourcePath = $(instinct2x.resourcePath);resources-short-text
+instinct3solar45mm.resourcePath = $(instinct3solar45mm.resourcePath);resources-short-text
+instincte40mm.resourcePath = $(instincte40mm.resourcePath);resources-short-text
+instincte45mm.resourcePath = $(instincte45mm.resourcePath);resources-short-text
+instinctcrossover.resourcePath = $(instinctcrossover.resourcePath);resources-short-text
+instinctcrossoveramoled.resourcePath = $(instinctcrossoveramoled.resourcePath);resources-short-text
