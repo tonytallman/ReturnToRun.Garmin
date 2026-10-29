@@ -36,26 +36,29 @@ function testTextPager(logger as Test.Logger) as Boolean {
 (:test)
 function testTextPageBreaks(logger as Test.Logger) as Boolean {
 	logger.debug("page breaks between sentences");
-	TestSupport.expectStarts([0], TextPages.pageStarts(TestSupport.textBlocks([2, 2]), 5), "fits on one page");
-	TestSupport.expectStarts([0], TextPages.pageStarts(TestSupport.textBlocks([5]), 5), "exactly one page");
-	TestSupport.expectStarts([0, 5], TextPages.pageStarts(TestSupport.textBlocks([1, 1, 1, 1, 1, 1]), 5), "fills a page with whole sentences");
-	TestSupport.expectStarts([0, 4], TextPages.pageStarts(TestSupport.textBlocks([2, 2, 2]), 5), "the third sentence moves whole to page two");
-	TestSupport.expectStarts([0, 3, 6], TextPages.pageStarts(TestSupport.textBlocks([3, 3, 3]), 5), "never splits a sentence");
-	TestSupport.expectStarts([0, 5], TextPages.pageStarts(TestSupport.textBlocks([5, 5]), 5), "an exact fill has no empty page");
-	TestSupport.expectStarts([0, 5], TextPages.pageStarts(TestSupport.textBlocks([7]), 5), "an oversize sentence splits at a line");
-	TestSupport.expectStarts([0, 2, 7], TextPages.pageStarts(TestSupport.textBlocks([2, 7, 1]), 5), "an oversize sentence starts a page");
-	TestSupport.expectStarts([0, 5], TextPages.pageStarts(TestSupport.textBlocks([10]), 5), "two full pages, no empty third");
-	TestSupport.expectStarts([0], TextPages.pageStarts([] as Array<Array<String> >, 5), "empty input is one page");
-	TestSupport.expectStarts([0, 1, 2], TextPages.pageStarts(TestSupport.textBlocks([1, 1, 1]), 0), "at least one line a page");
-
-	var withBlank = TestSupport.textBlocks([5]);
-	withBlank.add([""] as Array<String>);
-	withBlank.add(TestSupport.textBlock(1));
-	TestSupport.expectStarts([0, 6], TextPages.pageStarts(withBlank, 5), "a blank line never starts a page");
-	var blankFits = TestSupport.textBlocks([2]);
-	blankFits.add([""] as Array<String>);
-	blankFits.add(TestSupport.textBlock(3));
-	TestSupport.expectStarts([0, 3], TextPages.pageStarts(blankFits, 5), "a blank line that fits stays");
+	var measure = new CharacterMeasure();
+	var three = [50, 50, 50] as Array<Number>;
+	var pages = TextPages.paginate("Aa. Bb. Cc.", three, measure);
+	TestSupport.expectStarts([0], pages[1] as Array<Number>, "three sentences fill one page");
+	TestSupport.expectEqual(3, (pages[0] as Array).size(), "one line each");
+	pages = TextPages.paginate("aa bb. cc dd.", three, measure);
+	TestSupport.expectStarts([0, 2], pages[1] as Array<Number>, "the second sentence moves whole to page two");
+	TestSupport.expectEqual("dd.", (pages[0] as Array)[3], "and keeps its lines");
+	pages = TextPages.paginate("a b c d e f g", [10, 10, 10] as Array<Number>, measure);
+	TestSupport.expectStarts([0, 3, 6], pages[1] as Array<Number>, "a sentence longer than a page splits at full pages");
+	TestSupport.expectEqual(7, (pages[0] as Array).size(), "keeping every word");
+	pages = TextPages.paginate("aa. bbbb cc", [100, 30] as Array<Number>, measure);
+	TestSupport.expectStarts([0, 1], pages[1] as Array<Number>, "too long for the narrow row moves to the next page");
+	TestSupport.expectEqual("bbbb cc", (pages[0] as Array)[1], "rewrapped to the wide first row");
+	pages = TextPages.paginate("aa||bb", three, measure);
+	TestSupport.expectEqual("", (pages[0] as Array)[1], "a blank line that fits stays");
+	TestSupport.expectStarts([0], pages[1] as Array<Number>, "on one page");
+	pages = TextPages.paginate("aa||bb", [50] as Array<Number>, measure);
+	TestSupport.expectStarts([0, 1], pages[1] as Array<Number>, "a blank line never starts a page");
+	TestSupport.expectEqual(2, (pages[0] as Array).size(), "it is dropped instead");
+	pages = TextPages.paginate("", three, measure);
+	TestSupport.expectStarts([0], pages[1] as Array<Number>, "empty text is one page");
+	TestSupport.expectEqual(0, (pages[0] as Array).size(), "with no lines");
 	return true;
 }
 
@@ -63,28 +66,40 @@ function testTextPageBreaks(logger as Test.Logger) as Boolean {
 function testTextPages(logger as Test.Logger) as Boolean {
 	logger.debug("text pages");
 	var measure = new CharacterMeasure();
-	var lines = TextPages.lines("aa bb cc|dd||ee", 50, measure);
+	var five = [50, 50, 50, 50, 50] as Array<Number>;
+	var lines = TextPages.paginate("aa bb cc|dd||ee", five, measure)[0] as Array<String>;
 	TestSupport.expectEqual(5, lines.size(), "wrapped lines, breaks, and a blank line");
 	TestSupport.expectEqual("aa bb", lines[0], "wrapped first line");
 	TestSupport.expectEqual("cc", lines[1], "wrapped second line");
 	TestSupport.expectEqual("dd", lines[2], "| starts a line");
 	TestSupport.expectEqual("", lines[3], "|| leaves a blank line");
 	TestSupport.expectEqual("ee", lines[4], "after the blank line");
-	TestSupport.expectEqual(1, TextPages.lines("one", 100, measure).size(), "no breaks");
 
-	var blocks = TextPages.blocks("Aa bb. Cc dd.|Is it? no.", 1000, measure);
-	TestSupport.expectEqual(3, blocks.size(), "one block per sentence");
-	TestSupport.expectEqual("Aa bb.", blocks[0][0], "first sentence keeps its period");
-	TestSupport.expectEqual("Cc dd.", blocks[1][0], "second sentence starts a line");
-	TestSupport.expectEqual("Is it? no.", blocks[2][0], "only a period ends a sentence");
-	var wrapped = TextPages.blocks("aa bb cc", 50, measure);
-	TestSupport.expectEqual(1, wrapped.size(), "a wrapped sentence is one block");
-	TestSupport.expectEqual(2, wrapped[0].size(), "of two lines");
-	TestSupport.expectEqual(1, TextPages.blocks("", 50, measure).size(), "empty text is one blank block");
+	lines = TextPages.paginate("Aa bb. Cc dd.|Is it? no.", [1000, 1000, 1000] as Array<Number>, measure)[0] as Array<String>;
+	TestSupport.expectEqual(3, lines.size(), "one line per sentence");
+	TestSupport.expectEqual("Aa bb.", lines[0], "first sentence keeps its period");
+	TestSupport.expectEqual("Cc dd.", lines[1], "second sentence starts a line");
+	TestSupport.expectEqual("Is it? no.", lines[2], "only a period ends a sentence");
 
 	TestSupport.expectEqual("github.com/|tonytallman/|ReturnToRun.Garmin",
 		TextPages.breakAfterSlashes("github.com/tonytallman/ReturnToRun.Garmin"), "the link breaks after each slash");
 	TestSupport.expectEqual("plain", TextPages.breakAfterSlashes("plain"), "no slash, no break");
+	return true;
+}
+
+// Built only for the Crossovers (see HandsBand); run the tests on instinctcrossover.
+(:test :hands)
+function testHandsBand(logger as Test.Logger) as Boolean {
+	logger.debug("text kept out of the Crossover's hands");
+	TestSupport.expectEqual(10, HandsBand.clearOf(10, 10, 66, 110), "a row above the band stays");
+	TestSupport.expectEqual(56, HandsBand.clearOf(56, 10, 66, 110), "a row ending at the band stays");
+	TestSupport.expectEqual(110, HandsBand.clearOf(60, 10, 66, 110), "a row reaching into the band moves below it");
+	TestSupport.expectEqual(120, HandsBand.clearOf(120, 10, 66, 110), "a row below the band stays");
+	TestSupport.expectEqual(30, HandsBand.centeredOf(30, 20, 66, 110), "a block clear of the band stays");
+	TestSupport.expectEqual(56, HandsBand.centeredOf(78, 20, 66, 110), "a block across the band is centered around it");
+	TestSupport.expectStarts([10, 30], HandsBand.spreadOf([10, 20] as Array<Number>, 0, 60), "equal gaps");
+	TestSupport.expectStarts([0, 40], HandsBand.spreadOf([40, 40] as Array<Number>, 0, 60), "packed when they do not fit");
+	TestSupport.expectEqual(23, HandsBand.halfHeight(), "the Crossover's band");
 	return true;
 }
 

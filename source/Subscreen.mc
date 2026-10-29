@@ -72,8 +72,9 @@ module Subscreen {
 	// block centered at y. On the Instinct, the block starts no higher than
 	// minTop, and each line is wrapped to the room it has: left of the
 	// subscreen on its rows, and inside the cut-off top corner and the round
-	// bottom. Returns the bottom of the block.
-	function drawMessage(dc as Graphics.Dc, text as String, y as Number, widthPercent as Number, minTop as Number) as Number {
+	// bottom. On the Instinct Crossover the lines skip the band of the
+	// parked hands (HandsBand). Returns the bottom of the block.
+	function drawMessage(dc as Graphics.Dc, text as String, y as Number, widthPercent as Number, minTop as Number, maxBottom as Number) as Number {
 		var width = dc.getWidth();
 		var height = dc.getHeight();
 		var font = Graphics.FONT_XTINY;
@@ -84,46 +85,70 @@ module Subscreen {
 		var wrapped = TextWrap.wrap(text, maxWidth, measure);
 		var lines = lineCount(wrapped);
 		var found = box();
-		if (found == null) {
+		if ((found == null) && (HandsBand.halfHeight() == 0)) {
 			dc.drawText(width / 2, y, font, wrapped, center);
 			return y + lines * lineHeight / 2;
 		}
-		var top = y - lines * lineHeight / 2;
-		if (top < minTop) {
-			top = minTop;
-		}
+		// Where the lines would run past maxBottom, they cross the hands instead.
+		var tops = [] as Array<Number>;
 		var widths = [] as Array<Number>;
 		var centers = [] as Array<Number>;
-		for (var index = 0; index < MAX_LINES; index++) {
-			var lineTop = top + index * lineHeight;
-			var lineBottom = lineTop + lineHeight;
-			var left = leftEdge(width, lineTop);
-			if (lineBottom > height / 2) {
-				var bottomLeft = (width - TitleFit.chordWidth(height, lineBottom)) / 2;
-				if (bottomLeft > left) {
-					left = bottomLeft;
+		for (var pass = 0; pass < 2; pass++) {
+			var skipHands = (pass == 0) && (HandsBand.halfHeight() > 0);
+			var top = y - lines * lineHeight / 2;
+			if (skipHands) {
+				top = HandsBand.centered(top, lines * lineHeight, height);
+			}
+			if (top < minTop) {
+				top = minTop;
+			}
+			tops = [] as Array<Number>;
+			widths = [] as Array<Number>;
+			centers = [] as Array<Number>;
+			for (var index = 0; index < MAX_LINES; index++) {
+				var lineTop = skipHands ? HandsBand.clear(top, lineHeight, height) : top;
+				tops.add(lineTop);
+				top = lineTop + lineHeight;
+				var left = rowLeft(width, height, lineTop, lineHeight);
+				var right = width - left;
+				if ((found != null) && (lineTop < found.y + found.height + GAP)) {
+					right = found.x - GAP;
 				}
+				var room = right - left - 2 * TitleFit.MARGIN;
+				widths.add(room < maxWidth ? room : maxWidth);
+				centers.add((left + right) / 2);
 			}
-			var right = width - left;
-			if (lineTop < found.y + found.height + GAP) {
-				right = found.x - GAP;
+			wrapped = TextWrap.wrapLines(text, widths, measure);
+			lines = lineCount(wrapped);
+			if (lines > MAX_LINES) {
+				lines = MAX_LINES;
 			}
-			var room = right - left - 2 * TitleFit.MARGIN;
-			widths.add(room < maxWidth ? room : maxWidth);
-			centers.add((left + right) / 2);
+			if (!skipHands || (tops[lines - 1] + lineHeight <= maxBottom)) {
+				break;
+			}
 		}
-		wrapped = TextWrap.wrapLines(text, widths, measure);
-		lines = lineCount(wrapped);
-		var lineY = top + lineHeight / 2;
 		var rest = wrapped;
 		for (var index = 0; index < lines; index++) {
 			var at = rest.find("\n");
 			var line = (at == null) ? rest : rest.substring(0, at as Number) as String;
 			rest = (at == null) ? "" : rest.substring((at as Number) + 1, rest.length()) as String;
-			dc.drawText(centers[(index < MAX_LINES) ? index : MAX_LINES - 1], lineY, font, line, center);
-			lineY += lineHeight;
+			dc.drawText(centers[index], tops[index] + lineHeight / 2, font, line, center);
 		}
-		return lineY - lineHeight / 2;
+		return tops[lines - 1] + lineHeight;
+	}
+
+	// The left edge of a row lineHeight tall whose top is at lineTop: inside
+	// the cut-off top corner or the round top, and the round bottom.
+	function rowLeft(width as Number, height as Number, lineTop as Number, lineHeight as Number) as Number {
+		var left = leftEdge(width, lineTop);
+		var lineBottom = lineTop + lineHeight;
+		if (lineBottom > height / 2) {
+			var bottomLeft = (width - TitleFit.chordWidth(height, lineBottom)) / 2;
+			if (bottomLeft > left) {
+				left = bottomLeft;
+			}
+		}
+		return left;
 	}
 
 	// The time of day in the subscreen, in the watch's 12- or 24-hour format.

@@ -25,7 +25,7 @@ class ProgramCompleteView extends WatchUi.View {
 
 		dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
 		// Below the subscreen and the title split in two beside it.
-		Subscreen.drawMessage(dc, message, height * 60 / 100, 80, Subscreen.below(titleY + dc.getFontHeight(Graphics.FONT_SMALL) + 2));
+		Subscreen.drawMessage(dc, message, height * 60 / 100, 80, Subscreen.below(titleY + dc.getFontHeight(Graphics.FONT_SMALL) + 2), height * 94 / 100);
 	}
 }
 

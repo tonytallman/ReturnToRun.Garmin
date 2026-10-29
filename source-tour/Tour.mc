@@ -26,6 +26,7 @@ module Tour {
 	var shot as Number = 0;
 	var stacked as Boolean = false;
 	var workoutView as WorkoutView?;
+	var historyList as HistoryListView?;
 	var textView as TextPageView?;
 	var textName as String = "";
 	var textPage as Number = 1;
@@ -170,14 +171,15 @@ module Tour {
 		} else if (name.equals("history-list")) {
 			workoutView = null;
 			var list = new HistoryListView();
+			historyList = list;
 			show(list, new HistoryListDelegate(list));
 		} else if (name.equals("history-older")) {
 			// The second page on watches that show the history 30 at a time;
-			// elsewhere the same list as history-list.
-			var list = new HistoryListView();
-			list.turnPage(1);
-			show(list, new HistoryListDelegate(list));
+			// elsewhere the same list as history-list. Turned in place, as
+			// Older workouts does, so two lists are never in memory at once.
+			(historyList as HistoryListView).turnPage(1);
 		} else if (name.equals("history-details")) {
+			historyList = null;
 			show(new HistoryDetailsView(0), new HistoryDetailsDelegate(0));
 		} else if (name.equals("add-date")) {
 			var view = new AddDateView(new DateStepper(services.currentDay()));

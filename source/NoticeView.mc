@@ -19,7 +19,7 @@ class NoticeView extends WatchUi.View {
 		dc.clear();
 
 		dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
-		Subscreen.drawMessage(dc, message, height / 2, 80, height * 16 / 100);
+		Subscreen.drawMessage(dc, message, height / 2, 80, height * 16 / 100, height * 94 / 100);
 	}
 }
 

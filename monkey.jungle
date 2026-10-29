@@ -2,6 +2,8 @@ project.manifest = manifest.xml
 base.resourcePath = resources;resources-program
 # Only source/. The screen tour (tour.jungle) adds source-tour.
 base.sourcePath = source
+# HandsBand is built only for the Instinct Crossovers (:hands); other watches get its stub (:noHands).
+base.excludeAnnotations = hands
 # The vivoactive 3 family's launcher icon is 40 x 33; this folder's LauncherIcon replaces the 40 x 40 one.
 vivoactive3.resourcePath = $(vivoactive3.resourcePath);resources-icon-40x33
 vivoactive3m.resourcePath = $(vivoactive3m.resourcePath);resources-icon-40x33
@@ -133,6 +135,11 @@ instinctcrossover.resourcePath = $(instinctcrossover.resourcePath);resources-ico
 instinct3amoled45mm.resourcePath = $(instinct3amoled45mm.resourcePath);resources-icon-60x60
 instinct3amoled50mm.resourcePath = $(instinct3amoled50mm.resourcePath);resources-icon-60x60
 instinctcrossoveramoled.resourcePath = $(instinctcrossoveramoled.resourcePath);resources-icon-38x38
+# The Crossovers' analog hands stay parked across the middle of the screen; resources-hands-* gives the band text keeps out of (HandsBand).
+instinctcrossover.resourcePath = $(instinctcrossover.resourcePath);resources-hands-crossover
+instinctcrossoveramoled.resourcePath = $(instinctcrossoveramoled.resourcePath);resources-hands-crossoveramoled
+instinctcrossover.excludeAnnotations = noHands
+instinctcrossoveramoled.excludeAnnotations = noHands
 # 96 KB watches cannot hold 100 history items at once; resources-low-memory shows the history 30 at a time.
 descentg1.resourcePath = $(descentg1.resourcePath);resources-low-memory
 instinct2.resourcePath = $(instinct2.resourcePath);resources-low-memory

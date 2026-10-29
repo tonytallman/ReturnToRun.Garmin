@@ -64,6 +64,10 @@ class WorkoutView extends WatchUi.View {
 				paused.setLocation(x, paused.locY);
 			}
 		}
+		// On the Instinct Crossover, out of the way of the parked hands.
+		if ((activityNameLabel != null) && (countdownLabel != null) && (pausedLabel != null) && (remainingLabel != null) && (intervalCountLabel != null)) {
+			HandsBand.layoutWorkout(dc, [activityNameLabel, countdownLabel, pausedLabel, remainingLabel, intervalCountLabel] as Array<WatchUi.Text>);
+		}
 		if (pausedLabel != null) {
 			(pausedLabel as WatchUi.Text).setColor(Palette.paused());
 		}

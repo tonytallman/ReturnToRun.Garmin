@@ -43,6 +43,12 @@ module TitleFit {
 	// that fits. If the title's rows reach the subscreen (Instinct), it is
 	// centered in the room to the subscreen's left instead.
 	function draw(dc as Graphics.Dc, text as String, screenY as Number, fonts as Array<Graphics.FontType>) as Void {
+		drawBelow(dc, text, screenY, fonts, 0);
+	}
+
+	// The same, with a title split in two lines starting no higher than minTop
+	// (below the page-up arrow).
+	function drawBelow(dc as Graphics.Dc, text as String, screenY as Number, fonts as Array<Graphics.FontType>, minTop as Number) as Void {
 		var width = dc.getWidth();
 		var center = Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER;
 		var sub = Subscreen.box();
@@ -56,6 +62,10 @@ module TitleFit {
 					// Too long even in the smallest font: two lines.
 					text = splitInTwo(text);
 					fitted = fontWithin(dc, text, room, fonts);
+					var lineHeight = dc.getFontHeight(fitted);
+					if (screenY - lineHeight < minTop) {
+						screenY = minTop + lineHeight;
+					}
 				}
 				dc.drawText((left + right) / 2, screenY, fitted, text, center);
 				return;

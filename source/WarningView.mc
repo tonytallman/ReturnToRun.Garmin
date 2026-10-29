@@ -50,17 +50,18 @@ class WarningView extends WatchUi.View {
 		// The message alone, wrapped to fit the wide middle of the round face.
 		// There is no title, so a full sentence has room for four lines.
 		dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
-		var messageBottom = Subscreen.drawMessage(dc, message, height * 37 / 100, 84, height * 16 / 100);
+		var barHeight = dc.getFontHeight(Graphics.FONT_SMALL) + 4;
+		var messageBottom = Subscreen.drawMessage(dc, message, height * 37 / 100, 84, height * 16 / 100, height * 97 / 100 - 2 * barHeight);
 
 		// The highlight bar and the focused action share one center line.
 		var continueY = WarningLayout.continueY(height);
 		var cancelY = WarningLayout.cancelY(height);
 		var barWidth = width * 58 / 100;
-		var barHeight = dc.getFontHeight(Graphics.FONT_SMALL) + 4;
 		// On the Instinct, a message wrapped beside the subscreen can run longer,
-		// so both actions move down below it. (These watches have no touch.)
+		// so both actions move down below it; on the Instinct Crossover, below a
+		// message that continues under the hands. (These watches have no touch.)
 		var overlap = messageBottom + barHeight / 2 + 2 - continueY;
-		if ((overlap > 0) && (Subscreen.box() != null)) {
+		if ((overlap > 0) && ((Subscreen.box() != null) || (HandsBand.halfHeight() > 0))) {
 			continueY += overlap;
 			cancelY += overlap;
 		}
