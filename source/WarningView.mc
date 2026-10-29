@@ -15,6 +15,7 @@ class WarningView extends WatchUi.View {
 	var focusContinue as Boolean;
 	var closed as Boolean;
 	var leaveTimer as LeaveTimer;
+	var screenHeight as Number;
 
 	function initialize(workoutIndex as Number, warnings as Array<Number>, position as Number) {
 		View.initialize();
@@ -24,6 +25,7 @@ class WarningView extends WatchUi.View {
 		focusContinue = true;
 		closed = false;
 		leaveTimer = new LeaveTimer();
+		screenHeight = 0;
 		var oncePerDay = WatchUi.loadResource(Rez.Strings.OncePerDayWarning) as String;
 		var sixPerWeek = WatchUi.loadResource(Rez.Strings.SixPerWeekWarning) as String;
 		var text = WarningMessages.messageFor(warnings[position] as Number, oncePerDay, sixPerWeek);
@@ -39,6 +41,7 @@ class WarningView extends WatchUi.View {
 	function onUpdate(dc as Graphics.Dc) as Void {
 		var width = dc.getWidth();
 		var height = dc.getHeight();
+		screenHeight = height;
 		var centerX = width / 2;
 		var center = Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER;
 		dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
@@ -51,8 +54,8 @@ class WarningView extends WatchUi.View {
 		dc.drawText(centerX, height * 37 / 100, Graphics.FONT_XTINY, wrapped, center);
 
 		// The highlight bar and the focused action share one center line.
-		var continueY = height * 70 / 100;
-		var cancelY = height * 84 / 100;
+		var continueY = WarningLayout.continueY(height);
+		var cancelY = WarningLayout.cancelY(height);
 		var focusY = focusContinue ? continueY : cancelY;
 		var barWidth = width * 58 / 100;
 		var barHeight = dc.getFontHeight(Graphics.FONT_SMALL) + 4;
@@ -91,6 +94,17 @@ class WarningView extends WatchUi.View {
 		}
 		closed = true;
 		continuePastWarning(workoutIndex, warnings, position);
+	}
+
+	// A tap at height y: Continue or Cancel if it hits one (WarningLayout).
+	function chooseAt(y as Number) as Void {
+		var row = WarningLayout.rowAt(y, screenHeight);
+		if (row == WarningLayout.ROW_CONTINUE) {
+			focusContinue = true;
+			activate();
+		} else if (row == WarningLayout.ROW_CANCEL) {
+			cancel();
+		}
 	}
 
 	function cancel() as Void {

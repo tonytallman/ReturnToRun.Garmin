@@ -146,11 +146,11 @@ module Tour {
 		} else if (name.equals("warning-1") || name.equals("warning-2")) {
 			var position = name.equals("warning-1") ? 0 : 1;
 			var view = new WarningView(WORKOUT_INDEX, services.warningsForToday(), position);
-			show(view, new WarningViewDelegate(view));
+			show(view, new WarningViewDelegate(view, deviceTouchPolicy()));
 		} else if (name.equals("warm-up")) {
 			var view = new WorkoutView(WORKOUT_INDEX);
 			workoutView = view;
-			show(view, new WorkoutViewDelegate(view));
+			show(view, new WorkoutViewDelegate(view, deviceTouchPolicy()));
 		} else if (name.equals("run")) {
 			(workoutView as WorkoutView).setCurrentActivity(1);
 		} else if (name.equals("run-paused")) {

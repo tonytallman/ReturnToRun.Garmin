@@ -81,3 +81,24 @@ venu2.resourcePath = $(venu2.resourcePath);resources-icon-70x70
 venu2plus.resourcePath = $(venu2plus.resourcePath);resources-icon-70x70
 venu3.resourcePath = $(venu3.resourcePath);resources-icon-70x70
 venu3s.resourcePath = $(venu3s.resourcePath);resources-icon-70x70
+# Two-button touch watches (Start and Back, no Up or Down): the Controls help describes Start, taps, and swipes.
+approachs50.resourcePath = $(approachs50.resourcePath);resources-touch-help
+approachs7042mm.resourcePath = $(approachs7042mm.resourcePath);resources-touch-help
+approachs7047mm.resourcePath = $(approachs7047mm.resourcePath);resources-touch-help
+approachs7243mm.resourcePath = $(approachs7243mm.resourcePath);resources-touch-help
+approachs7247mm.resourcePath = $(approachs7247mm.resourcePath);resources-touch-help
+venu2.resourcePath = $(venu2.resourcePath);resources-touch-help
+venu2plus.resourcePath = $(venu2plus.resourcePath);resources-touch-help
+venu2s.resourcePath = $(venu2s.resourcePath);resources-touch-help
+venu3.resourcePath = $(venu3.resourcePath);resources-touch-help
+venu3s.resourcePath = $(venu3s.resourcePath);resources-touch-help
+venu441mm.resourcePath = $(venu441mm.resourcePath);resources-touch-help
+venu445mm.resourcePath = $(venu445mm.resourcePath);resources-touch-help
+vivoactive5.resourcePath = $(vivoactive5.resourcePath);resources-touch-help
+vivoactive6.resourcePath = $(vivoactive6.resourcePath);resources-touch-help
+# Touch watches where Start never reaches the Select behavior: a tap pauses and resumes the workout (TouchPolicy),
+# and the help and the About hint say to tap.
+venu.resourcePath = $(venu.resourcePath);resources-tap-pause
+venud.resourcePath = $(venud.resourcePath);resources-tap-pause
+d2air.resourcePath = $(d2air.resourcePath);resources-tap-pause
+d2airx10.resourcePath = $(d2airx10.resourcePath);resources-tap-pause
