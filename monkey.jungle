@@ -81,6 +81,12 @@ venu2.resourcePath = $(venu2.resourcePath);resources-icon-70x70
 venu2plus.resourcePath = $(venu2plus.resourcePath);resources-icon-70x70
 venu3.resourcePath = $(venu3.resourcePath);resources-icon-70x70
 venu3s.resourcePath = $(venu3s.resourcePath);resources-icon-70x70
+# Group D (rectangular) launcher icon sizes, rendered the same way. The Venu Sq 2 family uses the default 40 x 40.
+# 36 x 36
+venusq.resourcePath = $(venusq.resourcePath);resources-icon-36x36
+venusqm.resourcePath = $(venusqm.resourcePath);resources-icon-36x36
+# 65 x 65
+venux1.resourcePath = $(venux1.resourcePath);resources-icon-65x65
 # Two-button touch watches (Start and Back, no Up or Down): the Controls help describes Start, taps, and swipes.
 approachs50.resourcePath = $(approachs50.resourcePath);resources-touch-help
 approachs7042mm.resourcePath = $(approachs7042mm.resourcePath);resources-touch-help
@@ -96,9 +102,14 @@ venu441mm.resourcePath = $(venu441mm.resourcePath);resources-touch-help
 venu445mm.resourcePath = $(venu445mm.resourcePath);resources-touch-help
 vivoactive5.resourcePath = $(vivoactive5.resourcePath);resources-touch-help
 vivoactive6.resourcePath = $(vivoactive6.resourcePath);resources-touch-help
+venux1.resourcePath = $(venux1.resourcePath);resources-touch-help
 # Touch watches where Start never reaches the Select behavior: a tap pauses and resumes the workout (TouchPolicy),
 # and the help and the About hint say to tap.
 venu.resourcePath = $(venu.resourcePath);resources-tap-pause
 venud.resourcePath = $(venud.resourcePath);resources-tap-pause
 d2air.resourcePath = $(d2air.resourcePath);resources-tap-pause
 d2airx10.resourcePath = $(d2airx10.resourcePath);resources-tap-pause
+venusq.resourcePath = $(venusq.resourcePath);resources-tap-pause
+venusq2.resourcePath = $(venusq2.resourcePath);resources-tap-pause
+venusq2m.resourcePath = $(venusq2m.resourcePath);resources-tap-pause
+venusqm.resourcePath = $(venusqm.resourcePath);resources-tap-pause

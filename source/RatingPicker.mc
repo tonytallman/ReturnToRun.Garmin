@@ -54,7 +54,7 @@ class RatingPickerFactory extends WatchUi.PickerFactory {
 // White words on their own black box, so they read the same on the watch and
 // in the simulator. Used for the title and for each rating word. The title
 // sits at the top of the screen, so it steps down a font size where it would
-// run past the edge of the circle.
+// run past the edge of the circle or out of its own box.
 class RatingPickerText extends WatchUi.Drawable {
 	var text as String;
 	var font as Graphics.FontType;

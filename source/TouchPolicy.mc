@@ -5,9 +5,10 @@ import Toybox.System;
 // Which input runs a screen's Start action, so a tap on a touch screen does
 // not. A tap and the Start button both arrive as the Select behavior, so where
 // taps are possible the action runs from the Start key (KEY_ENTER) instead.
-// On the Venu, Venu D, D2 Air, and D2 Air X10, Start never reaches the Select
-// behavior (monkey.jungle adds resources-tap-pause, which turns StartButton's
-// "selects" off), so a tap is how the workout pauses and resumes there.
+// On the Venu, Venu D, Venu Sq, Venu Sq 2, D2 Air, and D2 Air X10, Start never
+// reaches the Select behavior (monkey.jungle adds resources-tap-pause, which
+// turns StartButton's "selects" off), so a tap is how the workout pauses and
+// resumes there.
 // UI-free, so it is unit tested with each combination.
 class TouchPolicy {
 	var touchScreen as Boolean;

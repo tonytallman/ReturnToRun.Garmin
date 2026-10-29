@@ -25,11 +25,16 @@ module TitleFit {
 
 	// The first of the fonts whose text fits at screenY (the middle of the
 	// line, measured from the top of the screen), or the last one if none do.
+	// The text also has to fit in dc, which can be narrower than the screen
+	// (the Venu Sq 2 gives the Picker title 214 of its 320 pixels).
 	function font(dc as Graphics.Dc, text as String, screenY as Number, fonts as Array<Graphics.FontType>) as Graphics.FontType {
 		var settings = System.getDeviceSettings();
 		var room = settings.screenWidth;
 		if (settings.screenShape == System.SCREEN_SHAPE_ROUND) {
 			room = chordWidth(settings.screenWidth, screenY);
+		}
+		if (dc.getWidth() < room) {
+			room = dc.getWidth();
 		}
 		return fontWithin(dc, text, room, fonts);
 	}
