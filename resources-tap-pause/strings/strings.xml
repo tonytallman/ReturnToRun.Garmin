@@ -1,0 +1,5 @@
+<resources xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://developer.garmin.com/downloads/connect-iq/resources.xsd">
+    <string id="HelpButtonsTitle">Controls</string>
+    <string id="HelpButtons">During a workout:|Tap the screen: pause or resume.|Back: pause.|Back while paused: the End workout? menu.|Resume: keep going.|Save: keep it and rate it.|Discard: delete it. Nothing is logged.|After the cool-down it ends and asks How did it feel?|Swipe up or down to change the rating. Tap to pick it. Back stays on this screen.</string>
+    <string id="OpenOnPhoneHint">Tap the screen to open the link on your phone.</string>
+</resources>

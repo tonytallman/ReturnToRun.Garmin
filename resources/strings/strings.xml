@@ -31,6 +31,8 @@
     <string id="History">History</string>
     <string id="ClearHistory">Clear history</string>
     <string id="AddWorkout">Add workout</string>
+    <string id="OlderWorkouts">Older workouts</string>
+    <string id="NewerWorkouts">Newer workouts</string>
     <string id="RatingLabel">Rating</string>
     <string id="Delete">Delete</string>
     <string id="DeleteOlder">Delete this &amp; older</string>
@@ -41,7 +43,7 @@
     <string id="WorkoutTitle">Workout</string>
     <string id="Today">Today</string>
     <string id="Yesterday">Yesterday</string>
-    <string id="Instructions">Instructions</string>
+    <string id="Instructions">Help</string>
     <string id="About">About</string>
     <string id="AppVersion">1.0.0</string>
     <string id="VersionLabel">Version</string>

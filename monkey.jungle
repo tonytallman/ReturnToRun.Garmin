@@ -1,2 +1,166 @@
 project.manifest = manifest.xml
 base.resourcePath = resources;resources-program
+# Only source/. The screen tour (tour.jungle) adds source-tour.
+base.sourcePath = source
+# HandsBand is built only for the Instinct Crossovers (:hands); other watches get its stub (:noHands).
+base.excludeAnnotations = hands
+# The vivoactive 3 family's launcher icon is 40 x 33; this folder's LauncherIcon replaces the 40 x 40 one.
+vivoactive3.resourcePath = $(vivoactive3.resourcePath);resources-icon-40x33
+vivoactive3m.resourcePath = $(vivoactive3m.resourcePath);resources-icon-40x33
+vivoactive3mlte.resourcePath = $(vivoactive3mlte.resourcePath);resources-icon-40x33
+# fr55, the Legacy Hero First Avenger and Legacy Saga Darth Vader, and the vivoactive 4 use 35 x 35.
+fr55.resourcePath = $(fr55.resourcePath);resources-icon-35x35
+legacyherofirstavenger.resourcePath = $(legacyherofirstavenger.resourcePath);resources-icon-35x35
+legacysagadarthvader.resourcePath = $(legacysagadarthvader.resourcePath);resources-icon-35x35
+vivoactive4.resourcePath = $(vivoactive4.resourcePath);resources-icon-35x35
+# The Legacy Hero Captain Marvel, Legacy Saga Rey, and vivoactive 4S use 30 x 30.
+legacyherocaptainmarvel.resourcePath = $(legacyherocaptainmarvel.resourcePath);resources-icon-30x30
+legacysagarey.resourcePath = $(legacysagarey.resourcePath);resources-icon-30x30
+vivoactive4s.resourcePath = $(vivoactive4s.resourcePath);resources-icon-30x30
+# Watches whose system Menu2 wraps a title such as "Return to Run" onto a second line and cuts it off.
+# resources-menu-title turns DrawnMenuTitles on, so their menu titles are drawn on one line (MenuTitle).
+vivoactive3.resourcePath = $(vivoactive3.resourcePath);resources-menu-title
+vivoactive3m.resourcePath = $(vivoactive3m.resourcePath);resources-menu-title
+vivoactive3mlte.resourcePath = $(vivoactive3mlte.resourcePath);resources-menu-title
+fr55.resourcePath = $(fr55.resourcePath);resources-menu-title
+legacysagadarthvader.resourcePath = $(legacysagadarthvader.resourcePath);resources-menu-title
+legacyherofirstavenger.resourcePath = $(legacyherofirstavenger.resourcePath);resources-menu-title
+# On the Instincts the subscreen clips or wraps the system menu title, so it is drawn too, left of the subscreen.
+descentg1.resourcePath = $(descentg1.resourcePath);resources-menu-title
+instinct2.resourcePath = $(instinct2.resourcePath);resources-menu-title
+instinct2s.resourcePath = $(instinct2s.resourcePath);resources-menu-title
+instinct2x.resourcePath = $(instinct2x.resourcePath);resources-menu-title
+instinct3solar45mm.resourcePath = $(instinct3solar45mm.resourcePath);resources-menu-title
+instincte40mm.resourcePath = $(instincte40mm.resourcePath);resources-menu-title
+instincte45mm.resourcePath = $(instincte45mm.resourcePath);resources-menu-title
+# Group C (round AMOLED) launcher icon sizes, rendered from resources/drawables/launcher_icon.svg with tools/render-icon.py.
+# 54 x 54
+fr165.resourcePath = $(fr165.resourcePath);resources-icon-54x54
+fr165m.resourcePath = $(fr165m.resourcePath);resources-icon-54x54
+fr170.resourcePath = $(fr170.resourcePath);resources-icon-54x54
+fr170m.resourcePath = $(fr170m.resourcePath);resources-icon-54x54
+fr57042mm.resourcePath = $(fr57042mm.resourcePath);resources-icon-54x54
+fr70.resourcePath = $(fr70.resourcePath);resources-icon-54x54
+venu441mm.resourcePath = $(venu441mm.resourcePath);resources-icon-54x54
+vivoactive6.resourcePath = $(vivoactive6.resourcePath);resources-icon-54x54
+# 56 x 56
+approachs50.resourcePath = $(approachs50.resourcePath);resources-icon-56x56
+vivoactive5.resourcePath = $(vivoactive5.resourcePath);resources-icon-56x56
+# 60 x 60
+approachs7042mm.resourcePath = $(approachs7042mm.resourcePath);resources-icon-60x60
+approachs7243mm.resourcePath = $(approachs7243mm.resourcePath);resources-icon-60x60
+d2air.resourcePath = $(d2air.resourcePath);resources-icon-60x60
+d2mach1.resourcePath = $(d2mach1.resourcePath);resources-icon-60x60
+descentg2.resourcePath = $(descentg2.resourcePath);resources-icon-60x60
+descentmk343mm.resourcePath = $(descentmk343mm.resourcePath);resources-icon-60x60
+descentmk351mm.resourcePath = $(descentmk351mm.resourcePath);resources-icon-60x60
+epix2.resourcePath = $(epix2.resourcePath);resources-icon-60x60
+epix2pro42mm.resourcePath = $(epix2pro42mm.resourcePath);resources-icon-60x60
+epix2pro47mm.resourcePath = $(epix2pro47mm.resourcePath);resources-icon-60x60
+epix2pro51mm.resourcePath = $(epix2pro51mm.resourcePath);resources-icon-60x60
+fenix843mm.resourcePath = $(fenix843mm.resourcePath);resources-icon-60x60
+fenix943mm.resourcePath = $(fenix943mm.resourcePath);resources-icon-60x60
+fenix9pro43mm.resourcePath = $(fenix9pro43mm.resourcePath);resources-icon-60x60
+fenixe.resourcePath = $(fenixe.resourcePath);resources-icon-60x60
+fr265.resourcePath = $(fr265.resourcePath);resources-icon-60x60
+fr265s.resourcePath = $(fr265s.resourcePath);resources-icon-60x60
+marq2.resourcePath = $(marq2.resourcePath);resources-icon-60x60
+marq2aviator.resourcePath = $(marq2aviator.resourcePath);resources-icon-60x60
+venu.resourcePath = $(venu.resourcePath);resources-icon-60x60
+venud.resourcePath = $(venud.resourcePath);resources-icon-60x60
+# 61 x 61
+venu2s.resourcePath = $(venu2s.resourcePath);resources-icon-61x61
+# 65 x 65
+approachs7247mm.resourcePath = $(approachs7247mm.resourcePath);resources-icon-65x65
+d2mach2.resourcePath = $(d2mach2.resourcePath);resources-icon-65x65
+d2mach2pro.resourcePath = $(d2mach2pro.resourcePath);resources-icon-65x65
+fenix847mm.resourcePath = $(fenix847mm.resourcePath);resources-icon-65x65
+fenix8pro47mm.resourcePath = $(fenix8pro47mm.resourcePath);resources-icon-65x65
+fenix947mm.resourcePath = $(fenix947mm.resourcePath);resources-icon-65x65
+fenix9pro47mm.resourcePath = $(fenix9pro47mm.resourcePath);resources-icon-65x65
+fenix9pro51mm.resourcePath = $(fenix9pro51mm.resourcePath);resources-icon-65x65
+fr57047mm.resourcePath = $(fr57047mm.resourcePath);resources-icon-65x65
+fr965.resourcePath = $(fr965.resourcePath);resources-icon-65x65
+fr970.resourcePath = $(fr970.resourcePath);resources-icon-65x65
+marq3.resourcePath = $(marq3.resourcePath);resources-icon-65x65
+venu445mm.resourcePath = $(venu445mm.resourcePath);resources-icon-65x65
+# 70 x 70
+approachs7047mm.resourcePath = $(approachs7047mm.resourcePath);resources-icon-70x70
+d2airx10.resourcePath = $(d2airx10.resourcePath);resources-icon-70x70
+venu2.resourcePath = $(venu2.resourcePath);resources-icon-70x70
+venu2plus.resourcePath = $(venu2plus.resourcePath);resources-icon-70x70
+venu3.resourcePath = $(venu3.resourcePath);resources-icon-70x70
+venu3s.resourcePath = $(venu3s.resourcePath);resources-icon-70x70
+# Group D (rectangular) launcher icon sizes, rendered the same way. The Venu Sq 2 family uses the default 40 x 40.
+# 36 x 36
+venusq.resourcePath = $(venusq.resourcePath);resources-icon-36x36
+venusqm.resourcePath = $(venusqm.resourcePath);resources-icon-36x36
+# 65 x 65
+venux1.resourcePath = $(venux1.resourcePath);resources-icon-65x65
+# Two-button touch watches (Start and Back, no Up or Down): the Controls help describes Start, taps, and swipes.
+approachs50.resourcePath = $(approachs50.resourcePath);resources-touch-help
+approachs7042mm.resourcePath = $(approachs7042mm.resourcePath);resources-touch-help
+approachs7047mm.resourcePath = $(approachs7047mm.resourcePath);resources-touch-help
+approachs7243mm.resourcePath = $(approachs7243mm.resourcePath);resources-touch-help
+approachs7247mm.resourcePath = $(approachs7247mm.resourcePath);resources-touch-help
+venu2.resourcePath = $(venu2.resourcePath);resources-touch-help
+venu2plus.resourcePath = $(venu2plus.resourcePath);resources-touch-help
+venu2s.resourcePath = $(venu2s.resourcePath);resources-touch-help
+venu3.resourcePath = $(venu3.resourcePath);resources-touch-help
+venu3s.resourcePath = $(venu3s.resourcePath);resources-touch-help
+venu441mm.resourcePath = $(venu441mm.resourcePath);resources-touch-help
+venu445mm.resourcePath = $(venu445mm.resourcePath);resources-touch-help
+vivoactive5.resourcePath = $(vivoactive5.resourcePath);resources-touch-help
+vivoactive6.resourcePath = $(vivoactive6.resourcePath);resources-touch-help
+venux1.resourcePath = $(venux1.resourcePath);resources-touch-help
+# Touch watches where Start never reaches the Select behavior: a tap pauses and resumes the workout (TouchPolicy),
+# and the help and the About hint say to tap.
+venu.resourcePath = $(venu.resourcePath);resources-tap-pause
+venud.resourcePath = $(venud.resourcePath);resources-tap-pause
+d2air.resourcePath = $(d2air.resourcePath);resources-tap-pause
+d2airx10.resourcePath = $(d2airx10.resourcePath);resources-tap-pause
+venusq.resourcePath = $(venusq.resourcePath);resources-tap-pause
+venusq2.resourcePath = $(venusq2.resourcePath);resources-tap-pause
+venusq2m.resourcePath = $(venusq2m.resourcePath);resources-tap-pause
+venusqm.resourcePath = $(venusqm.resourcePath);resources-tap-pause
+
+# Group E (Instinct family). The black-and-white screens use launcher icons rendered from
+# resources/drawables/launcher_icon_mono.svg with tools/render-icon.py ... mono, and resources-mono
+# (Palette draws white instead of green, yellow, gray, and blue there).
+# 62x62 (rendered with mono)
+descentg1.resourcePath = $(descentg1.resourcePath);resources-icon-mono-62x62;resources-mono
+instinct2.resourcePath = $(instinct2.resourcePath);resources-icon-mono-62x62;resources-mono
+instinct2x.resourcePath = $(instinct2x.resourcePath);resources-icon-mono-62x62;resources-mono
+instinct3solar45mm.resourcePath = $(instinct3solar45mm.resourcePath);resources-icon-mono-62x62;resources-mono
+instincte45mm.resourcePath = $(instincte45mm.resourcePath);resources-icon-mono-62x62;resources-mono
+# 54x54
+instinct2s.resourcePath = $(instinct2s.resourcePath);resources-icon-mono-54x54;resources-mono
+# 52x52
+instincte40mm.resourcePath = $(instincte40mm.resourcePath);resources-icon-mono-52x52;resources-mono
+# 26x26
+instinctcrossover.resourcePath = $(instinctcrossover.resourcePath);resources-icon-mono-26x26;resources-mono
+# The Instinct 3 AMOLED watches use 60 x 60 and the Instinct Crossover AMOLED 38 x 38, rendered in color.
+instinct3amoled45mm.resourcePath = $(instinct3amoled45mm.resourcePath);resources-icon-60x60
+instinct3amoled50mm.resourcePath = $(instinct3amoled50mm.resourcePath);resources-icon-60x60
+instinctcrossoveramoled.resourcePath = $(instinctcrossoveramoled.resourcePath);resources-icon-38x38
+# The Crossovers' analog hands stay parked across the middle of the screen; resources-hands-* gives the band text keeps out of (HandsBand).
+instinctcrossover.resourcePath = $(instinctcrossover.resourcePath);resources-hands-crossover
+instinctcrossoveramoled.resourcePath = $(instinctcrossoveramoled.resourcePath);resources-hands-crossoveramoled
+instinctcrossover.excludeAnnotations = noHands
+instinctcrossoveramoled.excludeAnnotations = noHands
+# 96 KB watches cannot hold 100 history items at once; resources-low-memory shows the history 30 at a time.
+descentg1.resourcePath = $(descentg1.resourcePath);resources-low-memory
+instinct2.resourcePath = $(instinct2.resourcePath);resources-low-memory
+instinct2s.resourcePath = $(instinct2s.resourcePath);resources-low-memory
+instinct2x.resourcePath = $(instinct2x.resourcePath);resources-low-memory
+instinctcrossover.resourcePath = $(instinctcrossover.resourcePath);resources-low-memory
+# The subscreen Instincts and the Crossovers: shorter wording for text that does not fit there.
+descentg1.resourcePath = $(descentg1.resourcePath);resources-short-text
+instinct2.resourcePath = $(instinct2.resourcePath);resources-short-text
+instinct2s.resourcePath = $(instinct2s.resourcePath);resources-short-text
+instinct2x.resourcePath = $(instinct2x.resourcePath);resources-short-text
+instinct3solar45mm.resourcePath = $(instinct3solar45mm.resourcePath);resources-short-text
+instincte40mm.resourcePath = $(instincte40mm.resourcePath);resources-short-text
+instincte45mm.resourcePath = $(instincte45mm.resourcePath);resources-short-text
+instinctcrossover.resourcePath = $(instinctcrossover.resourcePath);resources-short-text
+instinctcrossoveramoled.resourcePath = $(instinctcrossoveramoled.resourcePath);resources-short-text

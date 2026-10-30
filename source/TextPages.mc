@@ -34,69 +34,55 @@ module TextPages {
 		return parts;
 	}
 
-	// One block of wrapped lines per sentence, so every sentence starts a line.
-	// An empty piece (from "||") is a block of one blank line.
-	function blocks(text as String, maxWidth as Number, measure as TextMeasure) as Array<Array<String> > {
-		var result = [] as Array<Array<String> >;
+	// The text as screen lines, and the first line of each page. Line n of a
+	// page is wrapped to widths[n], so pages can follow the screen's edge (the
+	// widths' count is the lines a page holds). A page takes as many whole
+	// sentences as fit, so a sentence is split across pages only when it is
+	// longer than a page. A blank line (from "||") that does not fit is dropped,
+	// so no page starts blank.
+	function paginate(text as String, widths as Array<Number>, measure as TextMeasure) as Array<Array> {
+		var perPage = widths.size();
+		var lines = [] as Array<String>;
+		var starts = [0] as Array<Number>;
+		var used = 0;
 		var pieces = split(text, BREAK);
 		for (var i = 0; i < pieces.size(); i++) {
 			var parts = sentences(pieces[i]);
-			var added = false;
+			var blank = true;
 			for (var j = 0; j < parts.size(); j++) {
-				var wrapped = TextWrap.wrap(parts[j], maxWidth, measure);
-				if (wrapped.length() > 0) {
-					result.add(split(wrapped, "\n"));
-					added = true;
+				var rest = parts[j];
+				while (rest.length() > 0) {
+					var wrapped = TextWrap.wrapLines(rest, widths.slice((used < perPage) ? used : perPage - 1, null), measure);
+					rest = "";
+					if (wrapped.length() == 0) {
+						break;
+					}
+					blank = false;
+					var wrappedLines = split(wrapped, "\n");
+					var size = wrappedLines.size();
+					if (used + size <= perPage) {
+						lines.addAll(wrappedLines);
+						used += size;
+					} else if (used > 0) {
+						starts.add(lines.size());
+						used = 0;
+						rest = parts[j];
+					} else {
+						// Longer than a page: a full page, and the rest goes on.
+						lines.addAll(wrappedLines.slice(0, perPage));
+						starts.add(lines.size());
+						for (var k = perPage; k < size; k++) {
+							rest += ((k > perPage) ? " " : "") + wrappedLines[k];
+						}
+					}
 				}
 			}
-			if (!added) {
-				result.add([""] as Array<String>);
+			if (blank && (used > 0) && (used < perPage)) {
+				lines.add("");
+				used += 1;
 			}
 		}
-		return result;
-	}
-
-	function flatten(blocks as Array<Array<String> >) as Array<String> {
-		var result = [] as Array<String>;
-		for (var i = 0; i < blocks.size(); i++) {
-			result.addAll(blocks[i]);
-		}
-		return result;
-	}
-
-	function lines(text as String, maxWidth as Number, measure as TextMeasure) as Array<String> {
-		return flatten(blocks(text, maxWidth, measure));
-	}
-
-	// The first line of each page. A page takes as many whole blocks as fit,
-	// so a sentence is never split across pages. A block taller than a page
-	// starts a new page and is split at line boundaries. A blank line that
-	// does not fit stays at the end of its page, so no page starts blank.
-	function pageStarts(blocks as Array<Array<String> >, linesPerPage as Number) as Array<Number> {
-		var perPage = (linesPerPage < 1) ? 1 : linesPerPage;
-		var starts = [0] as Array<Number>;
-		var line = 0;
-		var used = 0;
-		for (var i = 0; i < blocks.size(); i++) {
-			var block = blocks[i];
-			var size = block.size();
-			if ((used > 0) && (used + size > perPage)) {
-				if ((size == 1) && (block[0].length() == 0)) {
-					line += 1;
-					continue;
-				}
-				starts.add(line);
-				used = 0;
-			}
-			while (size > perPage) {
-				line += perPage;
-				size -= perPage;
-				starts.add(line);
-			}
-			line += size;
-			used += size;
-		}
-		return starts;
+		return [lines, starts] as Array<Array>;
 	}
 
 	// A link has no spaces to wrap at, so it breaks after each "/" instead:

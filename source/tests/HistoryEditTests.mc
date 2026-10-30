@@ -17,6 +17,39 @@ function testHistoryFormat(logger as Test.Logger) as Boolean {
 	TestSupport.expectEqual(2, HistoryFormat.focusAfterDelete(2, 5), "the next older entry takes its place");
 	TestSupport.expectEqual(1, HistoryFormat.focusAfterDelete(2, 2), "deleting the oldest focuses the new oldest");
 	TestSupport.expectEqual(1, HistoryFormat.focusAfterDelete(0, 0), "empty history focuses Add");
+	TestSupport.expectEqual(false, HistoryFormat.shouldSetFocus(0, true), "first build on the first item leaves focus alone, so the title shows");
+	TestSupport.expectEqual(true, HistoryFormat.shouldSetFocus(3, true), "first build elsewhere sets focus");
+	TestSupport.expectEqual(true, HistoryFormat.shouldSetFocus(0, false), "a rebuild always sets focus");
+	return true;
+}
+
+(:test)
+function testHistoryPages(logger as Test.Logger) as Boolean {
+	logger.debug("history list a page at a time");
+	TestSupport.expectEqual(0, HistoryFormat.lastPage(100, 0), "page size 0 is one page");
+	TestSupport.expectEqual(3, HistoryFormat.lastPage(100, 30), "100 entries make 4 pages of 30");
+	TestSupport.expectEqual(0, HistoryFormat.lastPage(0, 30), "empty history has one page");
+	TestSupport.expectEqual(2, HistoryFormat.pageFor(65, 100, 30, 0), "the page follows the focused entry");
+	TestSupport.expectEqual(1, HistoryFormat.pageFor(100, 100, 30, 1), "Clear history stays on the current page");
+	TestSupport.expectEqual(1, HistoryFormat.pageFor(101, 40, 30, 3), "a page past the end is clamped");
+	TestSupport.expectEqual(0, HistoryFormat.pageFor(65, 100, 0, 2), "no paging: always page 0");
+	TestSupport.expectEqual(90, HistoryFormat.pageFirst(3, 30), "last page starts at 90");
+	TestSupport.expectEqual(100, HistoryFormat.pageEnd(3, 100, 30), "and ends at the last entry");
+	TestSupport.expectEqual(100, HistoryFormat.pageEnd(0, 100, 0), "no paging: every entry");
+	TestSupport.expectFalse(HistoryFormat.hasNewer(0), "no Newer workouts on the first page");
+	TestSupport.expectTrue(HistoryFormat.hasOlder(0, 100, 30), "Older workouts on the first page");
+	TestSupport.expectFalse(HistoryFormat.hasOlder(3, 100, 30), "none on the last");
+	TestSupport.expectFalse(HistoryFormat.hasOlder(0, 100, 0), "none without paging");
+	TestSupport.expectEqual(33, HistoryFormat.pageItemCount(0, 100, 30), "30 entries, Older, Clear, Add");
+	TestSupport.expectEqual(34, HistoryFormat.pageItemCount(1, 100, 30), "plus Newer on a middle page");
+	TestSupport.expectEqual(13, HistoryFormat.pageItemCount(3, 100, 30), "Newer, 10 entries, Clear, Add");
+	TestSupport.expectEqual(HistoryFormat.itemCount(100), HistoryFormat.pageItemCount(0, 100, 0), "no paging matches the whole list");
+	TestSupport.expectEqual(6, HistoryFormat.pagePosition(35, 1, 100, 30), "an entry after Newer workouts");
+	TestSupport.expectEqual(32, HistoryFormat.pagePosition(100, 1, 100, 30), "Clear after the entries and Older");
+	TestSupport.expectEqual(12, HistoryFormat.pagePosition(101, 3, 100, 30), "Add last on the last page");
+	TestSupport.expectEqual(5, HistoryFormat.pagePosition(5, 0, 100, 0), "no paging: the position is the focus");
+	TestSupport.expectEqual(30, HistoryFormat.focusAfterTurn(0, 1, 100, 30), "Older focuses the next entry");
+	TestSupport.expectEqual(29, HistoryFormat.focusAfterTurn(1, -1, 100, 30), "Newer focuses the previous entry");
 	return true;
 }
 

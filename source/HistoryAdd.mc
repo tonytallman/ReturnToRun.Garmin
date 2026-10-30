@@ -35,20 +35,29 @@ class AddDateView extends WatchUi.View {
 		dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_BLACK);
 		dc.clear();
 
-		dc.drawText(centerX, height * 18 / 100, Graphics.FONT_SMALL, title, center);
-		dc.drawText(centerX, height * 50 / 100, Graphics.FONT_LARGE, words.shortDate(stepper.date()), center);
+		TitleFit.draw(dc, title, height * 18 / 100, [Graphics.FONT_SMALL, Graphics.FONT_TINY] as Array<Graphics.FontType>);
+		var arrow = width * 4 / 100;
+		var dateY = height * 50 / 100;
+		var dayY = height * 66 / 100;
+		var downY = height * 79 / 100;
+		var rows = HandsBand.dateRows(dc, arrow);
+		if (rows != null) {
+			// On the Instinct Crossover, below the parked hands.
+			dateY = rows[0];
+			dayY = rows[1];
+			downY = rows[2];
+		}
+		dc.drawText(centerX, dateY, Graphics.FONT_LARGE, words.shortDate(stepper.date()), center);
 
 		var dayWord = stepper.isToday() ? todayWord : (stepper.isYesterday() ? yesterdayWord : HistoryWords.weekdayDaysAgo(stepper.daysBack));
-		dc.setColor(Graphics.COLOR_LT_GRAY, Graphics.COLOR_TRANSPARENT);
-		dc.drawText(centerX, height * 66 / 100, Graphics.FONT_TINY, dayWord, center);
+		dc.setColor(Palette.dim(), Graphics.COLOR_TRANSPARENT);
+		dc.drawText(centerX, dayY, Graphics.FONT_TINY, dayWord, center);
 
 		// Up arrow only when a later day is available; there is always an earlier one.
-		var arrow = width * 4 / 100;
 		if (!stepper.isToday()) {
 			var upY = height * 31 / 100;
 			dc.fillPolygon([[centerX - arrow, upY + arrow], [centerX + arrow, upY + arrow], [centerX, upY]]);
 		}
-		var downY = height * 79 / 100;
 		dc.fillPolygon([[centerX - arrow, downY - arrow], [centerX + arrow, downY - arrow], [centerX, downY]]);
 	}
 }

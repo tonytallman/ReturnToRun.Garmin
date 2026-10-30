@@ -6,7 +6,7 @@ class WorkoutListView extends WatchUi.Menu2 {
 
 	// Run uses this list, and so does History's Add workout with its own title.
 	function initialize(title as String) {
-		Menu2.initialize({:title=>title});
+		Menu2.initialize({:title=>MenuTitle.of(title)});
 		leaveTimer = new LeaveTimer();
 
 		var services = appServices();

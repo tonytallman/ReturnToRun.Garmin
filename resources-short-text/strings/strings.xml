@@ -1,0 +1,6 @@
+<strings>
+    <string id="RatingTitle">How was it?</string>
+    <string id="AddTooOldMessage">Not added: this workout is older than all 100 saved workouts.</string>
+    <string id="ProgramCompleteMessage">Well done! Keep running #40, or pick #1 to restart.</string>
+    <string id="HelpButtons">During a workout:|Start: pause or resume.|Back: pause.|Back while paused: the End workout? menu.|Resume: keep going.|Save: keep it and rate it.|Discard: delete it. Nothing is logged.|After the cool-down it ends and asks How was it?|Up and Down change the rating. Start picks it. Back stays on this screen.</string>
+</strings>

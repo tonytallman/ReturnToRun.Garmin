@@ -11,7 +11,7 @@ function openWorkout(workoutIndex as Number) as Void {
 	var warnings = appServices().warningsForToday();
 	if (warnings.size() > 0) {
 		var view = new WarningView(workoutIndex, warnings, 0);
-		var delegate = new WarningViewDelegate(view);
+		var delegate = new WarningViewDelegate(view, deviceTouchPolicy());
 		WatchUi.pushView(view, delegate, WatchUi.SLIDE_LEFT);
 		return;
 	}
@@ -27,12 +27,12 @@ function continuePastWarning(workoutIndex as Number, warnings as Array<Number>, 
 		return;
 	}
 	var view = new WarningView(workoutIndex, warnings, next as Number);
-	var delegate = new WarningViewDelegate(view);
+	var delegate = new WarningViewDelegate(view, deviceTouchPolicy());
 	WatchUi.switchToView(view, delegate, WatchUi.SLIDE_LEFT);
 }
 
 function startWorkout(workoutIndex as Number) as Void {
 	var view = new WorkoutView(workoutIndex);
-	var delegate = new WorkoutViewDelegate(view);
+	var delegate = new WorkoutViewDelegate(view, deviceTouchPolicy());
 	WatchUi.pushView(view, delegate, WatchUi.SLIDE_LEFT);
 }

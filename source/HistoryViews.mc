@@ -1,42 +1,98 @@
+import Toybox.Application;
 import Toybox.Lang;
 import Toybox.WatchUi;
 
 function openHistory() as Void {
-	WatchUi.pushView(new HistoryListView(), new HistoryListDelegate(), WatchUi.SLIDE_LEFT);
+	var list = new HistoryListView();
+	WatchUi.pushView(list, new HistoryListDelegate(list), WatchUi.SLIDE_LEFT);
 }
 
 // Every saved workout, newest first, then Clear history and Add workout.
 // Items are built from the stored numbers with cached words, so a full history
 // stays cheap. After an edit the list rebuilds itself when it shows again.
+// While a screen opened from the list is showing (an entry's details and its
+// rating picker, Clear history, or Add workout), the list's items are released
+// to free memory, and the list is rebuilt with the same item in focus on return.
+// Watches with little memory show it a page at a time (HistoryPageSize).
 class HistoryListView extends WatchUi.Menu2 {
 	var leaveTimer as LeaveTimer;
 	var builtVersion as Number;
 	var builtItems as Number;
+	var releaseWhenHidden as Boolean;
+	var pageSize as Number;
+	var page as Number;
 
 	function initialize() {
-		Menu2.initialize({:title=>WatchUi.loadResource(Rez.Strings.History) as String});
+		Menu2.initialize({:title=>MenuTitle.of(WatchUi.loadResource(Rez.Strings.History) as String)});
 		leaveTimer = new LeaveTimer();
 		builtVersion = -1;
 		builtItems = 0;
+		releaseWhenHidden = false;
+		var setting = Application.loadResource(Rez.JsonData.HistoryPageSize);
+		pageSize = (setting instanceof Dictionary && setting["size"] instanceof Number) ? setting["size"] as Number : 0;
+		page = 0;
 		appServices().historyFocus = 0;
 		build();
 	}
 
 	function build() as Void {
+		var firstBuild = builtVersion < 0;
 		var services = appServices();
 		var words = new HistoryWords();
 		var count = services.historySize();
-		for (var index = 0; index < count; index++) {
+		var focus = HistoryFormat.clampFocus(services.historyFocus, count);
+		page = HistoryFormat.pageFor(focus, count, pageSize, page);
+		if (HistoryFormat.hasNewer(page)) {
+			addItem(new WatchUi.MenuItem(WatchUi.loadResource(Rez.Strings.NewerWorkouts) as String, null, :newer, null));
+		}
+		var end = HistoryFormat.pageEnd(page, count, pageSize);
+		for (var index = HistoryFormat.pageFirst(page, pageSize); index < end; index++) {
 			var entry = services.historyEntryAt(index);
 			if (entry != null) {
 				addItem(new WatchUi.MenuItem(words.entryLabel(entry as HistoryEntry), null, index, null));
 			}
 		}
+		if (HistoryFormat.hasOlder(page, count, pageSize)) {
+			addItem(new WatchUi.MenuItem(WatchUi.loadResource(Rez.Strings.OlderWorkouts) as String, null, :older, null));
+		}
 		addItem(new WatchUi.MenuItem(WatchUi.loadResource(Rez.Strings.ClearHistory) as String, null, :clear, null));
 		addItem(new WatchUi.MenuItem(WatchUi.loadResource(Rez.Strings.AddWorkout) as String, null, :add, null));
-		builtItems = HistoryFormat.itemCount(count);
+		builtItems = HistoryFormat.pageItemCount(page, count, pageSize);
 		builtVersion = services.historyVersion;
-		setFocus(HistoryFormat.clampFocus(services.historyFocus, count));
+		var position = HistoryFormat.pagePosition(focus, page, count, pageSize);
+		if (HistoryFormat.shouldSetFocus(position, firstBuild)) {
+			setFocus(position);
+		}
+	}
+
+	// Older workouts (step 1) or Newer workouts (step -1).
+	function turnPage(step as Number) as Void {
+		var services = appServices();
+		services.historyFocus = HistoryFormat.focusAfterTurn(page, step, services.historySize(), pageSize);
+		release();
+		build();
+		WatchUi.requestUpdate();
+	}
+
+	function release() as Void {
+		for (var index = builtItems - 1; index >= 0; index--) {
+			deleteItem(index);
+		}
+		builtItems = 0;
+	}
+
+	// Called with the selected item's position just before a screen opens over
+	// the list. Menu2 cannot report its focus later, so it is kept here.
+	function releaseOnHide(focus as Number) as Void {
+		appServices().historyFocus = focus;
+		releaseWhenHidden = true;
+	}
+
+	function onHide() as Void {
+		if (releaseWhenHidden) {
+			releaseWhenHidden = false;
+			release();
+		}
 	}
 
 	function onShow() as Void {
@@ -44,29 +100,37 @@ class HistoryListView extends WatchUi.Menu2 {
 		if (leaveTimer.schedule()) {
 			return;
 		}
-		if (appServices().historyVersion != builtVersion) {
-			for (var index = builtItems - 1; index >= 0; index--) {
-				deleteItem(index);
-			}
-			builtItems = 0;
+		if ((builtItems == 0) || (appServices().historyVersion != builtVersion)) {
+			release();
 			build();
 		}
 	}
 }
 
 class HistoryListDelegate extends WatchUi.Menu2InputDelegate {
-	function initialize() {
+	var list as HistoryListView;
+
+	function initialize(list as HistoryListView) {
 		Menu2InputDelegate.initialize();
+		self.list = list;
 	}
 
 	function onSelect(item as WatchUi.MenuItem) as Void {
 		var id = item.getId();
+		var count = appServices().historySize();
 		if (id instanceof Number) {
+			list.releaseOnHide(id as Number);
 			var view = new HistoryDetailsView(id as Number);
 			WatchUi.pushView(view, new HistoryDetailsDelegate(id as Number), WatchUi.SLIDE_LEFT);
+		} else if (id == :older) {
+			list.turnPage(1);
+		} else if (id == :newer) {
+			list.turnPage(-1);
 		} else if (id == :clear) {
+			list.releaseOnHide(HistoryFormat.clearPosition(count));
 			confirmHistoryChange(Rez.Strings.ConfirmClear, HistoryConfirmDelegate.CLEAR, 0);
 		} else if (id == :add) {
+			list.releaseOnHide(HistoryFormat.addPosition(count));
 			var stepper = new DateStepper(appServices().currentDay());
 			var dateView = new AddDateView(stepper);
 			WatchUi.pushView(dateView, new AddDateDelegate(dateView), WatchUi.SLIDE_LEFT);
@@ -90,7 +154,7 @@ class HistoryDetailsView extends WatchUi.Menu2 {
 			title = words.shortDate(found.date) + "  #" + found.workoutId.toString();
 			ratingWord = words.rating(found.rating);
 		}
-		Menu2.initialize({:title=>title});
+		Menu2.initialize({:title=>MenuTitle.of(title)});
 		leaveTimer = new LeaveTimer();
 		addItem(new WatchUi.MenuItem(WatchUi.loadResource(Rez.Strings.RatingLabel) as String, ratingWord, :rating, null));
 		addItem(new WatchUi.MenuItem(WatchUi.loadResource(Rez.Strings.Delete) as String, null, :delete, null));

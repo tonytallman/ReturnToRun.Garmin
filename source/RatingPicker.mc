@@ -8,6 +8,7 @@ import Toybox.WatchUi;
 class RatingPicker extends WatchUi.Picker {
 	function initialize(rating as Number?) {
 		var title = new RatingPickerText(WatchUi.loadResource(Rez.Strings.RatingTitle) as String, Graphics.FONT_SMALL);
+		title.fitToScreen = true;
 		Picker.initialize({
 			:title=>title,
 			:pattern=>[new RatingPickerFactory()],
@@ -51,10 +52,13 @@ class RatingPickerFactory extends WatchUi.PickerFactory {
 }
 
 // White words on their own black box, so they read the same on the watch and
-// in the simulator. Used for the title and for each rating word.
+// in the simulator. Used for the title and for each rating word. The title
+// sits at the top of the screen, so it steps down a font size where it would
+// run past the edge of the circle or out of its own box.
 class RatingPickerText extends WatchUi.Drawable {
 	var text as String;
 	var font as Graphics.FontType;
+	var fitToScreen as Boolean = false;
 
 	function initialize(text as String, font as Graphics.FontType) {
 		Drawable.initialize({});
@@ -68,7 +72,25 @@ class RatingPickerText extends WatchUi.Drawable {
 		dc.setColor(Graphics.COLOR_BLACK, Graphics.COLOR_BLACK);
 		dc.fillRectangle(0, 0, width, height);
 		dc.setColor(Graphics.COLOR_WHITE, Graphics.COLOR_TRANSPARENT);
-		dc.drawText(width / 2, height / 2, font, text, Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
+		var drawFont = font;
+		if (fitToScreen) {
+			var fonts = [font, Graphics.FONT_TINY, Graphics.FONT_XTINY] as Array<Graphics.FontType>;
+			if (Subscreen.box() != null) {
+				// On the Instinct, left of the subscreen like the other titles
+				// (the title's dc starts at the screen's left edge). The title
+				// area is too short for two lines, so the smallest font is the
+				// last resort.
+				var room = (Subscreen.box() as Graphics.BoundingBox).x - Subscreen.GAP;
+				if (room > width) {
+					room = width;
+				}
+				drawFont = TitleFit.fontWithin(dc, text, room, fonts);
+				dc.drawText(room / 2, height / 2, drawFont, text, Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
+				return;
+			}
+			drawFont = TitleFit.font(dc, text, height / 2, fonts);
+		}
+		dc.drawText(width / 2, height / 2, drawFont, text, Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
 	}
 }
 

@@ -10,7 +10,7 @@ function openTextPage(titleId as ResourceId, bodyId as ResourceId) as Void {
 // The instruction topics. Each item opens one paged text screen.
 class InstructionsMenu extends WatchUi.Menu2 {
 	function initialize() {
-		Menu2.initialize({:title=>WatchUi.loadResource(Rez.Strings.Instructions) as String});
+		Menu2.initialize({:title=>MenuTitle.of(WatchUi.loadResource(Rez.Strings.Instructions) as String)});
 		var topics = InstructionsMenu.topics();
 		for (var i = 0; i < topics.size(); i++) {
 			var topic = topics[i] as Array<ResourceId>;
@@ -49,14 +49,18 @@ function openInstructions() as Void {
 // About: app name, version, and the repository link as text. Start asks the
 // phone (through Garmin Connect Mobile) to open the link.
 function openAbout() as Void {
+	var view = aboutView();
+	WatchUi.pushView(view, new AboutDelegate(view), WatchUi.SLIDE_LEFT);
+}
+
+function aboutView() as TextPageView {
 	var version = AppVersion.label(WatchUi.loadResource(Rez.Strings.VersionLabel) as String, WatchUi.loadResource(Rez.Strings.AppVersion) as String);
 	var link = TextPages.breakAfterSlashes(WatchUi.loadResource(Rez.Strings.RepoLink) as String);
 	var body = version + "||" + link;
 	if (Communications has :openWebPage) {
 		body += "||" + (WatchUi.loadResource(Rez.Strings.OpenOnPhoneHint) as String);
 	}
-	var view = new TextPageView(WatchUi.loadResource(Rez.Strings.AppName) as String, body);
-	WatchUi.pushView(view, new AboutDelegate(view), WatchUi.SLIDE_LEFT);
+	return new TextPageView(WatchUi.loadResource(Rez.Strings.AppName) as String, body);
 }
 
 class AboutDelegate extends TextPageDelegate {
