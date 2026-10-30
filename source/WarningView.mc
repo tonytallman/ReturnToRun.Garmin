@@ -119,6 +119,7 @@ class WarningView extends WatchUi.View {
 			return;
 		}
 		closed = true;
+		appServices().log.note("warning cancelled");
 		WatchUi.popView(WatchUi.SLIDE_RIGHT);
 	}
 }
