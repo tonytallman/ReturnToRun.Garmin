@@ -11,6 +11,8 @@ class WorkoutView extends WatchUi.View {
 	var session as WorkoutSession.Machine;
 	var recorder as WorkoutRecording.Recorder;
 	var leaveTimer as LeaveTimer;
+	var log as Breadcrumbs;
+	var shownOnce as Boolean = false;
 	var timer as Timer.Timer?;
 	var visible as Boolean;
 	var timeLeft as Number;
@@ -24,6 +26,7 @@ class WorkoutView extends WatchUi.View {
 
 	function initialize(workoutIndex as Number) {
 		View.initialize();
+		log = appServices().log;
 		self.workoutIndex = workoutIndex;
 		session = new WorkoutSession.Machine();
 		recorder = appServices().newRecorder(workoutIndex + 1);
@@ -79,6 +82,10 @@ class WorkoutView extends WatchUi.View {
 	}
 
 	function onShow() as Void {
+		if (!shownOnce) {
+			shownOnce = true;
+			log.note("workout screen shown");
+		}
 		visible = true;
 		if (leaveTimer.schedule()) {
 			stopTicking();
@@ -100,6 +107,7 @@ class WorkoutView extends WatchUi.View {
 		if (session.onResumeFromEnd() != WorkoutSession.RESUME) {
 			return;
 		}
+		log.note("resumed from end prompt");
 		recorder.start();
 		WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
 	}
@@ -118,6 +126,7 @@ class WorkoutView extends WatchUi.View {
 		if (session.onSaveEarly() != WorkoutSession.SAVE) {
 			return;
 		}
+		log.note("ended early, save");
 		recorder.save();
 		WatchUi.switchToView(new RatingPicker(Rating.GOOD), new RatingDelegate(self), WatchUi.SLIDE_LEFT);
 	}
@@ -128,6 +137,7 @@ class WorkoutView extends WatchUi.View {
 		if (session.onDiscard() != WorkoutSession.DISCARD) {
 			return;
 		}
+		log.note("ended early, discard");
 		recorder.discard();
 		ScreenStack.requestReturnToMain();
 		WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
@@ -139,6 +149,7 @@ class WorkoutView extends WatchUi.View {
 		if (session.onRated() != WorkoutSession.LOG) {
 			return;
 		}
+		log.note("rated " + rating);
 		recorder.save();
 		var services = appServices();
 		if (services.logWorkout(workoutIndex, rating)) {
@@ -160,18 +171,21 @@ class WorkoutView extends WatchUi.View {
 
 	function apply(action as Number) as Void {
 		if (action == WorkoutSession.PAUSE) {
+			log.note("paused");
 			recorder.pause();
 			stopTicking();
 			showTimeLeft();
 			return;
 		}
 		if (action == WorkoutSession.RESUME) {
+			log.note("resumed");
 			recorder.start();
 			startTicking();
 			showTimeLeft();
 			return;
 		}
 		if (action == WorkoutSession.ASK_TO_END) {
+			log.note("end prompt");
 			stopTicking();
 			showTimeLeft();
 			WatchUi.pushView(new EndWorkoutMenu(), new EndWorkoutDelegate(self), WatchUi.SLIDE_IMMEDIATE);
@@ -204,6 +218,7 @@ class WorkoutView extends WatchUi.View {
 		if (session.onCompleted() != WorkoutSession.COMPLETE) {
 			return;
 		}
+		log.note("workout complete");
 		stopTicking();
 		recorder.pause();
 		attentionForWorkoutComplete();
