@@ -34,13 +34,11 @@ function vibrateWorkoutComplete() as Void {
 	if (!(Attention has :vibrate)) {
 		return;
 	}
-	var vibrateData = [
-		new Attention.VibeProfile(100, 500),
-		new Attention.VibeProfile(0, 250),
-		new Attention.VibeProfile(100, 500),
-		new Attention.VibeProfile(0, 250),
-		new Attention.VibeProfile(100, 500)
-	] as Array<Attention.VibeProfile>;
+	var vibrateData = [] as Array<Attention.VibeProfile>;
+	var steps = CompleteVibration.steps();
+	for (var index = 0; index < steps.size(); index++) {
+		vibrateData.add(new Attention.VibeProfile(steps[index][0], steps[index][1]));
+	}
 	Attention.vibrate(vibrateData);
 }
 
