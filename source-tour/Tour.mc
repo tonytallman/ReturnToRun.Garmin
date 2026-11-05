@@ -167,7 +167,7 @@ module Tour {
 			var view = workoutView as WorkoutView;
 			view.stopTicking();
 			view.recorder.discard();
-			show(new RatingPicker(Rating.GOOD), new RatingDelegate(view));
+			show(new RatingPicker(Rating.GOOD, null), new RatingDelegate(view));
 		} else if (name.equals("history-list")) {
 			workoutView = null;
 			var list = new HistoryListView();

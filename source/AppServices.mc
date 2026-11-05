@@ -7,6 +7,8 @@ class AppServices {
 	var trainingProgress as Progress;
 	var activeRecorder as WorkoutRecording.Recorder?;
 	var log as Breadcrumbs;
+	// The pending switch to the rating screen, cancelled if the app exits.
+	var ratingHandoff as RatingHandoff?;
 	// Bumped on every History edit so the History list knows to rebuild.
 	var historyVersion as Number = 0;
 	// The item the History list focuses after its next rebuild.
@@ -66,6 +68,9 @@ class AppServices {
 
 	// Returns true when a run was still open and has been saved.
 	function finishActiveRecording() as Boolean {
+		if (ratingHandoff != null) {
+			(ratingHandoff as RatingHandoff).cancel();
+		}
 		if (activeRecorder != null) {
 			return (activeRecorder as WorkoutRecording.Recorder).save();
 		}

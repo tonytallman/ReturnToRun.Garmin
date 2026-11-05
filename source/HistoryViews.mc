@@ -179,7 +179,7 @@ class HistoryDetailsDelegate extends WatchUi.Menu2InputDelegate {
 		if (id == :rating) {
 			var entry = appServices().historyEntryAt(index);
 			var current = (entry == null) ? Rating.GOOD : (entry as HistoryEntry).rating;
-			WatchUi.pushView(new RatingPicker(current), new HistoryRatingDelegate(index), WatchUi.SLIDE_LEFT);
+			WatchUi.pushView(new RatingPicker(current, null), new HistoryRatingDelegate(index), WatchUi.SLIDE_LEFT);
 		} else if (id == :delete) {
 			confirmHistoryChange(Rez.Strings.ConfirmDelete, HistoryConfirmDelegate.DELETE, index);
 		} else if (id == :deleteOlder) {

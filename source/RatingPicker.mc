@@ -6,7 +6,10 @@ import Toybox.WatchUi;
 // Up and Down change the rating and Start picks it. The choices, their order,
 // and the starting one come from RatingChoices.
 class RatingPicker extends WatchUi.Picker {
-	function initialize(rating as Number?) {
+	private var handoff as RatingHandoff?;
+
+	function initialize(rating as Number?, handoff as RatingHandoff?) {
+		self.handoff = handoff;
 		var title = new RatingPickerText(WatchUi.loadResource(Rez.Strings.RatingTitle) as String, Graphics.FONT_SMALL);
 		title.fitToScreen = true;
 		Picker.initialize({
@@ -14,6 +17,13 @@ class RatingPicker extends WatchUi.Picker {
 			:pattern=>[new RatingPickerFactory()],
 			:defaults=>[RatingChoices.defaultIndex(rating)]
 		});
+	}
+
+	function onShow() as Void {
+		Picker.onShow();
+		if (handoff != null) {
+			(handoff as RatingHandoff).shown();
+		}
 	}
 
 	// Black behind the white words, like the app's other screens. The watch
