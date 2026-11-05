@@ -92,6 +92,19 @@ The version shown comes from one place, the `AppVersion` string resource, becaus
 
 Every segment, including warm-up and cool-down, starts with one vibration: duty cycle 100 for 1000 ms. Connect IQ has no built-in vibration preset, so that single pulse is the segment cue. Workout complete is three 500 ms pulses at the same duty cycle, separated by 250 ms gaps. Each of the last five seconds of a segment (5, 4, 3, 2, 1) plays one short tone when the device has `Attention.playTone` and `System.getDeviceSettings().tonesOn` is true. Those beeps do not vibrate, and they do not play while paused. The next segment's vibration follows the last beep. Which seconds beep, which repeat a segment index is, which alert a segment gets, the list text, the duration totals, the warning message, text wrapping, the workout session transitions (pause, end prompt, save, discard, rating), and the recording lifecycle are UI-free (`CountdownTones`, `IntervalCount`, `SegmentAlerts`, `WorkoutListFormat`, `WorkoutDuration`, `WarningMessages`, `TextWrap`, `WorkoutSession`, `WorkoutRecording`). They do not import the UI, and the recorder is tested with a fake port.
 
+### Breadcrumb log
+
+To help diagnose problems on the watch, such as the app closing on its own, the app keeps a short log of what it did. Screens and the recorder see only `Breadcrumbs`, whose `note` records nothing; `RingBreadcrumbs` is the real one, and tests use it with a memory store and a fixed clock. Each entry is the watch-clock time and a short event, such as `10-27 11:05:12 workout 2 started`. The app logs:
+
+- start (with the app version) and stop, including whether a run was still open and was saved;
+- the workout list, each pre-run warning shown (once per day, six per week), and a cancelled warning;
+- the workout starting, the recording opening, the workout screen first showing, pause, resume, the end prompt, Save or Discard on it, the workout completing, and the rating;
+- save started, save finished or failed, a discarded recording, and any error while opening or saving the recording.
+
+Segment changes are not logged. The newest 40 entries are kept in `Application.Storage` under the key `log` (about 1.5 KB), and the oldest entry is dropped when a new one is added after that.
+
+Every entry is also printed with `System.println`. On a sideloaded app, the watch writes those lines to a file only if the file already exists. To turn this on, connect the watch over USB and create an empty file in `GARMIN/APPS/LOGS` named after the PRG, in capital letters with a `.TXT` extension: for `ReturnToRun.prg`, that is `GARMIN/APPS/LOGS/RETURNTORUN.TXT`. After the next run, copy the file off the watch. The log can't be viewed on the watch.
+
 ### Instinct watches
 
 The Instinct 2, 2S, 2X, Instinct Crossover, Instinct 3 Solar 45 mm, Instinct E 40 and 45 mm, and Descent G1 have black-and-white screens. `resources-mono` turns on the `Monochrome` resource, and `Palette` then draws every title, the paused countdown, the dimmed text, and the warning's highlight bar in white (with the focused action in black on it) instead of green, yellow, gray, or blue, which would come out black (invisible) or white there. The Instinct 3 AMOLED and Instinct Crossover AMOLED are color screens and keep the colors.

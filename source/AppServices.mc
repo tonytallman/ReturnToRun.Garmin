@@ -6,22 +6,24 @@ class AppServices {
 	var program as WorkoutProgram;
 	var trainingProgress as Progress;
 	var activeRecorder as WorkoutRecording.Recorder?;
+	var log as Breadcrumbs;
 	// Bumped on every History edit so the History list knows to rebuild.
 	var historyVersion as Number = 0;
 	// The item the History list focuses after its next rebuild.
 	var historyFocus as Number = 0;
 
-	function initialize(program as WorkoutProgram, trainingProgress as Progress) {
+	function initialize(program as WorkoutProgram, trainingProgress as Progress, log as Breadcrumbs) {
+		self.log = log;
 		self.program = program;
 		self.trainingProgress = trainingProgress;
 	}
 
-	static function production() as AppServices {
+	static function production(log as Breadcrumbs) as AppServices {
 		var program = WorkoutProgram.load();
 		var gateway = new ApplicationStorageGateway();
 		var history = new HistoryStore(gateway, HISTORY_ENTRY_CAP, program.maxId());
 		history.load();
-		return new AppServices(program, new Progress(history));
+		return new AppServices(program, new Progress(history), log);
 	}
 
 	function currentDay() as CalendarDay {
@@ -57,15 +59,17 @@ class AppServices {
 	// unfinished run if the app is stopped.
 	function newRecorder(workoutId as Number) as WorkoutRecording.Recorder {
 		var name = RecordingActivityName.forWorkout(workoutId);
-		var recorder = new WorkoutRecording.Recorder(new FitRecordingPort(name));
+		var recorder = new WorkoutRecording.Recorder(new FitRecordingPort(name, log));
 		activeRecorder = recorder;
 		return recorder;
 	}
 
-	function finishActiveRecording() as Void {
+	// Returns true when a run was still open and has been saved.
+	function finishActiveRecording() as Boolean {
 		if (activeRecorder != null) {
-			(activeRecorder as WorkoutRecording.Recorder).save();
+			return (activeRecorder as WorkoutRecording.Recorder).save();
 		}
+		return false;
 	}
 
 	function historySize() as Number {
