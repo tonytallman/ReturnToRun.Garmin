@@ -102,7 +102,7 @@ class AddWorkoutDelegate extends WatchUi.Menu2InputDelegate {
 	function onSelect(item as WatchUi.MenuItem) as Void {
 		var id = item.getId();
 		if (id instanceof Number) {
-			WatchUi.pushView(new RatingPicker(Rating.GOOD), new AddRatingDelegate(date, id as Number), WatchUi.SLIDE_LEFT);
+			WatchUi.pushView(new RatingPicker(Rating.GOOD, null), new AddRatingDelegate(date, id as Number), WatchUi.SLIDE_LEFT);
 		}
 	}
 }

@@ -7,6 +7,8 @@ class AppServices {
 	var trainingProgress as Progress;
 	var activeRecorder as WorkoutRecording.Recorder?;
 	var log as Breadcrumbs;
+	// The pending switch to the rating screen, cancelled if the app exits.
+	var ratingHandoff as RatingHandoff?;
 	// Bumped on every History edit so the History list knows to rebuild.
 	var historyVersion as Number = 0;
 	// The item the History list focuses after its next rebuild.
@@ -52,7 +54,10 @@ class AppServices {
 	function logWorkout(zeroBasedIndex as Number, rating as Number) as Boolean {
 		historyFocus = 0;
 		historyChanged();
-		return trainingProgress.logWorkout(currentDay(), zeroBasedIndex + 1, rating);
+		log.note("history write start");
+		var show = trainingProgress.logWorkout(currentDay(), zeroBasedIndex + 1, rating);
+		log.note("history write done");
+		return show;
 	}
 
 	// One recorder per workout. The app keeps the latest so it can save an
@@ -66,8 +71,14 @@ class AppServices {
 
 	// Returns true when a run was still open and has been saved.
 	function finishActiveRecording() as Boolean {
+		if (ratingHandoff != null) {
+			(ratingHandoff as RatingHandoff).cancel();
+		}
 		if (activeRecorder != null) {
-			return (activeRecorder as WorkoutRecording.Recorder).save();
+			var recorder = activeRecorder as WorkoutRecording.Recorder;
+			var saved = recorder.save();
+			recorder.shutdown();
+			return saved;
 		}
 		return false;
 	}

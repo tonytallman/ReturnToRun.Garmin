@@ -13,6 +13,7 @@ class WorkoutView extends WatchUi.View {
 	var leaveTimer as LeaveTimer;
 	var log as Breadcrumbs;
 	var shownOnce as Boolean = false;
+	var handoff as RatingHandoff;
 	var timer as Timer.Timer?;
 	var visible as Boolean;
 	var timeLeft as Number;
@@ -31,6 +32,8 @@ class WorkoutView extends WatchUi.View {
 		session = new WorkoutSession.Machine();
 		recorder = appServices().newRecorder(workoutIndex + 1);
 		leaveTimer = new LeaveTimer();
+		handoff = new RatingHandoff(log, new TimerScheduler(), new WorkoutRatingScreen(self));
+		appServices().ratingHandoff = handoff;
 		pausedText = "";
 		timeLeftSuffix = "";
 		visible = false;
@@ -87,6 +90,7 @@ class WorkoutView extends WatchUi.View {
 			log.note("workout screen shown");
 		}
 		visible = true;
+		handoff.release();
 		if (leaveTimer.schedule()) {
 			stopTicking();
 			return;
@@ -98,6 +102,7 @@ class WorkoutView extends WatchUi.View {
 	}
 
 	function onHide() as Void {
+		handoff.hold();
 		visible = false;
 		stopTicking();
 	}
@@ -128,7 +133,7 @@ class WorkoutView extends WatchUi.View {
 		}
 		log.note("ended early, save");
 		recorder.save();
-		WatchUi.switchToView(new RatingPicker(Rating.GOOD), new RatingDelegate(self), WatchUi.SLIDE_LEFT);
+		WatchUi.switchToView(new RatingPicker(Rating.GOOD, null), new RatingDelegate(self), WatchUi.SLIDE_LEFT);
 	}
 
 	// Discard on "End workout?". Nothing is saved or logged. Closing the prompt
@@ -139,18 +144,20 @@ class WorkoutView extends WatchUi.View {
 		}
 		log.note("ended early, discard");
 		recorder.discard();
+		recorder.shutdown();
 		ScreenStack.requestReturnToMain();
 		WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
 	}
 
-	// A choice on "How did it feel?". Saves the run if the end prompt did not,
-	// logs it, then shows program complete once or returns to the main menu.
+	// A choice on "How did it feel?". The run is already saved (at completion
+	// or on the end prompt); save here does nothing then. Logs the rating, then shows program complete once or returns to the main menu.
 	function rate(rating as Number) as Void {
 		if (session.onRated() != WorkoutSession.LOG) {
 			return;
 		}
 		log.note("rated " + rating);
 		recorder.save();
+		recorder.shutdown();
 		var services = appServices();
 		if (services.logWorkout(workoutIndex, rating)) {
 			services.markProgramCompleteShown();
@@ -212,17 +219,26 @@ class WorkoutView extends WatchUi.View {
 		}
 	}
 
-	// The last segment finished. The recording stops and waits for the rating,
-	// which replaces this view.
+	// The last segment finished. The screen shows 0:00, the run is saved, and
+	// the rating replaces this view after the complete vibration.
 	function finish() as Void {
 		if (session.onCompleted() != WorkoutSession.COMPLETE) {
 			return;
 		}
 		log.note("workout complete");
 		stopTicking();
-		recorder.pause();
+		if (countdownLabel != null) {
+			(countdownLabel as WatchUi.Text).setText(getTimeAsString(0));
+		}
+		WatchUi.requestUpdate();
+		log.note("vibration start");
 		attentionForWorkoutComplete();
-		WatchUi.switchToView(new RatingPicker(Rating.GOOD), new RatingDelegate(self), WatchUi.SLIDE_LEFT);
+		handoff.begin(recorder);
+	}
+
+	// Called by the handoff once the vibration has finished and the run is saved.
+	function showRating() as Void {
+		WatchUi.switchToView(new RatingPicker(Rating.GOOD, handoff), new RatingDelegate(self), WatchUi.SLIDE_LEFT);
 	}
 
 	function showCurrentActivityName() as Void {
@@ -319,5 +335,23 @@ class WorkoutView extends WatchUi.View {
 		if (timer != null) {
 			(timer as Timer.Timer).stop();
 		}
+	}
+}
+
+// Lets the rating handoff switch screens without knowing the views.
+class WorkoutRatingScreen extends RatingScreenPort {
+	private var view as WorkoutView;
+
+	function initialize(view as WorkoutView) {
+		RatingScreenPort.initialize();
+		self.view = view;
+	}
+
+	function present() as Void {
+		view.showRating();
+	}
+
+	function redraw() as Void {
+		WatchUi.requestUpdate();
 	}
 }

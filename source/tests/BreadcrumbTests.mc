@@ -51,7 +51,10 @@ function testBreadcrumbCap(logger as Test.Logger) as Boolean {
 function testBreadcrumbPersistence(logger as Test.Logger) as Boolean {
 	logger.debug("a new log on the same storage continues the old one");
 	var gateway = new MemoryStorageGateway();
-	BreadcrumbTestSupport.open(gateway, 3).note("first run");
+	var first = BreadcrumbTestSupport.open(gateway, 3);
+	first.note("first run");
+	TestSupport.expectNull(gateway.get(RingBreadcrumbs.STORAGE_KEY), "nothing written before flush");
+	first.flush();
 	var reopened = BreadcrumbTestSupport.open(gateway, 3);
 	reopened.note("second run");
 	var entries = reopened.entries();
