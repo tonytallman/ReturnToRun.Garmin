@@ -19,11 +19,15 @@ class RecordingPort {
 	function addLap() as Void {
 	}
 
-	// Saves or discards the session and turns GPS and heart rate back off.
+	// Saves or discards the session. GPS and heart rate stay on.
 	function save() as Void {
 	}
 
 	function discard() as Void {
+	}
+
+	// Turns GPS and heart rate off. Safe to call more than once.
+	function shutdown() as Void {
 	}
 }
 
@@ -85,6 +89,12 @@ module WorkoutRecording {
 			port.save();
 			state = SAVED;
 			return true;
+		}
+
+		// Turns GPS and heart rate off, once the session is saved or discarded
+		// (or the app is exiting).
+		function shutdown() as Void {
+			port.shutdown();
 		}
 
 		function discard() as Boolean {

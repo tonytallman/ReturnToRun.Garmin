@@ -23,6 +23,7 @@ class ReturnToRunApp extends Application.AppBase {
 			open = (services as AppServices).finishActiveRecording();
 		}
 		getBreadcrumbs().note(open ? "stop, unfinished run saved" : "stop");
+		getBreadcrumbs().flush();
 	}
 
 	function getBreadcrumbs() as Breadcrumbs {
@@ -46,7 +47,13 @@ class ReturnToRunApp extends Application.AppBase {
 	// The watch stops an app whose single callback runs too long.
 	function getInitialView() {
 		startTour(self);
-		getServices();
+		var services = getServices();
+		var unfinished = services.unfinishedWorkout();
+		if (unfinished != null) {
+			var entry = unfinished as HistoryEntry;
+			services.log.note("unfinished workout " + entry.workoutId + " found");
+			return [new RatingPicker(Rating.GOOD, null), new UnfinishedRatingDelegate(entry)];
+		}
 		var view = new MainMenuView();
 		var delegate = new MainMenuDelegate();
 		return [view, delegate];

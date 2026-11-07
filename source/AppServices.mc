@@ -13,9 +13,11 @@ class AppServices {
 	var historyVersion as Number = 0;
 	// The item the History list focuses after its next rebuild.
 	var historyFocus as Number = 0;
+	var inProgress as InProgressNote;
 
-	function initialize(program as WorkoutProgram, trainingProgress as Progress, log as Breadcrumbs) {
+	function initialize(program as WorkoutProgram, trainingProgress as Progress, log as Breadcrumbs, inProgress as InProgressNote) {
 		self.log = log;
+		self.inProgress = inProgress;
 		self.program = program;
 		self.trainingProgress = trainingProgress;
 	}
@@ -25,7 +27,7 @@ class AppServices {
 		var gateway = new ApplicationStorageGateway();
 		var history = new HistoryStore(gateway, HISTORY_ENTRY_CAP, program.maxId());
 		history.load();
-		return new AppServices(program, new Progress(history), log);
+		return new AppServices(program, new Progress(history), log, new InProgressNote(gateway));
 	}
 
 	function currentDay() as CalendarDay {
@@ -52,9 +54,45 @@ class AppServices {
 	// Logs a rated run on today's date. Returns true when the program-complete
 	// screen should show.
 	function logWorkout(zeroBasedIndex as Number, rating as Number) as Boolean {
+		return logWorkoutOn(currentDay(), zeroBasedIndex + 1, rating);
+	}
+
+	// Writes the rated run to history and clears the in-progress note.
+	function logWorkoutOn(date as CalendarDay, workoutId as Number, rating as Number) as Boolean {
 		historyFocus = 0;
 		historyChanged();
-		return trainingProgress.logWorkout(currentDay(), zeroBasedIndex + 1, rating);
+		log.note("history write start");
+		var show = trainingProgress.logWorkout(date, workoutId, rating);
+		log.note("history write done");
+		clearInProgress();
+		return show;
+	}
+
+	function markInProgress(zeroBasedIndex as Number) as Void {
+		log.note("in progress write start");
+		inProgress.set(zeroBasedIndex + 1, currentDay());
+		log.note("in progress write done");
+	}
+
+	function clearInProgress() as Void {
+		inProgress.clear();
+	}
+
+	// A workout left unrated by a watch restart, unless history already has it.
+	function unfinishedWorkout() as HistoryEntry? {
+		var pending = inProgress.read();
+		if (pending == null) {
+			return null;
+		}
+		var entry = pending as HistoryEntry;
+		for (var index = 0; index < historySize(); index++) {
+			var logged = historyEntryAt(index);
+			if ((logged != null) && (logged.workoutId == entry.workoutId) && (logged.date.compare(entry.date) == 0)) {
+				clearInProgress();
+				return null;
+			}
+		}
+		return entry;
 	}
 
 	// One recorder per workout. The app keeps the latest so it can save an
@@ -72,7 +110,10 @@ class AppServices {
 			(ratingHandoff as RatingHandoff).cancel();
 		}
 		if (activeRecorder != null) {
-			return (activeRecorder as WorkoutRecording.Recorder).save();
+			var recorder = activeRecorder as WorkoutRecording.Recorder;
+			var saved = recorder.save();
+			recorder.shutdown();
+			return saved;
 		}
 		return false;
 	}

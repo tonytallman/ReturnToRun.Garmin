@@ -52,7 +52,7 @@ module Tour {
 		history.load();
 		// Keep only what the app itself would keep, so the memory figures compare.
 		gateway.remove(HISTORY_STORAGE_KEY);
-		return new AppServices(program, new Progress(history), new Breadcrumbs());
+		return new AppServices(program, new Progress(history), new Breadcrumbs(), new InProgressNote(gateway));
 	}
 
 	function begin() as Void {

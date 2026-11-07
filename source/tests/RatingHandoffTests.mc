@@ -26,9 +26,17 @@ module RatingHandoffTestSupport {
 			self.log = log;
 		}
 
+		function stop() as Void {
+			log.note("stop");
+		}
+
 		function save() as Void {
 			saves++;
 			log.note("save");
+		}
+
+		function shutdown() as Void {
+			log.note("sensors off");
 		}
 	}
 
@@ -110,10 +118,13 @@ module RatingHandoffTestSupport {
 function testRatingHandoffOrder(logger as Test.Logger) as Boolean {
 	var f = new RatingHandoffTestSupport.Fixture();
 	f.handoff.begin(f.recorder);
-	TestSupport.expectEqual("workout complete, save", f.order(), "saved at completion, before the rating");
+	TestSupport.expectEqual("", f.order(), "nothing runs while the vibration plays");
+	f.scheduler.fire();
+	TestSupport.expectEqual("stop", f.order(), "stopped once the vibration is over");
+	TestSupport.expectEqual(f.handoff.SETTLE_MS, f.scheduler.delayMs, "save waits a moment after stop");
 	f.scheduler.fire();
 	f.handoff.shown();
-	TestSupport.expectEqual("workout complete, save, present, rating shown", f.order(), "complete, save, rating shown");
+	TestSupport.expectEqual("stop, save, present, rating shown", f.order(), "stop, save, then the rating");
 	TestSupport.expectEqual(1, f.screen.redraws, "one redraw after the switch");
 	TestSupport.expectNull(f.scheduler.callback, "watchdog cancelled once shown");
 	return true;
@@ -121,12 +132,10 @@ function testRatingHandoffOrder(logger as Test.Logger) as Boolean {
 
 (:test)
 function testRatingHandoffDelay(logger as Test.Logger) as Boolean {
-	TestSupport.expectEqual(2000, CompleteVibration.durationMs(), "three 500 ms pulses and two 250 ms gaps");
 	var f = new RatingHandoffTestSupport.Fixture();
 	f.handoff.begin(f.recorder);
-	TestSupport.expectEqual(CompleteVibration.durationMs() + CompleteVibration.MARGIN_MS, f.scheduler.delayMs, "waits for the vibration");
-	f.scheduler.fire();
-	TestSupport.expectEqual(f.handoff.WATCHDOG_MS, f.scheduler.delayMs, "watchdog after the switch");
+	TestSupport.expectEqual(CompleteVibration.durationMs() + 100, f.scheduler.delayMs, "stop waits for the vibration");
+	TestSupport.expectEqual(2100, f.scheduler.delayMs, "2,100 ms");
 	return true;
 }
 
@@ -134,10 +143,12 @@ function testRatingHandoffDelay(logger as Test.Logger) as Boolean {
 function testRatingDoesNotSaveAgain(logger as Test.Logger) as Boolean {
 	var f = new RatingHandoffTestSupport.Fixture();
 	f.handoff.begin(f.recorder);
+	f.scheduler.fire();
+	f.scheduler.fire();
+	f.recorder.save();
 	f.handoff.begin(f.recorder);
-	TestSupport.expectFalse(f.recorder.save(), "rating's save does nothing");
-	TestSupport.expectFalse(f.recorder.save(), "exit's save does nothing");
-	TestSupport.expectEqual(1, f.port.saves, "one save");
+	TestSupport.expectEqual(1, f.port.saves, "saved once");
+	TestSupport.expectEqual("stop, save, present", f.order(), "GPS and heart rate stay on after the save");
 	return true;
 }
 
@@ -147,10 +158,10 @@ function testRatingRedrawForced(logger as Test.Logger) as Boolean {
 	f.handoff.begin(f.recorder);
 	f.scheduler.fire();
 	f.scheduler.fire();
-	TestSupport.expectEqual("workout complete, save, present, rating redraw forced", f.order(), "watchdog logs");
-	TestSupport.expectEqual(2, f.screen.redraws, "forced redraw");
-	f.handoff.shown();
-	TestSupport.expectEqual("workout complete, save, present, rating redraw forced, rating shown", f.order(), "shown after the forced redraw");
+	TestSupport.expectEqual(f.handoff.WATCHDOG_MS, f.scheduler.delayMs, "watchdog after the switch");
+	f.scheduler.fire();
+	TestSupport.expectEqual("stop, save, present, rating redraw forced", f.order(), "forced redraw logged");
+	TestSupport.expectEqual(2, f.screen.redraws, "redrawn again");
 	return true;
 }
 
@@ -159,13 +170,17 @@ function testRatingHandoffHoldAndCancel(logger as Test.Logger) as Boolean {
 	var f = new RatingHandoffTestSupport.Fixture();
 	f.handoff.begin(f.recorder);
 	f.handoff.hold();
-	TestSupport.expectNull(f.scheduler.callback, "covered: pending switch cancelled");
+	f.scheduler.fire();
+	f.scheduler.fire();
+	TestSupport.expectEqual("stop, save", f.order(), "saved on time while covered, no switch");
 	f.handoff.release();
-	TestSupport.expectEqual(CompleteVibration.ratingDelayMs(), f.scheduler.delayMs, "shown again: waits again");
-	f.handoff.cancel();
-	TestSupport.expectNull(f.scheduler.callback, "exit cancels");
-	f.handoff.present();
-	f.handoff.release();
-	TestSupport.expectEqual("workout complete, save", f.order(), "nothing after cancel");
+	TestSupport.expectEqual("stop, save, present", f.order(), "switch once uncovered");
+
+	var g = new RatingHandoffTestSupport.Fixture();
+	g.handoff.begin(g.recorder);
+	g.handoff.cancel();
+	TestSupport.expectNull(g.scheduler.callback, "exit cancels the pending step");
+	g.scheduler.fire();
+	TestSupport.expectEqual(0, g.port.saves, "the handoff does not save after exit");
 	return true;
 }
