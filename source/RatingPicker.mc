@@ -127,38 +127,3 @@ class RatingDelegate extends WatchUi.PickerDelegate {
 	}
 }
 
-// "How did it feel?" for a workout the watch restarted in the middle of saving.
-// The watch saved the recording itself; this only logs the run in history,
-// on the day it was run. Back skips it. Either way the main menu follows.
-class UnfinishedRatingDelegate extends WatchUi.PickerDelegate {
-	var entry as HistoryEntry;
-
-	function initialize(entry as HistoryEntry) {
-		PickerDelegate.initialize();
-		self.entry = entry;
-	}
-
-	function onAccept(values as Array) as Boolean {
-		var rating = RatingChoices.fromPicked(values);
-		if (rating == null) {
-			return true;
-		}
-		var services = appServices();
-		services.log.note("unfinished workout " + entry.workoutId + " rated " + rating);
-		services.logWorkoutOn(entry.date, entry.workoutId, rating as Number);
-		showMainMenu();
-		return true;
-	}
-
-	function onCancel() as Boolean {
-		var services = appServices();
-		services.log.note("unfinished workout " + entry.workoutId + " skipped");
-		services.clearInProgress();
-		showMainMenu();
-		return true;
-	}
-
-	function showMainMenu() as Void {
-		WatchUi.switchToView(new MainMenuView(), new MainMenuDelegate(), WatchUi.SLIDE_LEFT);
-	}
-}

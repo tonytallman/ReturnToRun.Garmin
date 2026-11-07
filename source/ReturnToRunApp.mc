@@ -47,13 +47,7 @@ class ReturnToRunApp extends Application.AppBase {
 	// The watch stops an app whose single callback runs too long.
 	function getInitialView() {
 		startTour(self);
-		var services = getServices();
-		var unfinished = services.unfinishedWorkout();
-		if (unfinished != null) {
-			var entry = unfinished as HistoryEntry;
-			services.log.note("unfinished workout " + entry.workoutId + " found");
-			return [new RatingPicker(Rating.GOOD, null), new UnfinishedRatingDelegate(entry)];
-		}
+		getServices();
 		var view = new MainMenuView();
 		var delegate = new MainMenuDelegate();
 		return [view, delegate];

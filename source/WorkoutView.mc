@@ -48,7 +48,6 @@ class WorkoutView extends WatchUi.View {
 		}
 		setCurrentActivity(0);
 		recorder.start();
-		appServices().markInProgress(workoutIndex);
 	}
 
 	function onLayout(dc as Graphics.Dc) as Void {
@@ -146,7 +145,6 @@ class WorkoutView extends WatchUi.View {
 		log.note("ended early, discard");
 		recorder.discard();
 		recorder.shutdown();
-		appServices().clearInProgress();
 		ScreenStack.requestReturnToMain();
 		WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
 	}
