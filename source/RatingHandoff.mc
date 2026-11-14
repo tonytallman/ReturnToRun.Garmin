@@ -2,7 +2,7 @@ import Toybox.Lang;
 import Toybox.Timer;
 
 // The three-pulse workout-complete vibration as [duty cycle, milliseconds] steps.
-// Attention plays it; RatingHandoff waits this long before the rating screen.
+// Attention plays it; RatingHandoff waits this long before stopping the session.
 module CompleteVibration {
 	const MARGIN_MS = 100;
 
@@ -19,7 +19,7 @@ module CompleteVibration {
 		return total;
 	}
 
-	// How long after the vibration starts the rating screen slides in.
+	// How long after the vibration starts the session is stopped.
 	function ratingDelayMs() as Number {
 		return durationMs() + MARGIN_MS;
 	}
@@ -72,47 +72,75 @@ class RatingScreenPort {
 	}
 }
 
-// The normal end of a workout: save the run, wait for the complete vibration
-// to finish, then show "How did it feel?". If the rating view has not shown
-// within WATCHDOG_MS of the switch, the screen is redrawn once.
+// The normal end of a workout. Nothing heavy runs while the complete
+// vibration plays. Once it has finished, the session is stopped; SETTLE_MS
+// later it is saved and "How did it feel?" slides in. If the rating view has
+// not shown within WATCHDOG_MS of the switch, the screen is redrawn once.
+// GPS and heart rate stay on until the rating is chosen or the app exits.
 class RatingHandoff {
+	const SETTLE_MS = 1000;
 	const WATCHDOG_MS = 2000;
 	const IDLE = 0;
-	const WAITING = 1;
-	const HELD = 2;
-	const SWITCHED = 3;
-	const SHOWN = 4;
-	const CANCELLED = 5;
+	const VIBRATING = 1;
+	const STOPPED = 2;
+	const SAVED = 3;
+	const SWITCHED = 4;
+	const SHOWN = 5;
+	const CANCELLED = 6;
 
 	var state as Number;
+	// The workout view is covered; the switch waits until it is back.
+	var held as Boolean;
 	private var log as Breadcrumbs;
 	private var scheduler as OneShotScheduler;
 	private var screen as RatingScreenPort;
+	private var recorder as WorkoutRecording.Recorder?;
 
 	function initialize(log as Breadcrumbs, scheduler as OneShotScheduler, screen as RatingScreenPort) {
 		self.log = log;
 		self.scheduler = scheduler;
 		self.screen = screen;
 		state = IDLE;
+		held = false;
+		recorder = null;
 	}
 
-	// Saves the recording now, so the rating only updates the history.
+	// Called right after the complete vibration starts.
 	function begin(recorder as WorkoutRecording.Recorder) as Void {
 		if (state != IDLE) {
 			return;
 		}
-		log.note("workout complete");
-		recorder.save();
-		wait();
+		self.recorder = recorder;
+		state = VIBRATING;
+		scheduler.schedule(CompleteVibration.ratingDelayMs(), method(:stopSession));
 	}
 
-	function wait() as Void {
-		state = WAITING;
-		scheduler.schedule(CompleteVibration.ratingDelayMs(), method(:present));
+	function stopSession() as Void {
+		if (state != VIBRATING) {
+			return;
+		}
+		state = STOPPED;
+		if (recorder != null) {
+			(recorder as WorkoutRecording.Recorder).pause();
+		}
+		scheduler.schedule(SETTLE_MS, method(:saveSession));
+	}
+
+	function saveSession() as Void {
+		if (state != STOPPED) {
+			return;
+		}
+		state = SAVED;
+		if (recorder != null) {
+			(recorder as WorkoutRecording.Recorder).save();
+		}
+		if (!held) {
+			present();
+		}
 	}
 
 	function present() as Void {
-		if (state != WAITING) {
+		if (state != SAVED) {
 			return;
 		}
 		state = SWITCHED;
@@ -139,22 +167,20 @@ class RatingHandoff {
 		screen.redraw();
 	}
 
-	// The workout view was covered before the rating screen came up.
+	// The workout view was covered. Stop and save still run on time.
 	function hold() as Void {
-		if (state == WAITING) {
-			scheduler.cancel();
-			state = HELD;
-		}
+		held = true;
 	}
 
-	// The workout view is back; wait the full delay again.
+	// The workout view is back.
 	function release() as Void {
-		if (state == HELD) {
-			wait();
+		held = false;
+		if (state == SAVED) {
+			present();
 		}
 	}
 
-	// The app is exiting.
+	// The app is exiting; it saves an open run itself.
 	function cancel() as Void {
 		scheduler.cancel();
 		if (state != SHOWN) {

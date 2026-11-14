@@ -144,6 +144,7 @@ class WorkoutView extends WatchUi.View {
 		}
 		log.note("ended early, discard");
 		recorder.discard();
+		recorder.shutdown();
 		ScreenStack.requestReturnToMain();
 		WatchUi.popView(WatchUi.SLIDE_IMMEDIATE);
 	}
@@ -156,6 +157,7 @@ class WorkoutView extends WatchUi.View {
 		}
 		log.note("rated " + rating);
 		recorder.save();
+		recorder.shutdown();
 		var services = appServices();
 		if (services.logWorkout(workoutIndex, rating)) {
 			services.markProgramCompleteShown();
@@ -223,16 +225,18 @@ class WorkoutView extends WatchUi.View {
 		if (session.onCompleted() != WorkoutSession.COMPLETE) {
 			return;
 		}
+		log.note("workout complete");
 		stopTicking();
 		if (countdownLabel != null) {
 			(countdownLabel as WatchUi.Text).setText(getTimeAsString(0));
 		}
 		WatchUi.requestUpdate();
+		log.note("vibration start");
 		attentionForWorkoutComplete();
 		handoff.begin(recorder);
 	}
 
-	// Called by the handoff once the complete vibration has finished.
+	// Called by the handoff once the vibration has finished and the run is saved.
 	function showRating() as Void {
 		WatchUi.switchToView(new RatingPicker(Rating.GOOD, handoff), new RatingDelegate(self), WatchUi.SLIDE_LEFT);
 	}

@@ -126,3 +126,4 @@ class RatingDelegate extends WatchUi.PickerDelegate {
 		return true;
 	}
 }
+

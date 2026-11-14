@@ -14,6 +14,10 @@ class Breadcrumbs {
 
 	function note(event as String) as Void {
 	}
+
+	// Writes anything kept in memory to storage.
+	function flush() as Void {
+	}
 }
 
 // Watch-clock time for each entry, as "MM-DD HH:MM:SS". Tests pass a fixed one.
@@ -51,6 +55,9 @@ class RingBreadcrumbs extends Breadcrumbs {
 	private var clock as BreadcrumbClock;
 	private var echo as BreadcrumbEcho?;
 	private var cap as Number;
+	// Entries since the last flush are kept here; storage is written only by
+	// flush (on app exit), so nothing is written while a run is being saved.
+	private var cached as Array<String>?;
 
 	function initialize(gateway as StorageGateway, clock as BreadcrumbClock, echo as BreadcrumbEcho?, cap as Number) {
 		Breadcrumbs.initialize();
@@ -75,11 +82,24 @@ class RingBreadcrumbs extends Breadcrumbs {
 			kept = kept.slice(start, null);
 		}
 		kept.add(line);
-		gateway.set(STORAGE_KEY, kept as Array<Storage.ValueType>);
+		cached = kept;
+	}
+
+	function flush() as Void {
+		if (cached != null) {
+			gateway.set(STORAGE_KEY, cached as Array<Storage.ValueType>);
+		}
 	}
 
 	// Oldest first. Anything stored that is not a list of strings reads as empty.
 	function entries() as Array<String> {
+		if (cached != null) {
+			return cached as Array<String>;
+		}
+		return stored();
+	}
+
+	private function stored() as Array<String> {
 		var stored = gateway.get(STORAGE_KEY);
 		if (!(stored instanceof Array)) {
 			return [] as Array<String>;

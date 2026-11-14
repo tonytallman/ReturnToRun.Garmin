@@ -11,6 +11,7 @@ class FitRecordingPort extends RecordingPort {
 	private var activityName as String;
 	private var session as ActivityRecording.Session?;
 	private var log as Breadcrumbs;
+	private var sensorsOn as Boolean = false;
 
 	function initialize(name as String, log as Breadcrumbs) {
 		RecordingPort.initialize();
@@ -21,6 +22,7 @@ class FitRecordingPort extends RecordingPort {
 	function open() as Void {
 		Position.enableLocationEvents(Position.LOCATION_CONTINUOUS, method(:onPosition));
 		Sensor.setEnabledSensors([Sensor.SENSOR_HEARTRATE] as Array<Sensor.SensorType>);
+		sensorsOn = true;
 		try {
 			session = ActivityRecording.createSession({
 				:name=>activityName,
@@ -46,7 +48,9 @@ class FitRecordingPort extends RecordingPort {
 
 	function stop() as Void {
 		if ((session != null) && (session as ActivityRecording.Session).isRecording()) {
+			log.note("session stop");
 			(session as ActivityRecording.Session).stop();
+			log.note("session stopped");
 		}
 	}
 
@@ -79,9 +83,20 @@ class FitRecordingPort extends RecordingPort {
 		release();
 	}
 
+	// Drops the session. GPS and heart rate stay on until shutdown, so they are
+	// not turned off in the same moment the watch writes the FIT file.
 	function release() as Void {
 		session = null;
+	}
+
+	function shutdown() as Void {
+		if (!sensorsOn) {
+			return;
+		}
+		sensorsOn = false;
 		Position.enableLocationEvents(Position.LOCATION_DISABLE, null);
+		log.note("gps off");
 		Sensor.setEnabledSensors([] as Array<Sensor.SensorType>);
+		log.note("sensors off");
 	}
 }

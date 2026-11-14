@@ -54,7 +54,10 @@ class AppServices {
 	function logWorkout(zeroBasedIndex as Number, rating as Number) as Boolean {
 		historyFocus = 0;
 		historyChanged();
-		return trainingProgress.logWorkout(currentDay(), zeroBasedIndex + 1, rating);
+		log.note("history write start");
+		var show = trainingProgress.logWorkout(currentDay(), zeroBasedIndex + 1, rating);
+		log.note("history write done");
+		return show;
 	}
 
 	// One recorder per workout. The app keeps the latest so it can save an
@@ -72,7 +75,10 @@ class AppServices {
 			(ratingHandoff as RatingHandoff).cancel();
 		}
 		if (activeRecorder != null) {
-			return (activeRecorder as WorkoutRecording.Recorder).save();
+			var recorder = activeRecorder as WorkoutRecording.Recorder;
+			var saved = recorder.save();
+			recorder.shutdown();
+			return saved;
 		}
 		return false;
 	}

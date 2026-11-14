@@ -23,6 +23,7 @@ class ReturnToRunApp extends Application.AppBase {
 			open = (services as AppServices).finishActiveRecording();
 		}
 		getBreadcrumbs().note(open ? "stop, unfinished run saved" : "stop");
+		getBreadcrumbs().flush();
 	}
 
 	function getBreadcrumbs() as Breadcrumbs {
