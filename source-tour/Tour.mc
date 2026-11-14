@@ -143,7 +143,8 @@ module Tour {
 	function open(name as String) as Void {
 		var services = appServices();
 		if (name.equals("workout-list")) {
-			show(new WorkoutListView(WatchUi.loadResource(Rez.Strings.Run) as String), new WorkoutListDelegate());
+			var list = new WorkoutListView(WatchUi.loadResource(Rez.Strings.Run) as String, true);
+			show(list, new WorkoutListDelegate(list));
 		} else if (name.equals("warning-1") || name.equals("warning-2")) {
 			var position = name.equals("warning-1") ? 0 : 1;
 			var view = new WarningView(WORKOUT_INDEX, services.warningsForToday(), position);
@@ -185,7 +186,7 @@ module Tour {
 			var view = new AddDateView(new DateStepper(services.currentDay()));
 			show(view, new AddDateDelegate(view));
 		} else if (name.equals("add-workout")) {
-			show(new WorkoutListView(WatchUi.loadResource(Rez.Strings.WorkoutTitle) as String), new AddWorkoutDelegate(services.currentDay()));
+			show(new WorkoutListView(WatchUi.loadResource(Rez.Strings.WorkoutTitle) as String, false), new AddWorkoutDelegate(services.currentDay()));
 		} else if (name.equals("too-old")) {
 			show(new NoticeView(WatchUi.loadResource(Rez.Strings.AddTooOldMessage) as String), new HistoryNoticeDelegate());
 		} else if (name.equals("program-complete")) {

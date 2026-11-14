@@ -53,3 +53,41 @@ function testCatalogListLabels(logger as Test.Logger) as Boolean {
 	TestSupport.expectEqual("40 min", WorkoutListFormat.subtitle(lastTotal, WorkoutListFormat.includesWalk(last.walkSeconds, last.repeatCount), "min", "with walks"), "workout 40 subtitle");
 	return true;
 }
+
+(:test)
+function testWorkoutListFirstShortcut(logger as Test.Logger) as Boolean {
+	logger.debug("go to #1 shortcut");
+	TestSupport.expectFalse(WorkoutListItems.includesFirstShortcut(-1), "before the first workout");
+	TestSupport.expectFalse(WorkoutListItems.includesFirstShortcut(0), "recommended #1");
+	TestSupport.expectFalse(WorkoutListItems.includesFirstShortcut(1), "recommended #2");
+	TestSupport.expectFalse(WorkoutListItems.includesFirstShortcut(2), "recommended #3");
+	TestSupport.expectTrue(WorkoutListItems.includesFirstShortcut(3), "recommended #4");
+	TestSupport.expectTrue(WorkoutListItems.includesFirstShortcut(19), "mid program");
+	TestSupport.expectTrue(WorkoutListItems.includesFirstShortcut(39), "recommended #40");
+
+	TestSupport.expectEqual(0, WorkoutListItems.firstWorkoutRow(), "workout 1 is the first row");
+	TestSupport.expectEqual(0, WorkoutListItems.focus(40, 0), "focus stays on #1");
+	TestSupport.expectEqual(2, WorkoutListItems.focus(40, 2), "focus stays on #3, no shortcut");
+	TestSupport.expectEqual(3, WorkoutListItems.focus(40, 3), "focus stays on #4, shortcut below");
+	TestSupport.expectEqual(20, WorkoutListItems.focus(40, 20), "focus stays on #21, shortcut below");
+	TestSupport.expectEqual(0, WorkoutListItems.focus(40, -1), "a negative index focuses #1");
+	TestSupport.expectEqual(39, WorkoutListItems.focus(40, 40), "past the end focuses #40, with the shortcut below it");
+
+	var early = WorkoutListItems.ids(5, 2, true);
+	TestSupport.expectEqual(5, early.size(), "no shortcut near the top");
+	TestSupport.expectEqual(0, early[0] as Number, "starts at #1");
+	TestSupport.expectEqual(2, early[2] as Number, "recommended #3 has no shortcut after it");
+
+	var mid = WorkoutListItems.ids(40, 20, true);
+	TestSupport.expectEqual(41, mid.size(), "one extra row");
+	TestSupport.expectEqual(0, mid[0] as Number, "still starts at #1");
+	TestSupport.expectEqual(20, mid[20] as Number, "recommended workout stays in place");
+	TestSupport.expectTrue(mid[21] == WorkoutListItems.FIRST_SHORTCUT, "shortcut just below the recommended row");
+	TestSupport.expectEqual(21, mid[22] as Number, "the next workout follows the shortcut");
+	TestSupport.expectEqual(20, WorkoutListItems.focus(40, 20), "focus is the recommended row, not the shortcut");
+
+	var add = WorkoutListItems.ids(40, 20, false);
+	TestSupport.expectEqual(40, add.size(), "Add workout has no shortcut");
+	TestSupport.expectEqual(20, add[20] as Number, "recommended row is unchanged");
+	return true;
+}
