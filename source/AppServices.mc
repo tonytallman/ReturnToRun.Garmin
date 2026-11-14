@@ -33,7 +33,7 @@ class AppServices {
 	}
 
 	function recommendedWorkoutIndex() as Number {
-		return trainingProgress.recommend(currentDay()).workoutId - 1;
+		return trainingProgress.recommend().workoutId - 1;
 	}
 
 	function workoutCount() as Number {
@@ -93,7 +93,7 @@ class AppServices {
 
 	// Returns true when the program-complete screen should show now.
 	function changeHistoryRating(index as Number, rating as Number) as Boolean {
-		var show = trainingProgress.changeRating(index, rating, currentDay());
+		var show = trainingProgress.changeRating(index, rating);
 		historyFocus = index;
 		historyChanged();
 		return show;
@@ -119,7 +119,7 @@ class AppServices {
 
 	// Returns true when the program-complete screen should show now.
 	function addHistoryWorkout(date as CalendarDay, zeroBasedIndex as Number, rating as Number) as Boolean {
-		var show = trainingProgress.addWorkout(date, zeroBasedIndex + 1, rating, currentDay());
+		var show = trainingProgress.addWorkout(date, zeroBasedIndex + 1, rating);
 		var added = trainingProgress.lastAddedIndex();
 		if (added >= 0) {
 			historyFocus = added;
@@ -141,7 +141,7 @@ class AppServices {
 	}
 
 	function shouldShowProgramComplete() as Boolean {
-		return trainingProgress.shouldShowProgramComplete(currentDay());
+		return trainingProgress.shouldShowProgramComplete();
 	}
 
 	function markProgramCompleteShown() as Void {

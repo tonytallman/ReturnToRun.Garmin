@@ -153,44 +153,44 @@ function testProgramCompleteFlag(logger as Test.Logger) as Boolean {
 	logger.debug("program complete flag");
 	var today = new CalendarDay(2026, 10, 8);
 	var progress = TestSupport.openStore(100).progress;
-	TestSupport.expectFalse(progress.shouldShowProgramComplete(today), "empty");
+	TestSupport.expectFalse(progress.shouldShowProgramComplete(), "empty");
 	progress.addEntry(today, 40, Rating.GOOD);
-	TestSupport.expectTrue(progress.recommend(today).programComplete, "good on 40 completes");
-	TestSupport.expectEqual(40, progress.recommend(today).workoutId, "recommendation stays on 40");
-	TestSupport.expectTrue(progress.shouldShowProgramComplete(today), "show the screen");
+	TestSupport.expectTrue(progress.recommend().programComplete, "good on 40 completes");
+	TestSupport.expectEqual(40, progress.recommend().workoutId, "recommendation stays on 40");
+	TestSupport.expectTrue(progress.shouldShowProgramComplete(), "show the screen");
 	progress.markProgramCompleteShown();
-	TestSupport.expectFalse(progress.shouldShowProgramComplete(today), "shown once");
-	TestSupport.expectTrue(progress.recommend(today).programComplete, "the signal stays true");
+	TestSupport.expectFalse(progress.shouldShowProgramComplete(), "shown once");
+	TestSupport.expectTrue(progress.recommend().programComplete, "the signal stays true");
 
 	progress.addEntry(today, 1, Rating.OK);
 	TestSupport.expectFalse(progress.isProgramCompleteShown(), "logging workout 1 resets the flag");
-	TestSupport.expectEqual(1, progress.recommend(today).workoutId, "workout 1 is now latest");
-	TestSupport.expectFalse(progress.shouldShowProgramComplete(today), "workout 1 is not complete");
+	TestSupport.expectEqual(1, progress.recommend().workoutId, "workout 1 is now latest");
+	TestSupport.expectFalse(progress.shouldShowProgramComplete(), "workout 1 is not complete");
 	progress.addEntry(today, 40, Rating.GREAT);
-	TestSupport.expectTrue(progress.shouldShowProgramComplete(today), "a new program can complete again");
+	TestSupport.expectTrue(progress.shouldShowProgramComplete(), "a new program can complete again");
 
 	var changed = TestSupport.openStore(100).progress;
 	changed.addEntry(today, 39, Rating.GOOD);
-	TestSupport.expectFalse(changed.shouldShowProgramComplete(today), "good on 39 is workout 40");
+	TestSupport.expectFalse(changed.shouldShowProgramComplete(), "good on 39 is workout 40");
 	changed.setRating(0, Rating.GREAT);
-	TestSupport.expectTrue(changed.recommend(today).programComplete, "great on the latest entry completes");
-	TestSupport.expectTrue(changed.shouldShowProgramComplete(today), "a rating change can show the screen");
+	TestSupport.expectTrue(changed.recommend().programComplete, "great on the latest entry completes");
+	TestSupport.expectTrue(changed.shouldShowProgramComplete(), "a rating change can show the screen");
 
 	var older = TestSupport.openStore(100).progress;
 	older.addEntry(today.plusDays(-1), 39, Rating.GOOD);
 	older.addEntry(today, 20, Rating.OK);
 	older.setRating(1, Rating.GREAT);
-	TestSupport.expectFalse(older.recommend(today).programComplete, "an older rating does not complete the program");
-	TestSupport.expectEqual(20, older.recommend(today).workoutId, "latest entry still decides");
+	TestSupport.expectFalse(older.recommend().programComplete, "an older rating does not complete the program");
+	TestSupport.expectEqual(20, older.recommend().workoutId, "latest entry still decides");
 
 	var edited = TestSupport.openStore(100).progress;
 	edited.addEntry(today, 40, Rating.GOOD);
 	edited.markProgramCompleteShown();
 	edited.setRating(0, Rating.OK);
-	TestSupport.expectFalse(edited.recommend(today).programComplete, "editing off a completing rating");
+	TestSupport.expectFalse(edited.recommend().programComplete, "editing off a completing rating");
 	TestSupport.expectTrue(edited.isProgramCompleteShown(), "the shown flag stays set");
 	edited.setRating(0, Rating.GOOD);
-	TestSupport.expectFalse(edited.shouldShowProgramComplete(today), "editing back does not show it again");
+	TestSupport.expectFalse(edited.shouldShowProgramComplete(), "editing back does not show it again");
 
 	var backdated = TestSupport.openStore(100).progress;
 	backdated.addEntry(today, 40, Rating.GOOD);
@@ -198,7 +198,7 @@ function testProgramCompleteFlag(logger as Test.Logger) as Boolean {
 	TestSupport.expectTrue(backdated.addEntry(today.plusDays(-10), 1, Rating.BAD), "backdated workout 1");
 	TestSupport.expectFalse(backdated.isProgramCompleteShown(), "workout 1 resets the flag even when it is not latest");
 	TestSupport.expectEqual(40, (backdated.latest() as HistoryEntry).workoutId, "today's workout is still latest");
-	TestSupport.expectTrue(backdated.shouldShowProgramComplete(today), "the screen can show again");
+	TestSupport.expectTrue(backdated.shouldShowProgramComplete(), "the screen can show again");
 
 	var full = TestSupport.openStore(1).progress;
 	full.addEntry(today, 40, Rating.GOOD);

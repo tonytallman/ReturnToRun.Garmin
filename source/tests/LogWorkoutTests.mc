@@ -11,13 +11,13 @@ function testLogWorkout(logger as Test.Logger) as Boolean {
 	TestSupport.expectFalse(progress.logWorkout(today, 40, Rating.OK), "OK on 40 repeats 40");
 	TestSupport.expectFalse(progress.logWorkout(today, 40, Rating.BAD), "Bad on 40 steps back");
 	TestSupport.expectTrue(progress.logWorkout(today, 40, Rating.GOOD), "Good on 40 completes");
-	TestSupport.expectEqual(40, progress.recommend(today).workoutId, "the recommendation stays at 40");
+	TestSupport.expectEqual(40, progress.recommend().workoutId, "the recommendation stays at 40");
 	progress.markProgramCompleteShown();
 	TestSupport.expectFalse(progress.logWorkout(today, 40, Rating.GREAT), "shown once per program");
 	TestSupport.expectFalse(progress.logWorkout(today, 1, Rating.GOOD), "workout 1 starts a new program");
 	TestSupport.expectFalse(progress.isProgramCompleteShown(), "and clears the flag");
 	TestSupport.expectTrue(progress.logWorkout(today, 39, Rating.GREAT), "Great on 39 completes the new program");
-	TestSupport.expectEqual(40, progress.recommend(today).workoutId, "still capped at 40");
+	TestSupport.expectEqual(40, progress.recommend().workoutId, "still capped at 40");
 	return true;
 }
 

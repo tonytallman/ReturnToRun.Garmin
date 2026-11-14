@@ -24,7 +24,6 @@ class InstructionsMenu extends WatchUi.Menu2 {
 			[Rez.Strings.HelpProgramTitle, Rez.Strings.HelpProgram],
 			[Rez.Strings.HelpListTitle, Rez.Strings.HelpList],
 			[Rez.Strings.HelpRatingsTitle, Rez.Strings.HelpRatings],
-			[Rez.Strings.HelpDaysOffTitle, Rez.Strings.HelpDaysOff],
 			[Rez.Strings.HelpWarningsTitle, Rez.Strings.HelpWarnings],
 			[Rez.Strings.HelpButtonsTitle, Rez.Strings.HelpButtons]
 		] as Array<Array<ResourceId> >;

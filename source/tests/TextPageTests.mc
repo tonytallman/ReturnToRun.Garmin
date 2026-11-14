@@ -124,7 +124,7 @@ function testAppVersion(logger as Test.Logger) as Boolean {
 function testInstructionWordsFit(logger as Test.Logger) as Boolean {
 	logger.debug("instruction words fit a line");
 	var topics = InstructionsMenu.topics();
-	TestSupport.expectEqual(6, topics.size(), "six topics");
+	TestSupport.expectEqual(5, topics.size(), "five topics");
 	for (var i = 0; i < topics.size(); i++) {
 		var topic = topics[i] as Array<ResourceId>;
 		var title = WatchUi.loadResource(topic[0]) as String;
