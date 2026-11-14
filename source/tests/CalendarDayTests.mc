@@ -7,10 +7,7 @@ function testCalendarDay(logger as Test.Logger) as Boolean {
 	var monday = TestSupport.sampleMonday();
 	var thursday = new CalendarDay(2026, 10, 8);
 	TestSupport.expectEqual(3, monday.daysUntil(thursday), "Monday to Thursday");
-	TestSupport.expectEqual(2, Recommender.daysOffBetween(monday, thursday), "two days off");
 	TestSupport.expectEqual(0, monday.compare(thursday.plusDays(-3)), "plusDays back to Monday");
-	TestSupport.expectEqual(0, Recommender.daysOffBetween(monday, monday), "same day");
-	TestSupport.expectEqual(0, Recommender.daysOffBetween(monday, monday.plusDays(1)), "next day");
 	TestSupport.expectEqual(2440588, CalendarDay.julianDay(1970, 1, 1), "unix epoch julian day");
 
 	var leap = new CalendarDay(2024, 2, 28).plusDays(1);

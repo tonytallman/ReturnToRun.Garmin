@@ -77,22 +77,22 @@ function testHistoryEditsOrderAndDelete(logger as Test.Logger) as Boolean {
 	logger.debug("history edits: order and delete");
 	var today = new CalendarDay(2026, 10, 24);
 	var progress = TestSupport.openStore(100).progress;
-	progress.addWorkout(today.plusDays(-2), 3, Rating.GOOD, today);
-	progress.addWorkout(today, 5, Rating.GOOD, today);
+	progress.addWorkout(today.plusDays(-2), 3, Rating.GOOD);
+	progress.addWorkout(today, 5, Rating.GOOD);
 	TestSupport.expectEqual(0, progress.lastAddedIndex(), "today's entry is newest");
-	progress.addWorkout(today.plusDays(-1), 4, Rating.OK, today);
+	progress.addWorkout(today.plusDays(-1), 4, Rating.OK);
 	TestSupport.expectEqual(1, progress.lastAddedIndex(), "a backdated entry sorts between");
-	progress.addWorkout(today.plusDays(-5), 1, Rating.GOOD, today);
+	progress.addWorkout(today.plusDays(-5), 1, Rating.GOOD);
 	TestSupport.expectEntry(progress.entryAt(0), 2026, 10, 24, 5, Rating.GOOD, "newest first");
 	TestSupport.expectEntry(progress.entryAt(1), 2026, 10, 23, 4, Rating.OK, "then yesterday");
 	TestSupport.expectEntry(progress.entryAt(2), 2026, 10, 22, 3, Rating.GOOD, "then two days ago");
 	TestSupport.expectEntry(progress.entryAt(3), 2026, 10, 19, 1, Rating.GOOD, "oldest last");
-	TestSupport.expectEqual(6, progress.recommend(today).workoutId, "Good on 5 recommends 6");
+	TestSupport.expectEqual(6, progress.recommend().workoutId, "Good on 5 recommends 6");
 	TestSupport.expectEqual(1, progress.warnings(today).size(), "already ran today");
 
 	// Deleting the newest entry re-derives the recommendation and warnings.
 	TestSupport.expectTrue(progress.deleteAt(0), "delete the newest");
-	TestSupport.expectEqual(4, progress.recommend(today).workoutId, "OK on 4 yesterday repeats 4");
+	TestSupport.expectEqual(4, progress.recommend().workoutId, "OK on 4 yesterday repeats 4");
 	TestSupport.expectEqual(0, progress.warnings(today).size(), "no run today any more");
 
 	// Delete this and older keeps only the newer entries.
@@ -102,7 +102,7 @@ function testHistoryEditsOrderAndDelete(logger as Test.Logger) as Boolean {
 	TestSupport.expectFalse(progress.deleteAtAndOlder(5), "out of range does nothing");
 	TestSupport.expectTrue(progress.deleteAtAndOlder(0), "delete the newest and older");
 	TestSupport.expectEqual(0, progress.size(), "empty");
-	TestSupport.expectEqual(1, progress.recommend(today).workoutId, "empty history recommends 1");
+	TestSupport.expectEqual(1, progress.recommend().workoutId, "empty history recommends 1");
 	return true;
 }
 
@@ -112,17 +112,17 @@ function testHistoryAddWithCap(logger as Test.Logger) as Boolean {
 	var today = new CalendarDay(2026, 10, 24);
 	var progress = TestSupport.openStore(3).progress;
 	TestSupport.expectFalse(progress.isTooOldToAdd(today.plusDays(-100)), "an empty history takes any date");
-	progress.addWorkout(today.plusDays(-3), 2, Rating.GOOD, today);
-	progress.addWorkout(today.plusDays(-2), 3, Rating.GOOD, today);
-	progress.addWorkout(today.plusDays(-1), 4, Rating.GOOD, today);
-	progress.addWorkout(today, 5, Rating.GOOD, today);
+	progress.addWorkout(today.plusDays(-3), 2, Rating.GOOD);
+	progress.addWorkout(today.plusDays(-2), 3, Rating.GOOD);
+	progress.addWorkout(today.plusDays(-1), 4, Rating.GOOD);
+	progress.addWorkout(today, 5, Rating.GOOD);
 	TestSupport.expectEqual(3, progress.size(), "stays at the cap");
 	TestSupport.expectEntry(progress.entryAt(2), 2026, 10, 22, 3, Rating.GOOD, "the oldest dropped");
 	TestSupport.expectTrue(progress.isTooOldToAdd(today.plusDays(-10)), "older than a full history is too old");
 	TestSupport.expectTrue(progress.isTooOldToAdd(today.plusDays(-3)), "the day before the oldest is too old");
 	TestSupport.expectFalse(progress.isTooOldToAdd(today.plusDays(-2)), "the oldest entry's day is not too old");
 	TestSupport.expectFalse(progress.isTooOldToAdd(today), "today is not too old");
-	TestSupport.expectFalse(progress.addWorkout(today.plusDays(-10), 1, Rating.GOOD, today), "older than a full history");
+	TestSupport.expectFalse(progress.addWorkout(today.plusDays(-10), 1, Rating.GOOD), "older than a full history");
 	TestSupport.expectEqual(-1, progress.lastAddedIndex(), "nothing added");
 	TestSupport.expectEqual(3, progress.size(), "still full");
 	TestSupport.expectEntry(progress.entryAt(2), 2026, 10, 22, 3, Rating.GOOD, "unchanged");
@@ -136,24 +136,24 @@ function testHistoryRatingChangeCompletesProgram(logger as Test.Logger) as Boole
 	var progress = TestSupport.openStore(100).progress;
 	progress.logWorkout(today.plusDays(-1), 39, Rating.GOOD);
 	progress.logWorkout(today, 40, Rating.OK);
-	TestSupport.expectFalse(progress.changeRating(1, Rating.GREAT, today), "an older entry never completes");
-	TestSupport.expectFalse(progress.changeRating(0, Rating.BAD, today), "Bad on 40 does not complete");
-	TestSupport.expectTrue(progress.changeRating(0, Rating.GOOD, today), "Good on the newest 40 completes");
+	TestSupport.expectFalse(progress.changeRating(1, Rating.GREAT), "an older entry never completes");
+	TestSupport.expectFalse(progress.changeRating(0, Rating.BAD), "Bad on 40 does not complete");
+	TestSupport.expectTrue(progress.changeRating(0, Rating.GOOD), "Good on the newest 40 completes");
 	TestSupport.expectEqual(Rating.GOOD, (progress.latest() as HistoryEntry).rating, "the rating changed");
 	TestSupport.expectFalse(progress.isProgramCompleteShown(), "detecting completion does not set the flag");
 	progress.markProgramCompleteShown();
-	TestSupport.expectFalse(progress.changeRating(0, Rating.GREAT, today), "shown once per program");
-	TestSupport.expectFalse(progress.changeRating(0, 9, today), "an invalid rating changes nothing");
-	TestSupport.expectFalse(progress.changeRating(5, Rating.GOOD, today), "no such entry");
+	TestSupport.expectFalse(progress.changeRating(0, Rating.GREAT), "shown once per program");
+	TestSupport.expectFalse(progress.changeRating(0, 9), "an invalid rating changes nothing");
+	TestSupport.expectFalse(progress.changeRating(5, Rating.GOOD), "no such entry");
 
 	// Adding: only an entry that becomes the newest can complete the program.
 	var added = TestSupport.openStore(100).progress;
 	added.logWorkout(today, 10, Rating.GOOD);
-	TestSupport.expectFalse(added.addWorkout(today.plusDays(-1), 40, Rating.GREAT, today), "a backdated 40 behind a newer entry");
-	TestSupport.expectTrue(added.addWorkout(today, 40, Rating.GOOD, today), "a newest 40 rated Good completes");
+	TestSupport.expectFalse(added.addWorkout(today.plusDays(-1), 40, Rating.GREAT), "a backdated 40 behind a newer entry");
+	TestSupport.expectTrue(added.addWorkout(today, 40, Rating.GOOD), "a newest 40 rated Good completes");
 	added.markProgramCompleteShown();
-	TestSupport.expectFalse(added.addWorkout(today, 40, Rating.GREAT, today), "still once per program");
-	TestSupport.expectFalse(added.addWorkout(today.plusDays(-3), 1, Rating.GOOD, today), "a backdated workout 1");
+	TestSupport.expectFalse(added.addWorkout(today, 40, Rating.GREAT), "still once per program");
+	TestSupport.expectFalse(added.addWorkout(today.plusDays(-3), 1, Rating.GOOD), "a backdated workout 1");
 	TestSupport.expectFalse(added.isProgramCompleteShown(), "still resets the flag, as before");
 	return true;
 }

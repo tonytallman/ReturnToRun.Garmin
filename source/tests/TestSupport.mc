@@ -21,7 +21,7 @@ module TestSupport {
 		return new Fixture(cap);
 	}
 
-	// Monday 5 October 2026. A run that day and Thursday 8 October is 2 days off.
+	// Monday 5 October 2026.
 	function sampleMonday() as CalendarDay {
 		return new CalendarDay(2026, 10, 5);
 	}
@@ -42,8 +42,8 @@ module TestSupport {
 		Test.assertMessage(actual == null, message);
 	}
 
-	function expectRecommendation(latest as HistoryEntry?, today as CalendarDay, workoutId as Number, complete as Boolean, message as String) as Void {
-		var result = Recommender.recommend(latest, today, 40);
+	function expectRecommendation(latest as HistoryEntry?, workoutId as Number, complete as Boolean, message as String) as Void {
+		var result = Recommender.recommend(latest, 40);
 		Test.assertEqualMessage(workoutId, result.workoutId, message);
 		Test.assertMessage(result.programComplete == complete, message + " complete");
 	}
