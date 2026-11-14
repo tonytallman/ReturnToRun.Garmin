@@ -28,6 +28,7 @@
     <string id="MinuteAbbrev">min</string>
     <string id="WithWalks">with walks</string>
     <string id="RecommendedMark">* </string>
+    <string id="GoToFirst">Go to #1</string>
     <string id="History">History</string>
     <string id="ClearHistory">Clear history</string>
     <string id="AddWorkout">Add workout</string>
@@ -52,7 +53,7 @@
     <string id="HelpProgramTitle">Program</string>
     <string id="HelpProgram">40 workouts of running and walking.|Each starts with a 5-minute warm-up walk and ends with a 5-minute cool-down walk.|Run at most once a day, 4 to 6 times a week.|Saved workouts sync to Garmin Connect as runs.||Check with your doctor before starting a running program.</string>
     <string id="HelpListTitle">Workout list</string>
-    <string id="HelpList">#1  R1 W1 &#215;3 means run 1 min, walk 1 min, 3 times.|No W: no walk.|No &#215;: once.|Second line: total time, including warm-up and cool-down.|* marks the recommended workout.</string>
+    <string id="HelpList">#1  R1 W1 &#215;3 means run 1 min, walk 1 min, 3 times.|No W: no walk.|No &#215;: once.|Second line: total time, including warm-up and cool-down.|* marks the recommended workout.|If the star is further down the list, Go to #1 appears just below it. Selecting that row jumps to workout 1.</string>
     <string id="HelpRatingsTitle">Ratings</string>
     <string id="HelpRatings">Rate how each workout felt. Your next workout:|Bad: back one.|OK: same one.|Good: next one.|Great: skip one.</string>
     <string id="HelpWarningsTitle">Warnings</string>

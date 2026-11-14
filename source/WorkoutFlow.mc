@@ -2,8 +2,8 @@ import Toybox.Lang;
 import Toybox.WatchUi;
 
 function openWorkoutList() as Void {
-	var view = new WorkoutListView(WatchUi.loadResource(Rez.Strings.Run) as String);
-	var delegate = new WorkoutListDelegate();
+	var view = new WorkoutListView(WatchUi.loadResource(Rez.Strings.Run) as String, true);
+	var delegate = new WorkoutListDelegate(view);
 	appServices().log.note("workout list");
 	WatchUi.pushView(view, delegate, WatchUi.SLIDE_LEFT);
 }

@@ -3,9 +3,12 @@ import Toybox.WatchUi;
 
 class WorkoutListView extends WatchUi.Menu2 {
 	var leaveTimer as LeaveTimer;
+	var firstWorkoutRow as Number = 0;
 
 	// Run uses this list, and so does History's Add workout with its own title.
-	function initialize(title as String) {
+	// includeFirstShortcut is true only for Run: a "Go to #1" row may sit just
+	// below the recommended workout so restarting is one scroll away.
+	function initialize(title as String, includeFirstShortcut as Boolean) {
 		Menu2.initialize({:title=>MenuTitle.of(title)});
 		leaveTimer = new LeaveTimer();
 
@@ -18,6 +21,8 @@ class WorkoutListView extends WatchUi.Menu2 {
 		if ((count > 0) && (focus >= count)) {
 			focus = count - 1;
 		}
+		var showShortcut = includeFirstShortcut && WorkoutListItems.includesFirstShortcut(focus);
+		var goToFirst = WatchUi.loadResource(Rez.Strings.GoToFirst) as String;
 
 		var runMark = WatchUi.loadResource(Rez.Strings.RunAbbrev) as String;
 		var walkMark = WatchUi.loadResource(Rez.Strings.WalkAbbrev) as String;
@@ -25,7 +30,7 @@ class WorkoutListView extends WatchUi.Menu2 {
 		var minuteWord = WatchUi.loadResource(Rez.Strings.MinuteAbbrev) as String;
 		var withWalksWord = WatchUi.loadResource(Rez.Strings.WithWalks) as String;
 		var marker = WatchUi.loadResource(Rez.Strings.RecommendedMark) as String;
-		var menuFocus = 0;
+		var menuFocus = WorkoutListItems.focus(count, focus);
 		var added = 0;
 
 		for (var index = 0; index < count; index++) {
@@ -34,21 +39,31 @@ class WorkoutListView extends WatchUi.Menu2 {
 				continue;
 			}
 			var workout = loaded as Workout;
+			if (index == 0) {
+				firstWorkoutRow = added;
+			}
 			var label = WorkoutListFormat.title(index + 1, workout.runSeconds, workout.walkSeconds, workout.repeatCount, runMark, walkMark, timesMark);
 			var withWalks = WorkoutListFormat.includesWalk(workout.walkSeconds, workout.repeatCount);
 			var total = WorkoutDuration.totalSeconds(workout);
 			var sub = WorkoutListFormat.subtitle(total, withWalks, minuteWord, withWalksWord);
 			var recommended = index == focus;
 			sub = WorkoutListFormat.withRecommendation(sub, recommended, marker);
-			if (recommended) {
-				menuFocus = added;
-			}
 			addItem(new WatchUi.MenuItem(label, sub, index, null));
 			added = added + 1;
+			if (showShortcut && (index == focus)) {
+				addItem(new WatchUi.MenuItem(goToFirst, null, WorkoutListItems.FIRST_SHORTCUT, null));
+				added = added + 1;
+			}
 		}
 		if (added > 0) {
 			setFocus(menuFocus);
 		}
+	}
+
+	// Moves the highlight to the real #1 row, so the user can see it and start it
+	// the same way as any other workout.
+	function focusFirst() as Void {
+		setFocus(firstWorkoutRow);
 	}
 
 	function onShow() as Void {

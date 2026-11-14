@@ -85,7 +85,7 @@ class AddDateDelegate extends WatchUi.BehaviorDelegate {
 
 	function onSelect() as Boolean {
 		var title = WatchUi.loadResource(Rez.Strings.WorkoutTitle) as String;
-		WatchUi.pushView(new WorkoutListView(title), new AddWorkoutDelegate(view.stepper.date()), WatchUi.SLIDE_LEFT);
+		WatchUi.pushView(new WorkoutListView(title, false), new AddWorkoutDelegate(view.stepper.date()), WatchUi.SLIDE_LEFT);
 		return true;
 	}
 }
